@@ -26,6 +26,8 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 import cs.BabyLasagna.Lasagna;
 
+import java.util.ArrayList;
+
 /** Super Mario Brothers-like very basic platformer, using a tile map built using <a href="https://www.mapeditor.org/">Tiled</a> and a
  * tileset and sprites by <a href="http://www.vickiwenderlich.com/">Vicky Wenderlich</a></p>
  *
@@ -42,7 +44,8 @@ public class Main extends InputAdapter implements ApplicationListener {
             return new Rectangle();
         }
     };
-    private final Array<Rectangle> tiles = new Array<Rectangle>();
+
+    private ArrayList<Entity> entities = new ArrayList<>();
 
     @Override
     public void create () {
@@ -81,7 +84,7 @@ public class Main extends InputAdapter implements ApplicationListener {
         renderer.render();
 
         // render the player
-        renderPlayer(deltaTime);
+        lasagna.render(deltaTime, renderer);
     }
 
     private void updatePlayer (float deltaTime) {
@@ -90,99 +93,26 @@ public class Main extends InputAdapter implements ApplicationListener {
         if (deltaTime > 0.1f)
             deltaTime = 0.1f;
 
+        lasagna.is_walking = false;
         if (Gdx.input.isKeyPressed(Keys.LEFT) || Gdx.input.isKeyPressed(Keys.A)) {
-            lasagna.velocity.x = -Lasagna.VELOCITY;
+            lasagna.velocity.x *= 1.0f - Lasagna.ACCELERATION;
+            lasagna.velocity.x -= Lasagna.ACCELERATION*Lasagna.MAX_VELOCITY;
+            lasagna.is_walking = true;
         }
 
         if (Gdx.input.isKeyPressed(Keys.RIGHT) || Gdx.input.isKeyPressed(Keys.D)) {
-            lasagna.velocity.x = Lasagna.VELOCITY;
+            lasagna.velocity.x *= 1.0f - Lasagna.ACCELERATION;
+            lasagna.velocity.x += Lasagna.ACCELERATION*Lasagna.MAX_VELOCITY;
+            lasagna.is_walking = true;
         }
 
-        if (Gdx.input.isKeyPressed(Keys.DOWN) || Gdx.input.isKeyPressed(Keys.S)) {
-            lasagna.velocity.y = -Lasagna.VELOCITY;
-        }
-
-        if (Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.W)) {
-            lasagna.velocity.y = Lasagna.VELOCITY;
-        }
-
-        // perform collision detection & response, on each axis, separately
-        // if the player is moving right, check the tiles to the right of it's
-        // right bounding box edge, otherwise check the ones to the left
-        Rectangle playerRect = rectPool.obtain();
-        playerRect.set(lasagna.position.x, lasagna.position.y, Lasagna.LAYER_WIDTH, Lasagna.LAYER_HEIGHT);
-        int startX, startY, endX, endY;
-        if (lasagna.velocity.x > 0) {
-            startX = endX = (int)(lasagna.position.x + Lasagna.LAYER_WIDTH + lasagna.velocity.x);
-        } else {
-            startX = endX = (int)(lasagna.position.x + lasagna.velocity.x);
-        }
-        startY = (int)(lasagna.position.y);
-        endY = (int)(lasagna.position.y + Lasagna.LAYER_HEIGHT);
-        getTiles(startX, startY, endX, endY, tiles);
-        playerRect.x += lasagna.velocity.x;
-        for (Rectangle tile : tiles) {
-            if (playerRect.overlaps(tile)) {
-                lasagna.velocity.x = 0;
-                break;
+        if (lasagna.standing_on != Entity.Ground.Air) {
+            if (Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.SPACE)) {
+                lasagna.velocity.y += Lasagna.JUMP_VELOCITY;
             }
         }
-        playerRect.x = lasagna.position.x;
 
-        // if the player is moving upwards, check the tiles to the top of its
-        // top bounding box edge, otherwise check the ones to the bottom
-        if (lasagna.velocity.y > 0) {
-            startY = endY = (int)(lasagna.position.y + Lasagna.LAYER_HEIGHT + lasagna.velocity.y);
-        } else {
-            startY = endY = (int)(lasagna.position.y + lasagna.velocity.y);
-        }
-        startX = (int)(lasagna.position.x);
-        endX = (int)(lasagna.position.x + Lasagna.LAYER_WIDTH);
-        getTiles(startX, startY, endX, endY, tiles);
-        playerRect.y += lasagna.velocity.y;
-        for (Rectangle tile : tiles) {
-            if (playerRect.overlaps(tile)) {
-                lasagna.velocity.y = 0;
-                break;
-            }
-        }
-        rectPool.free(playerRect);
-
-        // unscale the velocity by the inverse delta time and set
-        // the latest position
-        lasagna.position.add(lasagna.velocity);
-        lasagna.velocity.scl(1 / deltaTime);
-
-
-        lasagna.velocity.x *= 0;
-        lasagna.velocity.y *= 0;
-    }
-
-    private void getTiles (int startX, int startY, int endX, int endY, Array<Rectangle> tiles) {
-        TiledMapTileLayer layer = (TiledMapTileLayer)map.getLayers().get("walls");
-        rectPool.freeAll(tiles);
-        tiles.clear();
-        for (int y = startY; y <= endY; y++) {
-            for (int x = startX; x <= endX; x++) {
-                Cell cell = layer.getCell(x, y);
-                if (cell != null) {
-                    Rectangle rect = rectPool.obtain();
-                    rect.set(x, y, 1, 1);
-                    tiles.add(rect);
-                }
-            }
-        }
-    }
-
-    private void renderPlayer (float deltaTime) {
-        // TODO: based on the player state, get the animation frame
-        // Currently just use the original
-        TextureRegion frame = Lasagna.ANI_DEFAULT.getKeyFrame(0);
-
-        Batch batch = renderer.getBatch();
-        batch.begin();
-        batch.draw(frame, lasagna.position.x, lasagna.position.y, Lasagna.LAYER_WIDTH, Lasagna.LAYER_HEIGHT);
-        batch.end();
+        lasagna.update(deltaTime, map, entities);
     }
 
     @Override

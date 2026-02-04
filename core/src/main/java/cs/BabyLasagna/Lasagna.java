@@ -1,18 +1,15 @@
 package cs.BabyLasagna;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.utils.Array;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
-import cs.BabyLasagna.TiledUtils;
 
 public class Lasagna extends Entity {
 
@@ -48,12 +45,12 @@ public class Lasagna extends Entity {
     @Override
     // Handle movement and collisions
     public void update(float deltaTime, TiledMap map, ArrayList<Entity> entities) {
-//        velocity.y -= GRAVITY; // * deltaTime;
+        velocity.y -= GRAVITY; // * deltaTime;
 
-//        // Apply friction if sliding (not walking) on the ground
-//        if (!is_walking) {
-//            velocity.x *= (float) Math.pow(standing_on.get(), deltaTime);
-//        }
+        // Apply friction if sliding (not walking) on the ground
+        if (!is_walking) {
+            velocity.x *= (float) Math.pow(standing_on.get(), deltaTime);
+        }
 
         move_with_collisions(deltaTime, map, entities, velocity);
     }

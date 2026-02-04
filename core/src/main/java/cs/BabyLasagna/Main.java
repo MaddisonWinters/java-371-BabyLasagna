@@ -75,7 +75,7 @@ public class Main extends InputAdapter implements ApplicationListener {
         updatePlayer(deltaTime);
 
         // let the camera follow the player, x-axis only
-        camera.position.x = lasagna.position.x;
+        camera.position.x = lasagna.hitbox.x;
         camera.update();
 
         // set the TiledMapRenderer view based on what the

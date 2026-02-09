@@ -13,7 +13,7 @@ public abstract class Entity {
         Left, Right, // Up, Down
     }
 
-    static float GRAVITY = 1.4f;
+    static float GRAVITY = 48;
 
     // What fraction of speed is kept per-second in air
     static float NORMAL_DAMPING = 0.7f;
@@ -21,7 +21,7 @@ public abstract class Entity {
     enum Ground {
         Air(NORMAL_DAMPING),
         Slick(NORMAL_DAMPING*0.15f),
-        Normal(NORMAL_DAMPING*0.00004f),
+        Normal(NORMAL_DAMPING*0.00003f),
         Rough(0f),
         // Special
         Sheer(1.0f),
@@ -33,15 +33,13 @@ public abstract class Entity {
     }
 
     Rectangle hitbox = new Rectangle();
+    final Vector2 velocity = new Vector2();
     Ground standing_on = Ground.Normal;
 
     // Render the entity
     public abstract void render(float deltaTime, OrthogonalTiledMapRenderer renderer);
     // Handle movement and collisions
-    public abstract void update(float deltaTime, TiledMap map, ArrayList<Entity> entities);
-
-    // Moves the entity by a velocity vector
-    public void move_with_collisions(float deltaTime, TiledMap map, ArrayList<Entity> entities, Vector2 velocity) {
+    public void update(float deltaTime, TiledMap map, ArrayList<Entity> entities) {
         velocity.scl(deltaTime);// if the player is moving upwards, check the tiles to the top of its
 
         // Just variables

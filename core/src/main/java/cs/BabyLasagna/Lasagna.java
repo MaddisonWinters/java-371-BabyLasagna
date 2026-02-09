@@ -20,12 +20,11 @@ public class Lasagna extends Entity {
 
     // Constants
     static float LAYER_WIDTH, LAYER_HEIGHT;
-    static float MAX_VELOCITY = 15f;
+    static float MAX_VELOCITY = 8f;
     static float ACCELERATION = 0.08f; // Range [0,1]
-    static float JUMP_VELOCITY = 20f;
+    static float JUMP_VELOCITY = 16f;
 
     // Member values
-    final Vector2 velocity = new Vector2();
     Facing facing = Facing.Right;
     boolean is_walking = false;
 
@@ -49,14 +48,14 @@ public class Lasagna extends Entity {
     @Override
     // Handle movement and collisions
     public void update(float deltaTime, TiledMap map, ArrayList<Entity> entities) {
-        velocity.y -= GRAVITY; // * deltaTime;
+        velocity.y -= GRAVITY * deltaTime;
 
         // Apply friction if sliding (not walking) on the ground
         if (!is_walking) {
             velocity.x *= (float) Math.pow(standing_on.get(), deltaTime);
         }
 
-        move_with_collisions(deltaTime, map, entities, velocity);
+        super.update(deltaTime, map, entities);
     }
 
     // Initializes textures and related constants

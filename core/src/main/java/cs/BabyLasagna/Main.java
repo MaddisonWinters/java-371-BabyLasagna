@@ -24,26 +24,19 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.ScreenUtils;
 
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import cs.BabyLasagna.Lasagna;
 
 import java.util.ArrayList;
 
-/** Super Mario Brothers-like very basic platformer, using a tile map built using <a href="https://www.mapeditor.org/">Tiled</a> and a
- * tileset and sprites by <a href="http://www.vickiwenderlich.com/">Vicky Wenderlich</a></p>
- *
- * Shows simple platformer collision detection as well as on-the-fly map modifications through destructible blocks!
- * @author mzechner */
+
 public class Main extends InputAdapter implements ApplicationListener {
     private TiledMap map;
     private Lasagna lasagna;
     private OrthogonalTiledMapRenderer renderer;
     private OrthographicCamera camera;
-    private final Pool<Rectangle> rectPool = new Pool<Rectangle>() {
-        @Override
-        protected Rectangle newObject () {
-            return new Rectangle();
-        }
-    };
+    private final Vector2 viewport_size = new Vector2(20,15);
 
     private ArrayList<Entity> entities = new ArrayList<>();
 
@@ -55,7 +48,7 @@ public class Main extends InputAdapter implements ApplicationListener {
 
         // create an orthographic camera, shows us 30x20 units of the world
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 30, 20);
+        camera.setToOrtho(false, viewport_size.x, viewport_size.y);
         camera.update();
 
         // Initialize the player
@@ -75,6 +68,7 @@ public class Main extends InputAdapter implements ApplicationListener {
         updatePlayer(deltaTime);
 
         // let the camera follow the player, x-axis only
+        // TODO: Make camera follow x and y, follow more smoothly, bound location to avoid seeing out of the world
         camera.position.x = lasagna.hitbox.x;
         camera.update();
 
@@ -169,11 +163,21 @@ public class Main extends InputAdapter implements ApplicationListener {
 
     @Override
     public void resize(int width, int height) {
-        // If the window is minimized on a desktop (LWJGL3) platform, width and height are 0, which causes problems.
-        // In that case, we don't resize anything, and wait for the window to be a normal size before updating.
+        final int MAX_VIEWPORT_SIZE = 30;
+
+        // If the window is minimized on a desktop (LWJGL3) platform, width and height are 0
         if(width <= 0 || height <= 0) return;
 
-        // Resize your screen here. The parameters represent the new window size.
+        if (width < height) {
+            viewport_size.y = MAX_VIEWPORT_SIZE;
+            viewport_size.x = MAX_VIEWPORT_SIZE * ((float)width / (float)height);
+        }
+        else {
+            viewport_size.x = MAX_VIEWPORT_SIZE;
+            viewport_size.y = MAX_VIEWPORT_SIZE * ((float)height / (float)width);
+        }
+
+        camera.setToOrtho(false, viewport_size.x, viewport_size.y);
     }
 
     @Override

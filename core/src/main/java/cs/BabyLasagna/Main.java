@@ -93,27 +93,71 @@ public class Main extends InputAdapter implements ApplicationListener {
         if (deltaTime > 0.1f)
             deltaTime = 0.1f;
 
+        // --- COYOTE TIMER UPDATE ---
+        if (lasagna.standing_on != Entity.Ground.Air) {
+            // Player is grounded → reset timer
+            lasagna.coyoteTimer = lasagna.COYOTE_TIME;
+        } else {
+            // Player is airborne → count down
+            lasagna.coyoteTimer -= deltaTime;
+        }
+
         lasagna.is_walking = false;
+
         if (Gdx.input.isKeyPressed(Keys.LEFT) || Gdx.input.isKeyPressed(Keys.A)) {
             lasagna.velocity.x *= 1.0f - Lasagna.ACCELERATION;
-            lasagna.velocity.x -= Lasagna.ACCELERATION*Lasagna.MAX_VELOCITY;
+            lasagna.velocity.x -= Lasagna.ACCELERATION * Lasagna.MAX_VELOCITY;
             lasagna.is_walking = true;
         }
 
         if (Gdx.input.isKeyPressed(Keys.RIGHT) || Gdx.input.isKeyPressed(Keys.D)) {
             lasagna.velocity.x *= 1.0f - Lasagna.ACCELERATION;
-            lasagna.velocity.x += Lasagna.ACCELERATION*Lasagna.MAX_VELOCITY;
+            lasagna.velocity.x += Lasagna.ACCELERATION * Lasagna.MAX_VELOCITY;
             lasagna.is_walking = true;
         }
 
-        if (lasagna.standing_on != Entity.Ground.Air) {
-            if (Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.SPACE)) {
-                lasagna.velocity.y += Lasagna.JUMP_VELOCITY;
-            }
+        // --- COYOTE JUMP ---
+        boolean jumpPressed =
+            Gdx.input.isKeyPressed(Keys.UP) ||
+                Gdx.input.isKeyPressed(Keys.W) ||
+                Gdx.input.isKeyPressed(Keys.SPACE);
+
+        if (jumpPressed && lasagna.coyoteTimer > 0f) {
+            lasagna.velocity.y = Lasagna.JUMP_VELOCITY;
+            lasagna.coyoteTimer = 0f; // prevent double jumps during coyote window
         }
 
         lasagna.update(deltaTime, map, entities);
     }
+
+
+//    private void updatePlayer (float deltaTime) {
+//        if (deltaTime == 0) return;
+//
+//        if (deltaTime > 0.1f)
+//            deltaTime = 0.1f;
+//
+//        lasagna.is_walking = false;
+//        if (Gdx.input.isKeyPressed(Keys.LEFT) || Gdx.input.isKeyPressed(Keys.A)) {
+//            lasagna.velocity.x *= 1.0f - Lasagna.ACCELERATION;
+//            lasagna.velocity.x -= Lasagna.ACCELERATION*Lasagna.MAX_VELOCITY;
+//            lasagna.is_walking = true;
+//        }
+//
+//        if (Gdx.input.isKeyPressed(Keys.RIGHT) || Gdx.input.isKeyPressed(Keys.D)) {
+//            lasagna.velocity.x *= 1.0f - Lasagna.ACCELERATION;
+//            lasagna.velocity.x += Lasagna.ACCELERATION*Lasagna.MAX_VELOCITY;
+//            lasagna.is_walking = true;
+//        }
+//
+//        if (lasagna.standing_on != Entity.Ground.Air) {
+//            if (Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.SPACE)) {
+//                lasagna.velocity.y += Lasagna.JUMP_VELOCITY;
+//            }
+//        }
+//
+//        lasagna.update(deltaTime, map, entities);
+//    }
 
     @Override
     public void dispose () {

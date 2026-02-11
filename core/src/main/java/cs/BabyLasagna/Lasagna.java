@@ -28,6 +28,10 @@ public class Lasagna extends Entity {
     Facing facing = Facing.Right;
     boolean is_walking = false;
 
+    //Brian L: Added Physics Parameters
+    static final float COYOTE_TIME = 0.1f; // 100 ms feels good
+    float coyoteTimer = 0f;
+
     // Render the entity
     @Override
     public void render(float deltaTime, OrthogonalTiledMapRenderer renderer) {

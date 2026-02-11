@@ -20,16 +20,16 @@ public class Lasagna extends Entity {
 
     // Constants
     static float LAYER_WIDTH, LAYER_HEIGHT;
-    static float MAX_VELOCITY = 8f;
+    static float MAX_VELOCITY = 6f;
     static float ACCELERATION = 0.08f; // Range [0,1]
-    static float JUMP_VELOCITY = 16f;
+    static float JUMP_VELOCITY = 8.5f;
 
     // Member values
     Facing facing = Facing.Right;
     boolean is_walking = false;
 
     //Brian L: Added Physics Parameters
-    static final float COYOTE_TIME = 0.1f; // 100 ms feels good
+    static final float COYOTE_TIME = 0.075f; // 100 ms feels good
     float coyoteTimer = 0f;
 
     // Render the entity
@@ -60,8 +60,8 @@ public class Lasagna extends Entity {
 
     // Initializes textures and related constants
     public static void init() {
-        TEXTURE = new Texture("koalio.png");
-        REGIONS = TextureRegion.split(TEXTURE, 18, 26)[0];
+        TEXTURE = new Texture("lasagna_single.png");
+        REGIONS = TextureRegion.split(TEXTURE, 16, 16)[0];
         LAYER_WIDTH = 1/16f * REGIONS[0].getRegionWidth();
         LAYER_HEIGHT = 1/16f * REGIONS[0].getRegionHeight();
         ANI_DEFAULT = new Animation<>(0, REGIONS[0]);

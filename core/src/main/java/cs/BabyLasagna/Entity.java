@@ -13,15 +13,15 @@ public abstract class Entity {
         Left, Right, // Up, Down
     }
 
-    static float GRAVITY = 48;
+    static float GRAVITY = 32;
 
     // What fraction of speed is kept per-second in air
-    static float NORMAL_DAMPING = 0.7f;
+    static float NORMAL_DAMPING = 0.001f;
     // For types of ground that the player is standing on, use .get() to get the friction of the surface
     enum Ground {
         Air(NORMAL_DAMPING),
         Slick(NORMAL_DAMPING*0.15f),
-        Normal(NORMAL_DAMPING*0.00003f),
+        Normal(NORMAL_DAMPING*0.000001f),
         Rough(0f),
         // Special
         Sheer(1.0f),

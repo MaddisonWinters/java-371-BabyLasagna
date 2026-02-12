@@ -27,6 +27,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import cs.BabyLasagna.Player;
+import jdk.internal.foreign.ArenaAllocator;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -60,10 +61,10 @@ public class Main extends InputAdapter implements ApplicationListener {
 
         // Add a collectable cheese for testing
         entities.add(new Collectable(Collectable.Type.Cheese, 24, 3f));
-        entities.add(new LasagnaStack(26, 3f, true, true, 8));
+        entities.add(new LasagnaStack(26, 3f, true, true));
 
         // Create player
-        player = new Player(new Vector2(20,3));
+        player = new Player(20,3);
     }
 
     @Override
@@ -74,7 +75,9 @@ public class Main extends InputAdapter implements ApplicationListener {
         // get the delta time
         float deltaTime = Gdx.graphics.getDeltaTime();
 
-        // Remove old entities
+        // Create copy of entities array
+        ArrayList<Entity> entities_cpy = new ArrayList<>(entities);
+
         Iterator<Entity> it = entities.iterator();
         while (it.hasNext()) {
             Entity e = it.next();
@@ -82,9 +85,11 @@ public class Main extends InputAdapter implements ApplicationListener {
                 it.remove();
             }
             else {
-                e.update(deltaTime, map, entities);
+                e.update(deltaTime, map, entities_cpy);
             }
         }
+
+        entities = entities_cpy;
 
         // update the player (process input, collision detection, position update)
         updatePlayer(deltaTime);

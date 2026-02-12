@@ -13,7 +13,7 @@ public abstract class Entity {
         Left, Right, // Up, Down
     }
 
-    static float GRAVITY = 32;
+    static float GRAVITY = 48;
 
     // What fraction of speed is kept per-second in air
     static float NORMAL_DAMPING = 0.001f;

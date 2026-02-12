@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -38,6 +39,8 @@ public class Main extends InputAdapter implements ApplicationListener {
     private OrthographicCamera camera;
     private final Vector2 viewport_size = new Vector2(20,15);
 
+    public static Sound jump;
+
     private ArrayList<Entity> entities = new ArrayList<>();
 
     @Override
@@ -45,6 +48,9 @@ public class Main extends InputAdapter implements ApplicationListener {
         // load the map, set the unit scale to 1/16 (1 unit == 16 pixels)
         map = new TmxMapLoader().load("level1.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, 1 / 16f);
+
+        // load sounds
+        jump = Gdx.audio.newSound(Gdx.files.internal("jump.wav"));
 
         // create an orthographic camera, shows us 30x20 units of the world
         camera = new OrthographicCamera();
@@ -117,6 +123,7 @@ public class Main extends InputAdapter implements ApplicationListener {
                 Gdx.input.isKeyPressed(Keys.SPACE);
 
         if (jumpPressed && lasagna.coyoteTimer > 0f) {
+            jump.play(0.6f);
             lasagna.velocity.y = Lasagna.JUMP_VELOCITY;
             lasagna.coyoteTimer = 0f; // prevent double jumps during coyote window
         }
@@ -155,6 +162,7 @@ public class Main extends InputAdapter implements ApplicationListener {
 
     @Override
     public void dispose () {
+        jump.dispose();
     }
 
     @Override

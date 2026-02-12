@@ -33,28 +33,45 @@ public abstract class Entity {
     }
 
     Rectangle hitbox = new Rectangle();
-    final Vector2 velocity = new Vector2();
+    final Vector2 velocity = new Vector2(0,0);
     Ground standing_on = Ground.Normal;
+    private boolean isAlive = true;
+    protected boolean shouldDespawn = false;
 
     // Render the entity
     public abstract void render(float deltaTime, OrthogonalTiledMapRenderer renderer);
     // Handle movement and collisions
     public void update(float deltaTime, TiledMap map, ArrayList<Entity> entities) {
-        velocity.scl(deltaTime);// if the player is moving upwards, check the tiles to the top of its
+        apply_gravity(deltaTime);
+        apply_friction(deltaTime);
+        move_with_collisions(deltaTime, map, entities);
+    }
+
+    public void apply_friction(float deltaTime) {
+        velocity.x *= (float) Math.pow(standing_on.get(), deltaTime);
+    }
+
+    public void apply_gravity(float deltaTime) {
+        velocity.y -= GRAVITY * deltaTime;
+    }
+
+    public void move_with_collisions(float deltaTime, TiledMap map, ArrayList<Entity> entities) {
+        Vector2 vel_scl = velocity.cpy();
+        vel_scl.scl(deltaTime);
 
         // Just variables
         Array<Rectangle> tiles = new Array<>();
         int startX, startY, endX, endY;
 
         // Find relevant area
-        if (velocity.y > 0) {
-            startY = endY = (int)(hitbox.y + Lasagna.LAYER_HEIGHT + velocity.y);
+        if (vel_scl.y > 0) {
+            startY = endY = (int)(hitbox.y + Lasagna.LAYER_HEIGHT + vel_scl.y);
         } else {
-            startY = endY = (int)(hitbox.y + velocity.y);
+            startY = endY = (int)(hitbox.y + vel_scl.y);
         }
         startX = (int)(hitbox.x);
         endX = (int)(hitbox.x + Lasagna.LAYER_WIDTH);
-        hitbox.y += velocity.y;
+        hitbox.y += vel_scl.y;
 
         // Get tiles for relevant area
         tiles.clear();
@@ -65,7 +82,7 @@ public abstract class Entity {
         for (Rectangle tile : tiles) {
             if (hitbox.overlaps(tile)) {
                 // Align with tile edge
-                if (velocity.y < 0) {
+                if (vel_scl.y < 0) {
                     never_hit_ground = false;
                     standing_on = Ground.Normal; // TODO?: Some way to check what ground we're on and assign value accordingly
                     hitbox.y = tile.y + tile.height;
@@ -73,6 +90,7 @@ public abstract class Entity {
                 else {
                     hitbox.y = tile.y - hitbox.height - 0.001f;
                 }
+                vel_scl.y = 0;
                 velocity.y = 0;
                 break;
             }
@@ -80,14 +98,14 @@ public abstract class Entity {
         if (never_hit_ground) standing_on = Ground.Air;
 
         // Update relevant area
-        if (velocity.x > 0) {
-            startX = endX = (int)(hitbox.x + Lasagna.LAYER_WIDTH + velocity.x);
+        if (vel_scl.x > 0) {
+            startX = endX = (int)(hitbox.x + Lasagna.LAYER_WIDTH + vel_scl.x);
         } else {
-            startX = endX = (int)(hitbox.x + velocity.x);
+            startX = endX = (int)(hitbox.x + vel_scl.x);
         }
         startY = (int)(hitbox.y);
         endY = (int)(hitbox.y + Lasagna.LAYER_HEIGHT);
-        hitbox.x += velocity.x;
+        hitbox.x += vel_scl.x;
 
         // Get tiles for relevant area
         tiles.clear();
@@ -97,7 +115,7 @@ public abstract class Entity {
         for (Rectangle tile : tiles) {
             if (hitbox.overlaps(tile)) {
                 // Align with tile edge
-                if (velocity.x < 0) {
+                if (vel_scl.x < 0) {
                     hitbox.x = tile.x + tile.width;
                 }
                 else {
@@ -105,15 +123,27 @@ public abstract class Entity {
                     // Known issue: Sometimes jam into the tile when traveling this direction and
                     // end up getting shot into the floor
                 }
+                vel_scl.x = 0;
                 velocity.x = 0;
                 break;
             }
         }
 
         // Update position based on corrected velocity
-        hitbox.x += velocity.x;
-        hitbox.y += velocity.y;
-        // Un-scale velocity based on time interval
-        velocity.scl(1 / deltaTime);
+        hitbox.x += vel_scl.x;
+        hitbox.y += vel_scl.y;
     }
+
+    public void move_no_collisions(float deltaTime) {
+        Vector2 vel_scl = velocity.cpy();
+        vel_scl.scl(deltaTime);
+
+        // Update position based on corrected velocity
+        hitbox.x += vel_scl.x;
+        hitbox.y += vel_scl.y;
+    }
+
+    public void kill() { isAlive = false; }
+    public boolean isAlive() { return isAlive; }
+    public boolean shouldDespawn() { return shouldDespawn; }
 }

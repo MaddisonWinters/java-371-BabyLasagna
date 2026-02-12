@@ -9,6 +9,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 
+import java.text.CollationElementIterator;
 import java.util.ArrayList;
 
 public class Lasagna extends Entity {
@@ -45,17 +46,36 @@ public class Lasagna extends Entity {
         batch.end();
     }
 
-    @Override
     // Handle movement and collisions
+    @Override
+
     public void update(float deltaTime, TiledMap map, ArrayList<Entity> entities) {
-        velocity.y -= GRAVITY * deltaTime;
+        apply_gravity(deltaTime);
 
         // Apply friction if sliding (not walking) on the ground
         if (!is_walking) {
-            velocity.x *= (float) Math.pow(standing_on.get(), deltaTime);
+            apply_friction(deltaTime);
         }
 
-        super.update(deltaTime, map, entities);
+        move_with_collisions(deltaTime, map, entities);
+
+        // Check entity interactions
+        for (Entity e : entities) {
+            if (!e.isAlive()) continue;
+
+            // If Collectable c
+            if (e instanceof Collectable) {
+                Collectable c = (Collectable) e;
+                if (hitbox.overlaps(c.hitbox)) {
+                    // Collect item
+                    if (c.type == Collectable.Type.Cheese)
+                        System.out.println("Cheese");
+                    else
+                        System.out.println("Sauce");
+                    e.kill();
+                }
+            }
+        }
     }
 
     // Initializes textures and related constants

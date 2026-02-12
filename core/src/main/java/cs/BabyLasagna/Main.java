@@ -29,6 +29,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import cs.BabyLasagna.Lasagna;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 
 public class Main extends InputAdapter implements ApplicationListener {
@@ -51,8 +52,12 @@ public class Main extends InputAdapter implements ApplicationListener {
         camera.setToOrtho(false, viewport_size.x, viewport_size.y);
         camera.update();
 
+        // Add a collectable cheese for testing
+        entities.add(new Collectable(Collectable.Type.Cheese, 25, 3f));
+
         // Initialize the player
         Lasagna.init();
+        Collectable.init();
         lasagna = new Lasagna(new Vector2(20,3));
     }
 
@@ -63,6 +68,18 @@ public class Main extends InputAdapter implements ApplicationListener {
 
         // get the delta time
         float deltaTime = Gdx.graphics.getDeltaTime();
+
+        // Remove old entities
+        Iterator<Entity> it = entities.iterator();
+        while (it.hasNext()) {
+            Entity e = it.next();
+            if (e.shouldDespawn()) {
+                it.remove();
+            }
+            else {
+                e.update(deltaTime, map, entities);
+            }
+        }
 
         // update the player (process input, collision detection, position update)
         updatePlayer(deltaTime);
@@ -76,6 +93,11 @@ public class Main extends InputAdapter implements ApplicationListener {
         // camera sees, and render the map
         renderer.setView(camera);
         renderer.render();
+
+        // render all non-player entities
+        for (Entity e : entities) {
+            e.render(deltaTime, renderer);
+        }
 
         // render the player
         lasagna.render(deltaTime, renderer);
@@ -123,35 +145,6 @@ public class Main extends InputAdapter implements ApplicationListener {
 
         lasagna.update(deltaTime, map, entities);
     }
-
-
-//    private void updatePlayer (float deltaTime) {
-//        if (deltaTime == 0) return;
-//
-//        if (deltaTime > 0.1f)
-//            deltaTime = 0.1f;
-//
-//        lasagna.is_walking = false;
-//        if (Gdx.input.isKeyPressed(Keys.LEFT) || Gdx.input.isKeyPressed(Keys.A)) {
-//            lasagna.velocity.x *= 1.0f - Lasagna.ACCELERATION;
-//            lasagna.velocity.x -= Lasagna.ACCELERATION*Lasagna.MAX_VELOCITY;
-//            lasagna.is_walking = true;
-//        }
-//
-//        if (Gdx.input.isKeyPressed(Keys.RIGHT) || Gdx.input.isKeyPressed(Keys.D)) {
-//            lasagna.velocity.x *= 1.0f - Lasagna.ACCELERATION;
-//            lasagna.velocity.x += Lasagna.ACCELERATION*Lasagna.MAX_VELOCITY;
-//            lasagna.is_walking = true;
-//        }
-//
-//        if (lasagna.standing_on != Entity.Ground.Air) {
-//            if (Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.SPACE)) {
-//                lasagna.velocity.y += Lasagna.JUMP_VELOCITY;
-//            }
-//        }
-//
-//        lasagna.update(deltaTime, map, entities);
-//    }
 
     @Override
     public void dispose () {

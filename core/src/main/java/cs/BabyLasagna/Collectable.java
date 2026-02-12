@@ -29,10 +29,18 @@ public class Collectable extends Entity {
 
     public void render(float deltaTime, OrthogonalTiledMapRenderer renderer) {
         TextureRegion frame = ANI_DEFAULT.getKeyFrame(0);
+
         Batch batch = renderer.getBatch();
         batch.begin();
         batch.draw(frame, hitbox.x, hitbox.y, hitbox.width, hitbox.height);
         batch.end();
+    }
+
+    @Override
+    public void update(float deltaTime, TiledMap map, ArrayList<Entity> entities) {
+        apply_gravity(deltaTime);
+        apply_friction(deltaTime);
+        move_with_collisions(deltaTime, map, entities);
     }
 
     @Override

@@ -26,7 +26,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import cs.BabyLasagna.Lasagna;
+import cs.BabyLasagna.Player;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -34,7 +34,7 @@ import java.util.Iterator;
 
 public class Main extends InputAdapter implements ApplicationListener {
     private TiledMap map;
-    private Lasagna lasagna;
+    private Player player;
     private OrthogonalTiledMapRenderer renderer;
     private OrthographicCamera camera;
     private final Vector2 viewport_size = new Vector2(20,15);
@@ -52,13 +52,18 @@ public class Main extends InputAdapter implements ApplicationListener {
         camera.setToOrtho(false, viewport_size.x, viewport_size.y);
         camera.update();
 
-        // Add a collectable cheese for testing
-        entities.add(new Collectable(Collectable.Type.Cheese, 25, 3f));
 
-        // Initialize the player
-        Lasagna.init();
+        // Initialize textures for various entities
+        Player.init();
         Collectable.init();
-        lasagna = new Lasagna(new Vector2(20,3));
+        LasagnaStack.init();
+
+        // Add a collectable cheese for testing
+        entities.add(new Collectable(Collectable.Type.Cheese, 24, 3f));
+        entities.add(new LasagnaStack(26, 3f, true, true, 8));
+
+        // Create player
+        player = new Player(new Vector2(20,3));
     }
 
     @Override
@@ -86,7 +91,7 @@ public class Main extends InputAdapter implements ApplicationListener {
 
         // let the camera follow the player, x-axis only
         // TODO: Make camera follow x and y, follow more smoothly, bound location to avoid seeing out of the world
-        camera.position.x = lasagna.hitbox.x;
+        camera.position.x = player.hitbox.x;
         camera.update();
 
         // set the TiledMapRenderer view based on what the
@@ -100,7 +105,7 @@ public class Main extends InputAdapter implements ApplicationListener {
         }
 
         // render the player
-        lasagna.render(deltaTime, renderer);
+        player.render(deltaTime, renderer);
     }
 
     private void updatePlayer (float deltaTime) {
@@ -110,26 +115,26 @@ public class Main extends InputAdapter implements ApplicationListener {
             deltaTime = 0.1f;
 
         // --- COYOTE TIMER UPDATE ---
-        if (lasagna.standing_on != Entity.Ground.Air) {
+        if (player.standing_on != Entity.Ground.Air) {
             // Player is grounded → reset timer
-            lasagna.coyoteTimer = lasagna.COYOTE_TIME;
+            player.coyoteTimer = Player.COYOTE_TIME;
         } else {
             // Player is airborne → count down
-            lasagna.coyoteTimer -= deltaTime;
+            player.coyoteTimer -= deltaTime;
         }
 
-        lasagna.is_walking = false;
+        player.is_walking = false;
 
         if (Gdx.input.isKeyPressed(Keys.LEFT) || Gdx.input.isKeyPressed(Keys.A)) {
-            lasagna.velocity.x *= 1.0f - Lasagna.ACCELERATION;
-            lasagna.velocity.x -= Lasagna.ACCELERATION * Lasagna.MAX_VELOCITY;
-            lasagna.is_walking = true;
+            player.velocity.x *= 1.0f - Player.ACCELERATION;
+            player.velocity.x -= Player.ACCELERATION * Player.MAX_VELOCITY;
+            player.is_walking = true;
         }
 
         if (Gdx.input.isKeyPressed(Keys.RIGHT) || Gdx.input.isKeyPressed(Keys.D)) {
-            lasagna.velocity.x *= 1.0f - Lasagna.ACCELERATION;
-            lasagna.velocity.x += Lasagna.ACCELERATION * Lasagna.MAX_VELOCITY;
-            lasagna.is_walking = true;
+            player.velocity.x *= 1.0f - Player.ACCELERATION;
+            player.velocity.x += Player.ACCELERATION * Player.MAX_VELOCITY;
+            player.is_walking = true;
         }
 
         // --- COYOTE JUMP ---
@@ -138,12 +143,12 @@ public class Main extends InputAdapter implements ApplicationListener {
                 Gdx.input.isKeyPressed(Keys.W) ||
                 Gdx.input.isKeyPressed(Keys.SPACE);
 
-        if (jumpPressed && lasagna.coyoteTimer > 0f) {
-            lasagna.velocity.y = Lasagna.JUMP_VELOCITY;
-            lasagna.coyoteTimer = 0f; // prevent double jumps during coyote window
+        if (jumpPressed && player.coyoteTimer > 0f) {
+            player.velocity.y = Player.JUMP_VELOCITY;
+            player.coyoteTimer = 0f; // prevent double jumps during coyote window
         }
 
-        lasagna.update(deltaTime, map, entities);
+        player.update(deltaTime, map, entities);
     }
 
     @Override

@@ -65,12 +65,12 @@ public abstract class Entity {
 
         // Find relevant area
         if (vel_scl.y > 0) {
-            startY = endY = (int)(hitbox.y + Lasagna.LAYER_HEIGHT + vel_scl.y);
+            startY = endY = (int)(hitbox.y + hitbox.height + vel_scl.y);
         } else {
             startY = endY = (int)(hitbox.y + vel_scl.y);
         }
         startX = (int)(hitbox.x);
-        endX = (int)(hitbox.x + Lasagna.LAYER_WIDTH);
+        endX = (int)(hitbox.x + hitbox.width);
         hitbox.y += vel_scl.y;
 
         // Get tiles for relevant area
@@ -99,12 +99,12 @@ public abstract class Entity {
 
         // Update relevant area
         if (vel_scl.x > 0) {
-            startX = endX = (int)(hitbox.x + Lasagna.LAYER_WIDTH + vel_scl.x);
+            startX = endX = (int)(hitbox.x + hitbox.width + vel_scl.x);
         } else {
             startX = endX = (int)(hitbox.x + vel_scl.x);
         }
         startY = (int)(hitbox.y);
-        endY = (int)(hitbox.y + Lasagna.LAYER_HEIGHT);
+        endY = (int)(hitbox.y + hitbox.height);
         hitbox.x += vel_scl.x;
 
         // Get tiles for relevant area

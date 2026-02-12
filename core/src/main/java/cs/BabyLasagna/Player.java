@@ -9,10 +9,9 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 
-import java.text.CollationElementIterator;
 import java.util.ArrayList;
 
-public class Lasagna extends Entity {
+public class Player extends Entity {
 
     // Textures etc.
     static Texture TEXTURE;
@@ -87,12 +86,12 @@ public class Lasagna extends Entity {
         ANI_DEFAULT = new Animation<>(0, REGIONS[0]);
     }
 
-    public Lasagna(Vector2 start_pos) {
+    public Player(Vector2 start_pos) {
         velocity.set(0,0);
         hitbox.set(start_pos.x, start_pos.y, LAYER_WIDTH, LAYER_HEIGHT);
     }
 
-    public Lasagna(float start_x, float start_y) {
+    public Player(float start_x, float start_y) {
         velocity.set(0,0);
         hitbox.set(start_x, start_y, LAYER_WIDTH, LAYER_HEIGHT);
     }

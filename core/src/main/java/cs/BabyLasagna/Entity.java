@@ -145,5 +145,6 @@ public abstract class Entity {
 
     public void kill() { isAlive = false; }
     public boolean isAlive() { return isAlive; }
+    public void makeDespawn() { shouldDespawn = true; }
     public boolean shouldDespawn() { return shouldDespawn; }
 }

@@ -36,7 +36,7 @@ public class LasagnaStack extends Entity {
 
 
     static final float SPLIT_VELOCITY = 1.5f;
-    static final float SPLIT_FORCE = 0.5f;
+    static final float SPLIT_FORCE = 0.8f;
 
     static final int WIDTH_P = 16;
     static final int HEIGHT_P = 14;
@@ -49,9 +49,10 @@ public class LasagnaStack extends Entity {
     static final float HEAD_HEIGHT  = HEAD_HEIGHT_P/16f;
     static final float LEG_HEIGHT   = LEG_HEIGHT_P/16f;
 
-    ArrayList<LType> layers = new ArrayList<>();
-    boolean hasLegs = false;
-    boolean hasHead = false;
+    protected ArrayList<LType> layers = new ArrayList<>();
+    protected boolean hasLegs = false;
+    protected boolean hasHead = false;
+    protected float age = 0f;
 
     public void render(float deltaTime, OrthogonalTiledMapRenderer renderer) {
         Batch batch = renderer.getBatch();
@@ -80,6 +81,12 @@ public class LasagnaStack extends Entity {
     }
 
     @Override
+    public void update(float deltaTime, TiledMap map, ArrayList<Entity> entities) {
+        age += deltaTime;
+        super.update(deltaTime, map, entities);
+    }
+
+    @Override
     public void move_with_collisions(float deltaTime, TiledMap map, ArrayList<Entity> entities) {
         Vector2 vel_scl = velocity.cpy();
         vel_scl.scl(deltaTime);
@@ -94,6 +101,7 @@ public class LasagnaStack extends Entity {
             )
         );
         boolean hasXCollide = false;
+        boolean canSplit = (size() > 2) && (Math.abs(velocity.x) > SPLIT_VELOCITY && age > 0.5f);
 
         // Find relevant area
         if (vel_scl.y > 0) {
@@ -155,7 +163,7 @@ public class LasagnaStack extends Entity {
                 }
 
                 hasXCollide = true;
-                if (Math.abs(velocity.x) < SPLIT_VELOCITY) continue;
+                if (!canSplit) continue;
 
                 float collide_top = getSplitLocation(tile.y + tile.height);
                 float collide_bot = getSplitLocation(tile.y);
@@ -176,20 +184,26 @@ public class LasagnaStack extends Entity {
         }
 
         if (hasXCollide) {
+            if (!canSplit) {
+                velocity.x = 0;
+                return;
+            }
             int splitAt = 0;
-            boolean stopUpper = xcollide_overlap.get(0);
+            int xcolLast = xcollide_overlap.size() - 1;
+            boolean stopUpper = xcollide_overlap.get(xcolLast);
 
             int i;
-            for (i = 1; i < xcollide_overlap.size(); ++i) {
+            for (i = xcolLast-1; i > 0; --i) {
                 if (xcollide_overlap.get(i) != stopUpper) {
+                    System.out.println(i);
                     splitAt = i;
-                    i=-1;
+                    i=xcolLast;
                     break;
                 }
             }
 
             // If never found a split location, don't split
-            if (i != -1) {
+            if (i != xcolLast) {
                 velocity.x = 0;
                 return;
             }
@@ -208,6 +222,7 @@ public class LasagnaStack extends Entity {
                 velocity.y += SPLIT_FORCE;
                 lower.velocity.y -= SPLIT_FORCE;
                 entities.add(lower);
+                age = 0;
             }
         }
     }
@@ -254,7 +269,8 @@ public class LasagnaStack extends Entity {
 
     // Returns the Lasagna stack containing legs
     // li is the index of the lowest layer kept by the upper section
-    public LasagnaStack splitAt(int li) {
+    protected LasagnaStack splitAt(int li) {
+        if (size() < 3) return null;
         LasagnaStack bottom;
 
         int old_size = size();
@@ -269,7 +285,7 @@ public class LasagnaStack extends Entity {
 
             bottom = new LasagnaStack(
                 hitbox.x, hitbox.y,
-                false, hasLegs
+                false, true
             );
         }
         // Lose some layers
@@ -342,6 +358,20 @@ public class LasagnaStack extends Entity {
             return layers.size()+2;
         }
         return height;
+    }
+
+    protected void growLegs() {
+        if (layers.size() <= 0 || hasLegs) return;
+        layers.remove(0);
+        hasLegs = true;
+        updateHitbox();
+    }
+
+    protected void growHead() {
+        if (layers.size() <= 0 || hasHead) return;
+        layers.remove(layers.size()-1);
+        hasHead = true;
+        updateHitbox();
     }
 
     public int size() { return layers.size() + (hasLegs?1:0) + (hasHead?1:0); }

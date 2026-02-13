@@ -41,6 +41,7 @@ public class Main extends InputAdapter implements ApplicationListener {
     private final Vector2 viewport_size = new Vector2(20,15);
 
     private ArrayList<Entity> entities = new ArrayList<>();
+    private boolean jumpWasPressed = false;
 
     @Override
     public void create () {
@@ -59,10 +60,6 @@ public class Main extends InputAdapter implements ApplicationListener {
         Collectable.init();
         LasagnaStack.init();
 
-        // Add a collectable cheese for testing
-        entities.add(new Collectable(Collectable.Type.Cheese, 24, 3f));
-        entities.add(new LasagnaStack(26, 3f, true, true));
-
         // Create player
         player = new Player(20,3);
     }
@@ -76,17 +73,21 @@ public class Main extends InputAdapter implements ApplicationListener {
         float deltaTime = Gdx.graphics.getDeltaTime();
 
         // Create copy of entities array
-        ArrayList<Entity> entities_cpy = new ArrayList<>(entities);
-
+        ArrayList<Entity> entities_cpy = entities;
         Iterator<Entity> it = entities.iterator();
+
+        // Despawn entities
+        while(it.hasNext()) {
+            Entity e = it.next();
+            if (e.shouldDespawn()) it.remove();
+        }
+
+        entities = entities_cpy;
+        it = entities.iterator();
+
         while (it.hasNext()) {
             Entity e = it.next();
-            if (e.shouldDespawn()) {
-                it.remove();
-            }
-            else {
-                e.update(deltaTime, map, entities_cpy);
-            }
+            e.update(deltaTime, map, entities_cpy);
         }
 
         entities = entities_cpy;
@@ -152,6 +153,12 @@ public class Main extends InputAdapter implements ApplicationListener {
             player.velocity.y = Player.JUMP_VELOCITY;
             player.coyoteTimer = 0f; // prevent double jumps during coyote window
         }
+
+        if (!jumpWasPressed && jumpPressed && player.standing_on == Entity.Ground.Air) {
+            LasagnaStack dropped = player.extraJump();
+            if (dropped != null) entities.add(dropped);
+        }
+        jumpWasPressed = jumpPressed;
 
         player.update(deltaTime, map, entities);
     }

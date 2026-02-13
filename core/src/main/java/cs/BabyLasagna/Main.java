@@ -27,14 +27,16 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import cs.BabyLasagna.Lasagna;
+import cs.BabyLasagna.Player;
+import jdk.internal.foreign.ArenaAllocator;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 
 public class Main extends InputAdapter implements ApplicationListener {
     private TiledMap map;
-    private Lasagna lasagna;
+    private Player player;
     private OrthogonalTiledMapRenderer renderer;
     private OrthographicCamera camera;
     private final Vector2 viewport_size = new Vector2(20,15);
@@ -42,6 +44,7 @@ public class Main extends InputAdapter implements ApplicationListener {
     public static Sound jump;
 
     private ArrayList<Entity> entities = new ArrayList<>();
+    private boolean jumpWasPressed = false;
 
     @Override
     public void create () {
@@ -57,9 +60,14 @@ public class Main extends InputAdapter implements ApplicationListener {
         camera.setToOrtho(false, viewport_size.x, viewport_size.y);
         camera.update();
 
-        // Initialize the player
-        Lasagna.init();
-        lasagna = new Lasagna(new Vector2(20,3));
+
+        // Initialize textures for various entities
+        Player.init();
+        Collectable.init();
+        LasagnaStack.init();
+
+        // Create player
+        player = new Player(20,3);
     }
 
     @Override
@@ -70,12 +78,32 @@ public class Main extends InputAdapter implements ApplicationListener {
         // get the delta time
         float deltaTime = Gdx.graphics.getDeltaTime();
 
+        // Create copy of entities array
+        ArrayList<Entity> entities_cpy = entities;
+        Iterator<Entity> it = entities.iterator();
+
+        // Despawn entities
+        while(it.hasNext()) {
+            Entity e = it.next();
+            if (e.shouldDespawn()) it.remove();
+        }
+
+        entities = entities_cpy;
+        it = entities.iterator();
+
+        while (it.hasNext()) {
+            Entity e = it.next();
+            e.update(deltaTime, map, entities_cpy);
+        }
+
+        entities = entities_cpy;
+
         // update the player (process input, collision detection, position update)
         updatePlayer(deltaTime);
 
         // let the camera follow the player, x-axis only
         // TODO: Make camera follow x and y, follow more smoothly, bound location to avoid seeing out of the world
-        camera.position.x = lasagna.hitbox.x;
+        camera.position.x = player.hitbox.x;
         camera.update();
 
         // set the TiledMapRenderer view based on what the
@@ -83,8 +111,13 @@ public class Main extends InputAdapter implements ApplicationListener {
         renderer.setView(camera);
         renderer.render();
 
+        // render all non-player entities
+        for (Entity e : entities) {
+            e.render(deltaTime, renderer);
+        }
+
         // render the player
-        lasagna.render(deltaTime, renderer);
+        player.render(deltaTime, renderer);
     }
 
     private void updatePlayer (float deltaTime) {
@@ -94,26 +127,26 @@ public class Main extends InputAdapter implements ApplicationListener {
             deltaTime = 0.1f;
 
         // --- COYOTE TIMER UPDATE ---
-        if (lasagna.standing_on != Entity.Ground.Air) {
+        if (player.standing_on != Entity.Ground.Air) {
             // Player is grounded → reset timer
-            lasagna.coyoteTimer = lasagna.COYOTE_TIME;
+            player.coyoteTimer = Player.COYOTE_TIME;
         } else {
             // Player is airborne → count down
-            lasagna.coyoteTimer -= deltaTime;
+            player.coyoteTimer -= deltaTime;
         }
 
-        lasagna.is_walking = false;
+        player.is_walking = false;
 
         if (Gdx.input.isKeyPressed(Keys.LEFT) || Gdx.input.isKeyPressed(Keys.A)) {
-            lasagna.velocity.x *= 1.0f - Lasagna.ACCELERATION;
-            lasagna.velocity.x -= Lasagna.ACCELERATION * Lasagna.MAX_VELOCITY;
-            lasagna.is_walking = true;
+            player.velocity.x *= 1.0f - Player.ACCELERATION;
+            player.velocity.x -= Player.ACCELERATION * Player.MAX_VELOCITY;
+            player.is_walking = true;
         }
 
         if (Gdx.input.isKeyPressed(Keys.RIGHT) || Gdx.input.isKeyPressed(Keys.D)) {
-            lasagna.velocity.x *= 1.0f - Lasagna.ACCELERATION;
-            lasagna.velocity.x += Lasagna.ACCELERATION * Lasagna.MAX_VELOCITY;
-            lasagna.is_walking = true;
+            player.velocity.x *= 1.0f - Player.ACCELERATION;
+            player.velocity.x += Player.ACCELERATION * Player.MAX_VELOCITY;
+            player.is_walking = true;
         }
 
         // --- COYOTE JUMP ---
@@ -122,43 +155,20 @@ public class Main extends InputAdapter implements ApplicationListener {
                 Gdx.input.isKeyPressed(Keys.W) ||
                 Gdx.input.isKeyPressed(Keys.SPACE);
 
-        if (jumpPressed && lasagna.coyoteTimer > 0f) {
+        if (jumpPressed && player.coyoteTimer > 0f) {
             jump.play(0.6f);
-            lasagna.velocity.y = Lasagna.JUMP_VELOCITY;
-            lasagna.coyoteTimer = 0f; // prevent double jumps during coyote window
+            player.velocity.y = Player.JUMP_VELOCITY;
+            player.coyoteTimer = 0f; // prevent double jumps during coyote window
         }
 
-        lasagna.update(deltaTime, map, entities);
+        if (!jumpWasPressed && jumpPressed && player.standing_on == Entity.Ground.Air) {
+            LasagnaStack dropped = player.extraJump();
+            if (dropped != null) entities.add(dropped);
+        }
+        jumpWasPressed = jumpPressed;
+
+        player.update(deltaTime, map, entities);
     }
-
-
-//    private void updatePlayer (float deltaTime) {
-//        if (deltaTime == 0) return;
-//
-//        if (deltaTime > 0.1f)
-//            deltaTime = 0.1f;
-//
-//        lasagna.is_walking = false;
-//        if (Gdx.input.isKeyPressed(Keys.LEFT) || Gdx.input.isKeyPressed(Keys.A)) {
-//            lasagna.velocity.x *= 1.0f - Lasagna.ACCELERATION;
-//            lasagna.velocity.x -= Lasagna.ACCELERATION*Lasagna.MAX_VELOCITY;
-//            lasagna.is_walking = true;
-//        }
-//
-//        if (Gdx.input.isKeyPressed(Keys.RIGHT) || Gdx.input.isKeyPressed(Keys.D)) {
-//            lasagna.velocity.x *= 1.0f - Lasagna.ACCELERATION;
-//            lasagna.velocity.x += Lasagna.ACCELERATION*Lasagna.MAX_VELOCITY;
-//            lasagna.is_walking = true;
-//        }
-//
-//        if (lasagna.standing_on != Entity.Ground.Air) {
-//            if (Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.SPACE)) {
-//                lasagna.velocity.y += Lasagna.JUMP_VELOCITY;
-//            }
-//        }
-//
-//        lasagna.update(deltaTime, map, entities);
-//    }
 
     @Override
     public void dispose () {

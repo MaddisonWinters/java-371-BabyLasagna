@@ -7,8 +7,10 @@ import cs.BabyLasagna.GameObj.Player;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+import java.rmi.server.UID;
+
 public class Game {
-    private static final float MAX_VIEWPORT_SIZE=16;
+    private static final float MAX_VIEWPORT_SIZE=12;
     public static final int PIXELS_PER_TILE=16;
 
     private final OrthographicCamera camera;
@@ -22,6 +24,8 @@ public class Game {
 
     // Renders map and all objects to `batch`
     public void render(float deltaTime, SpriteBatch batch) {
+        // camera.position.set(...)
+        camera.update();
         batch.setProjectionMatrix(camera.combined);
 
         batch.begin();
@@ -46,8 +50,7 @@ public class Game {
     public Game(String level) {
         camera = new OrthographicCamera();
         updateViewport(1,1);
-        player = new Player(0,0);
-        player.setVelocity(new Vector2(0.5f,0.5f)); // For testing
+        player = new Player(1,1);
     }
 
     public void dispose() {}

@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.math.Rectangle;
+
 
 import javax.naming.ldap.ExtendedRequest;
 import java.rmi.server.UID;
@@ -15,7 +17,12 @@ public class Player extends GameObj {
         ///  Constants
     private static final float  WIDTH=16/(float)(Game.PIXELS_PER_TILE),
                                 HEIGHT=18/(float)(Game.PIXELS_PER_TILE);
+    //new 2/21-----------------------------
+    private static final float GRAVITY = -20f;
+    private static final float JUMP_FORCE = 8f;
 
+    private boolean grounded = false;
+    //---------------------------------------
     private static final Texture texture;
 
     private static final UIHandler uidata = UIHandler.getUI();
@@ -32,14 +39,62 @@ public class Player extends GameObj {
     @Override
     public void update(float deltaTime) {
         uidata.update();
-        velocity.set(uidata.getMoveVector());
-        velocity.scl(6f);
+        //new 2/21------------------------------
 
+        velocity.x = uidata.getMoveXDir() * 6f;
+
+        // Jump (only if grounded)
+        if (uidata.jump_pressed && grounded) {
+            velocity.y = JUMP_FORCE;
+            grounded = false; // prevent double jump
+        }
+
+        velocity.y += GRAVITY * deltaTime;
+
+        hitbox.x += velocity.x * deltaTime;
+
+        hitbox.y += velocity.y * deltaTime;
+        //------------------------------------
+/*
         Vector2 vel_scl = new Vector2(velocity);
         vel_scl.scl(deltaTime);
         hitbox.x += vel_scl.x;
         hitbox.y += vel_scl.y;
+ */
     }
+
+    //new 2/21----------------------------------
+    public void resolveCollision(Rectangle tile) {
+        if (!hitbox.overlaps(tile)) return;
+
+        float dx = (hitbox.x + hitbox.width/2f) - (tile.x + tile.width/2f);
+        float dy = (hitbox.y + hitbox.height/2f) - (tile.y + tile.height/2f);
+
+        float combinedHalfWidths = (hitbox.width + tile.width) / 2f;
+        float combinedHalfHeights = (hitbox.height + tile.height) / 2f;
+
+        float overlapX = combinedHalfWidths - Math.abs(dx);
+        float overlapY = combinedHalfHeights - Math.abs(dy);
+
+        if (overlapX < overlapY) {
+            if (dx > 0)
+                hitbox.x += overlapX;
+            else
+                hitbox.x -= overlapX;
+
+            velocity.x = 0;
+        } else {
+            if (dy > 0) {
+                hitbox.y += overlapY;
+                grounded = true;
+            } else {
+                hitbox.y -= overlapY;
+            }
+
+            velocity.y = 0;
+        }
+    }
+    //-----------------------------
 
     public Player(float x, float y) {
         super(x, y, WIDTH, HEIGHT);

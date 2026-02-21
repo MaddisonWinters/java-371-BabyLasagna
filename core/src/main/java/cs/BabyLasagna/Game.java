@@ -4,8 +4,10 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import cs.BabyLasagna.GameObj.Player;
-
+import com.badlogic.gdx.math.Rectangle;
+import java.util.ArrayList;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import java.rmi.server.UID;
 
@@ -18,8 +20,24 @@ public class Game {
 
     private final Player player;
 
+    //new 2/21-----------------------------
+    private final ArrayList<Rectangle> testTiles = new ArrayList<>();
+    private final ShapeRenderer shapeRenderer = new ShapeRenderer();
+    //---------------
     public void update(float deltaTime) {
         player.update(deltaTime);
+        for (Rectangle tile : testTiles) {
+            player.resolveCollision(tile);
+        }
+
+        //camera.position.set(player.getX(), player.getY(), 0);
+        //new----------------------
+        camera.position.set(
+            player.getX() + player.getHitbox().width / 2f,
+            player.getY() + player.getHitbox().height / 2f,
+            0
+        );
+        //----------------------------
     }
 
     // Renders map and all objects to `batch`
@@ -27,6 +45,19 @@ public class Game {
         // camera.position.set(...)
         camera.update();
         batch.setProjectionMatrix(camera.combined);
+
+        //new-------------------
+        // --- Draw rectangles (tiles) ---
+        shapeRenderer.setProjectionMatrix(camera.combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(1, 1, 1, 1); // white
+
+        for (Rectangle tile : testTiles) {
+            shapeRenderer.rect(tile.x, tile.y, tile.width, tile.height);
+        }
+
+        shapeRenderer.end();
+        //-----------------------
 
         batch.begin();
         player.render(deltaTime, batch);
@@ -51,6 +82,12 @@ public class Game {
         camera = new OrthographicCamera();
         updateViewport(1,1);
         player = new Player(1,1);
+
+        //new 2/21----------------------
+        testTiles.add(new Rectangle(0,0,10,1));   // ground
+        testTiles.add(new Rectangle(4,1,1,2));    // wall
+        testTiles.add(new Rectangle(2,2,3,0.5f)); // platform
+        //--------------------
     }
 
     public void dispose() {}

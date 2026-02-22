@@ -43,12 +43,11 @@ public class Player extends GameObj {
 
         velocity.x = uidata.getMoveXDir() * 6f;
 
-        // Jump (only if grounded)
+        // Jump (only if grounded/on ground)
         if (uidata.jump_pressed && grounded) {
             velocity.y = JUMP_FORCE;
-            grounded = false; // prevent double jump
+            grounded = false;
         }
-
         velocity.y += GRAVITY * deltaTime;
 
         hitbox.x += velocity.x * deltaTime;
@@ -76,22 +75,26 @@ public class Player extends GameObj {
         float overlapX = combinedHalfWidths - Math.abs(dx);
         float overlapY = combinedHalfHeights - Math.abs(dy);
 
-        if (overlapX < overlapY) {
-            if (dx > 0)
-                hitbox.x += overlapX;
-            else
-                hitbox.x -= overlapX;
+        if (velocity.y < -0) {
 
-            velocity.x = 0;
-        } else {
             if (dy > 0) {
-                hitbox.y += overlapY;
+                hitbox.y = tile.y + tile.height;
                 grounded = true;
             } else {
-                hitbox.y -= overlapY;
+                hitbox.y = tile.y - hitbox.height;
             }
 
             velocity.y = 0;
+
+        } else {
+
+            // Only resolve horizontal if no vertical motion
+            if (dx > 0)
+                hitbox.x = tile.x + tile.width;
+            else
+                hitbox.x = tile.x - hitbox.width;
+
+            velocity.x = 0;
         }
     }
     //-----------------------------

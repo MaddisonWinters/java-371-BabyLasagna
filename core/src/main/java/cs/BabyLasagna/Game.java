@@ -26,12 +26,13 @@ public class Game {
     //---------------
     public void update(float deltaTime) {
         player.update(deltaTime);
+        //new----------------------
         for (Rectangle tile : testTiles) {
             player.resolveCollision(tile);
         }
 
         //camera.position.set(player.getX(), player.getY(), 0);
-        //new----------------------
+
         camera.position.set(
             player.getX() + player.getHitbox().width / 2f,
             player.getY() + player.getHitbox().height / 2f,

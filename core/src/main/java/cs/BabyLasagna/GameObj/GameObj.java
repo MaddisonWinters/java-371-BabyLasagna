@@ -11,7 +11,11 @@ public abstract class GameObj {
     protected final Rectangle hitbox = new Rectangle();
     protected final Vector2 velocity = new Vector2();
 
-        /// Getters
+    public GameObj() {
+
+    }
+
+    /// Getters
     public final Vector2 getPosition() { return new Vector2(hitbox.x, hitbox.y); }
     public final float getX() { return hitbox.x; }
     public final float getY() { return hitbox.y; }

@@ -43,6 +43,8 @@ public class Player extends GameObj {
 
     public Player(float x, float y) {
         super(x, y, WIDTH, HEIGHT);
+        TransformComponent transform = new TransformComponent(0,0,WIDTH,HEIGHT);
+        PhysicsComponent physics = new PhysicsComponent(transform);
     }
 }
 

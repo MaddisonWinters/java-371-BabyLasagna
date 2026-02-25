@@ -12,6 +12,9 @@ import javax.naming.ldap.ExtendedRequest;
 import java.rmi.server.UID;
 
 public class Player extends GameObj {
+
+    private CoyoteTimeComponent coyoteTime;
+
         ///  Constants
     private static final float  WIDTH=16/(float)(Game.PIXELS_PER_TILE),
                                 HEIGHT=18/(float)(Game.PIXELS_PER_TILE);
@@ -43,6 +46,7 @@ public class Player extends GameObj {
 
     public Player(float x, float y) {
         super(x, y, WIDTH, HEIGHT);
+        coyoteTime = new CoyoteTimeComponent(2f);
     }
 }
 

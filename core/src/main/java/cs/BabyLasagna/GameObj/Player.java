@@ -22,6 +22,7 @@ public class Player extends GameObj {
     private static final float JUMP_FORCE = 8f;
 
     private boolean grounded = false;
+    private float previousBottom;
     //---------------------------------------
     private static final Texture texture;
 
@@ -41,6 +42,8 @@ public class Player extends GameObj {
         uidata.update();
         //new 2/21------------------------------
 
+        previousBottom = hitbox.y;
+
         velocity.x = uidata.getMoveXDir() * 6f;
 
         // Jump (only if grounded/on ground)
@@ -54,12 +57,6 @@ public class Player extends GameObj {
 
         hitbox.y += velocity.y * deltaTime;
         //------------------------------------
-/*
-        Vector2 vel_scl = new Vector2(velocity);
-        vel_scl.scl(deltaTime);
-        hitbox.x += vel_scl.x;
-        hitbox.y += vel_scl.y;
- */
     }
 
     //new 2/21----------------------------------
@@ -75,26 +72,36 @@ public class Player extends GameObj {
         float overlapX = combinedHalfWidths - Math.abs(dx);
         float overlapY = combinedHalfHeights - Math.abs(dy);
 
-        if (velocity.y < -0) {
+        // Resolve the smaller overlap first
+        if (overlapX < overlapY) {
 
-            if (dy > 0) {
-                hitbox.y = tile.y + tile.height;
-                grounded = true;
-            } else {
-                hitbox.y = tile.y - hitbox.height;
-            }
-
-            velocity.y = 0;
-
-        } else {
-
-            // Only resolve horizontal if no vertical motion
+            // Horizontal collision
             if (dx > 0)
                 hitbox.x = tile.x + tile.width;
             else
                 hitbox.x = tile.x - hitbox.width;
 
             velocity.x = 0;
+
+        } else {
+
+            // Vertical collision
+            if (dy > 0) {
+
+                if (velocity.y <= 0) {
+                    hitbox.y = tile.y + tile.height;
+                    grounded = true;
+                    velocity.y = 0;
+                }
+
+            } else {
+                if (velocity.y > 0) {
+                    hitbox.y = tile.y - hitbox.height;
+                    velocity.y = 0;
+                }
+            }
+
+            velocity.y = 0;
         }
     }
     //-----------------------------

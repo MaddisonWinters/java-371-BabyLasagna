@@ -23,7 +23,6 @@ public class Player extends GameObj {
 
     private boolean grounded = false;
     private boolean facingRight = true;
-    private float previousBottom;
     //---------------------------------------
     private static final Texture texture;
 
@@ -48,27 +47,26 @@ public class Player extends GameObj {
         uidata.update();
         //new 2/21------------------------------
 
-        previousBottom = hitbox.y;
-
        velocity.x = uidata.getMoveXDir() * 6f;
 
-        if (uidata.move_x == UIHandler.Ternary.Pos) {
+        if (uidata.move_x == UIHandler.Ternary.Neg) {
             facingRight = false;
         }
-        else if (uidata.move_x == UIHandler.Ternary.Neg) {
+        else if (uidata.move_x == UIHandler.Ternary.Pos) {
             facingRight = true;
         }
 
         // Jump (only if grounded/on ground)
         if (uidata.jump_pressed && grounded) {
             velocity.y = JUMP_FORCE;
-            grounded = false;
         }
         velocity.y += GRAVITY * deltaTime;
 
         hitbox.x += velocity.x * deltaTime;
 
         hitbox.y += velocity.y * deltaTime;
+
+        grounded = false;
         //------------------------------------
     }
 
@@ -136,9 +134,9 @@ class UIHandler {
 
     // Store -1,0,1 with an enum, convert to float with .toFloat()
     public enum Ternary {
-        Pos(-1f),
+        Neg(-1f),
         Zero(0f),
-        Neg(1f);
+        Pos(1f);
 
         final float i;
         Ternary(float i) { this.i = i; }
@@ -172,17 +170,17 @@ class UIHandler {
         if (right == left)
             move_x = Ternary.Zero;
         else if (right)
-            move_x = Ternary.Neg;
-        else
             move_x = Ternary.Pos;
+        else
+            move_x = Ternary.Neg;
 
         // Set `move_y`
         if (up == down)
             move_y = Ternary.Zero;
         else if (up)
-            move_y = Ternary.Neg;
-        else
             move_y = Ternary.Pos;
+        else
+            move_y = Ternary.Neg;
 
         // Set jump state
         jump_pressed = up && (!jump_held);

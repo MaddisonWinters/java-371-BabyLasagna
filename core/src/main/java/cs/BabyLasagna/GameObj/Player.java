@@ -16,7 +16,7 @@ import java.rmi.server.UID;
 public class Player extends GameObj {
         ///  Constants
     private static final float  WIDTH=16/(float)(Game.PIXELS_PER_TILE),
-                                HEIGHT=18/(float)(Game.PIXELS_PER_TILE);
+                                HEIGHT=17/(float)(Game.PIXELS_PER_TILE);
     //new 2/21-----------------------------
     private static final float GRAVITY = -20f;
     private static final float JUMP_FORCE = 8f;

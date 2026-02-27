@@ -86,7 +86,7 @@ public class Game {
 
         //new 2/21----------------------
         testTiles.add(new Rectangle(0,0,10,1));   // ground
-        testTiles.add(new Rectangle(4,1,1,2));    // wall
+        testTiles.add(new Rectangle(3,1,1,2));    // wall
         testTiles.add(new Rectangle(2,2,3,0.5f)); // platform
         //--------------------
     }

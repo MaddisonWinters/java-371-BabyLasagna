@@ -1,6 +1,8 @@
 package cs.BabyLasagna;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import cs.BabyLasagna.GameObj.Player;
@@ -14,8 +16,7 @@ public class Game {
     public static final int PIXELS_PER_TILE=16;
 
     private final OrthographicCamera camera;
-    // private OrthogonalTiledMapRenderer renderer;
-
+    private final OrthogonalTiledMapRenderer renderer;
     private final Player player;
 
     public void update(float deltaTime) {
@@ -31,6 +32,9 @@ public class Game {
         batch.begin();
         player.render(deltaTime, batch);
         batch.end();
+
+        renderer.setView(camera);
+        renderer.render();
     }
 
     // Updates the viewport of the camera
@@ -51,6 +55,8 @@ public class Game {
         camera = new OrthographicCamera();
         updateViewport(1,1);
         player = new Player(1,1);
+        TiledMap map = new TmxMapLoader().load("levels/level1.tmx");
+        renderer = new OrthogonalTiledMapRenderer(map, 1/16f);
     }
 
     public void dispose() {}

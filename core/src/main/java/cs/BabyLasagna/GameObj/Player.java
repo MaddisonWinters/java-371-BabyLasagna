@@ -22,6 +22,7 @@ public class Player extends GameObj {
     private static final float JUMP_FORCE = 8f;
 
     private boolean grounded = false;
+    private boolean facingRight = true;
     private float previousBottom;
     //---------------------------------------
     private static final Texture texture;
@@ -34,7 +35,12 @@ public class Player extends GameObj {
 
     @Override
     public void render(float deltaTime, SpriteBatch batch) {
-        batch.draw(texture, hitbox.x, hitbox.y, hitbox.width, hitbox.height);
+        if(facingRight) {
+            batch.draw(texture, hitbox.x, hitbox.y, hitbox.width, hitbox.height);
+        }
+        else {
+            batch.draw(texture, hitbox.x + hitbox.width, hitbox.y, -hitbox.width, hitbox.height);
+        }
     }
 
     @Override
@@ -44,7 +50,14 @@ public class Player extends GameObj {
 
         previousBottom = hitbox.y;
 
-        velocity.x = uidata.getMoveXDir() * 6f;
+       velocity.x = uidata.getMoveXDir() * 6f;
+
+        if (uidata.move_x == UIHandler.Ternary.Pos) {
+            facingRight = false;
+        }
+        else if (uidata.move_x == UIHandler.Ternary.Neg) {
+            facingRight = true;
+        }
 
         // Jump (only if grounded/on ground)
         if (uidata.jump_pressed && grounded) {

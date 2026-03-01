@@ -4,14 +4,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Vector2;
 import cs.BabyLasagna.GameObj.Player;
-import com.badlogic.gdx.math.Rectangle;
-import java.util.ArrayList;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
-import java.rmi.server.UID;
 
 public class Game {
     private static final float MAX_VIEWPORT_SIZE=12;
@@ -64,7 +59,7 @@ public class Game {
     public Game(String level) {
         camera = new OrthographicCamera();
         updateViewport(1,1);
-        player = new Player(1,1);
+        player = new Player(3,3);
 
         map = new TmxMapLoader().load("levels/level1.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, 1/16f);

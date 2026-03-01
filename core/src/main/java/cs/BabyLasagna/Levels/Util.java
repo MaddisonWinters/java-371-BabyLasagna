@@ -9,7 +9,6 @@ public class Util {
     private Util() {}
     // Returns a list of rectangles of all tiles in the specific layer
     public static void getTiles(TiledMap map, String layer_name, Array<Rectangle> tile_rects, int startX, int startY, int endX, int endY) {
-        tile_rects.clear();
         TiledMapTileLayer layer = (TiledMapTileLayer)map.getLayers().get(layer_name);
         if (layer == null) {
             System.err.println("ERROR in Levels.Util.getTiles: Null layer found in TiledMap");

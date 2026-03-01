@@ -19,10 +19,15 @@ public class Player extends GameObj {
     private CoyoteTimeComponent coyoteTime;
 
         ///  Constants
-    private static final float  WIDTH=16/(float)(Game.PIXELS_PER_TILE),
-                                HEIGHT=17/(float)(Game.PIXELS_PER_TILE);
-    private static final float GRAVITY = -20f;
-    private static final float JUMP_FORCE = 8f;
+    private static final float  DRAW_WIDTH =16/(float)(Game.PIXELS_PER_TILE),
+                                DRAW_HEIGHT=17/(float)(Game.PIXELS_PER_TILE);
+    private static final float  DRAW_X     =0f,
+                                DRAW_Y     =0f;
+    private static final float  HIT_WIDTH  =16/(float)(Game.PIXELS_PER_TILE),
+                                HIT_HEIGHT =14/(float)(Game.PIXELS_PER_TILE);
+
+    private static final float GRAVITY = -30f;
+    private static final float JUMP_FORCE = 12f;
 
     private static final Texture texture;
     private static final UIHandler uidata = UIHandler.getUI();
@@ -31,16 +36,24 @@ public class Player extends GameObj {
         texture = new Texture("lasagna_single.png");
     }
 
-    private boolean grounded = false;
     private boolean facingRight = true;
 
     @Override
     public void render(float deltaTime, SpriteBatch batch) {
         if(facingRight) {
-            batch.draw(texture, hitbox.x, hitbox.y, hitbox.width, hitbox.height);
+            batch.draw(texture,
+                hitbox.x + DRAW_X,
+                hitbox.y + DRAW_Y,
+                DRAW_WIDTH,
+                DRAW_HEIGHT);
         }
         else {
-            batch.draw(texture, hitbox.x + hitbox.width, hitbox.y, -hitbox.width, hitbox.height);
+            batch.draw(texture,
+                hitbox.x + DRAW_X + hitbox.width,
+                hitbox.y + DRAW_Y,
+                -DRAW_WIDTH,
+                DRAW_HEIGHT
+            );
         }
     }
 
@@ -63,74 +76,12 @@ public class Player extends GameObj {
         }
         velocity.y += GRAVITY * deltaTime;
 
-        hitbox.x += velocity.x * deltaTime;
-        hitbox.y += velocity.y * deltaTime;
-
-        grounded = false;
-
-        Array<Rectangle> tile_rects = new Array<>();
-        Util.getTiles(
-            map,
-            "Wall",
-            tile_rects,
-            (int)Math.floor(hitbox.x),
-            (int)Math.floor(hitbox.y),
-            (int)Math.ceil(hitbox.x),
-            (int)Math.ceil(hitbox.y)
-        );
-
-        for (Rectangle rect : tile_rects) {
-            resolveCollision(rect);
-        }
-    }
-
-    public void resolveCollision(Rectangle tile) {
-        if (!hitbox.overlaps(tile)) return;
-
-        float dx = (hitbox.x + hitbox.width/2f) - (tile.x + tile.width/2f);
-        float dy = (hitbox.y + hitbox.height/2f) - (tile.y + tile.height/2f);
-
-        float combinedHalfWidths = (hitbox.width + tile.width) / 2f;
-        float combinedHalfHeights = (hitbox.height + tile.height) / 2f;
-
-        float overlapX = combinedHalfWidths - Math.abs(dx);
-        float overlapY = combinedHalfHeights - Math.abs(dy);
-
-        // Resolve the smaller overlap first
-        if (overlapX < overlapY) {
-
-            // Horizontal collision
-            if (dx > 0)
-                hitbox.x = tile.x + tile.width;
-            else
-                hitbox.x = tile.x - hitbox.width;
-
-            velocity.x = 0;
-
-        } else {
-
-            // Vertical collision
-            if (dy > 0) {
-
-                if (velocity.y <= 0) {
-                    hitbox.y = tile.y + tile.height;
-                    grounded = true;
-                    velocity.y = 0;
-                }
-
-            } else {
-                if (velocity.y > 0) {
-                    hitbox.y = tile.y - hitbox.height;
-                    velocity.y = 0;
-                }
-            }
-
-            velocity.y = 0;
-        }
+        // Move and collide with tilemap
+        moveWithCollisions(deltaTime, map);
     }
 
     public Player(float x, float y) {
-        super(x, y, WIDTH, HEIGHT);
+        super(x, y, HIT_WIDTH, HIT_HEIGHT);
         coyoteTime = new CoyoteTimeComponent(2f);
     }
 }

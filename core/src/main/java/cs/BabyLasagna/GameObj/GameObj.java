@@ -1,6 +1,7 @@
 package cs.BabyLasagna.GameObj;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import cs.BabyLasagna.Levels.TileData;
@@ -11,7 +12,11 @@ public abstract class GameObj {
     protected final Rectangle hitbox = new Rectangle();
     protected final Vector2 velocity = new Vector2();
 
-        /// Getters
+    public GameObj() {
+
+    }
+
+    /// Getters
     public final Vector2 getPosition() { return new Vector2(hitbox.x, hitbox.y); }
     public final float getX() { return hitbox.x; }
     public final float getY() { return hitbox.y; }
@@ -28,7 +33,7 @@ public abstract class GameObj {
         /// Abstract member functions
     // batch.begin() and batch.end() are not to be called within this function
     public abstract void render(float deltaTime, SpriteBatch batch);
-    public abstract void update(float deltaTime);
+    public abstract void update(float deltaTime, TiledMap map);
 
         /// Collision-related functions
     public void collideWithTile(Rectangle rect, TileData.TType ttype) {

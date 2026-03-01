@@ -1,6 +1,8 @@
 package cs.BabyLasagna;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import cs.BabyLasagna.GameObj.Player;
@@ -16,29 +18,19 @@ public class Game {
     public static final int PIXELS_PER_TILE=16;
 
     private final OrthographicCamera camera;
-    // private OrthogonalTiledMapRenderer renderer;
-
+    private final OrthogonalTiledMapRenderer renderer;
     private final Player player;
 
-    //new 2/21-----------------------------
-    private final ArrayList<Rectangle> testTiles = new ArrayList<>();
-    private final ShapeRenderer shapeRenderer = new ShapeRenderer();
-    //---------------
-    public void update(float deltaTime) {
-        player.update(deltaTime);
-        //new----------------------
-        for (Rectangle tile : testTiles) {
-            player.resolveCollision(tile);
-        }
+    private final TiledMap map;
 
-        //camera.position.set(player.getX(), player.getY(), 0);
+    public void update(float deltaTime) {
+        player.update(deltaTime, map);
 
         camera.position.set(
             player.getX() + player.getHitbox().width / 2f,
             player.getY() + player.getHitbox().height / 2f,
             0
         );
-        //----------------------------
     }
 
     // Renders map and all objects to `batch`
@@ -47,22 +39,12 @@ public class Game {
         camera.update();
         batch.setProjectionMatrix(camera.combined);
 
-        //new-------------------
-        // --- Draw rectangles (tiles) ---
-        shapeRenderer.setProjectionMatrix(camera.combined);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(1, 1, 1, 1); // white
-
-        for (Rectangle tile : testTiles) {
-            shapeRenderer.rect(tile.x, tile.y, tile.width, tile.height);
-        }
-
-        shapeRenderer.end();
-        //-----------------------
-
         batch.begin();
         player.render(deltaTime, batch);
         batch.end();
+
+        renderer.setView(camera);
+        renderer.render();
     }
 
     // Updates the viewport of the camera
@@ -84,11 +66,8 @@ public class Game {
         updateViewport(1,1);
         player = new Player(1,1);
 
-        //new 2/21----------------------
-        testTiles.add(new Rectangle(0,0,10,1));   // ground
-        testTiles.add(new Rectangle(3,1,1,2));    // wall
-        testTiles.add(new Rectangle(2,2,3,0.5f)); // platform
-        //--------------------
+        map = new TmxMapLoader().load("levels/level1.tmx");
+        renderer = new OrthogonalTiledMapRenderer(map, 1/16f);
     }
 
     public void dispose() {}

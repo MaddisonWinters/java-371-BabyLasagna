@@ -1,6 +1,9 @@
 package cs.BabyLasagna.GameObj;
 
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.utils.Array;
 import cs.BabyLasagna.Game;
+import cs.BabyLasagna.Levels.Util;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -8,29 +11,28 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Rectangle;
+import org.w3c.dom.css.Rect;
 
-
-import javax.naming.ldap.ExtendedRequest;
-import java.rmi.server.UID;
 
 public class Player extends GameObj {
+
+    private CoyoteTimeComponent coyoteTime;
+
         ///  Constants
     private static final float  WIDTH=16/(float)(Game.PIXELS_PER_TILE),
                                 HEIGHT=17/(float)(Game.PIXELS_PER_TILE);
-    //new 2/21-----------------------------
     private static final float GRAVITY = -20f;
     private static final float JUMP_FORCE = 8f;
 
-    private boolean grounded = false;
-    private boolean facingRight = true;
-    //---------------------------------------
     private static final Texture texture;
-
     private static final UIHandler uidata = UIHandler.getUI();
 
     static {
         texture = new Texture("lasagna_single.png");
     }
+
+    private boolean grounded = false;
+    private boolean facingRight = true;
 
     @Override
     public void render(float deltaTime, SpriteBatch batch) {
@@ -43,9 +45,8 @@ public class Player extends GameObj {
     }
 
     @Override
-    public void update(float deltaTime) {
+    public void update(float deltaTime, TiledMap map) {
         uidata.update();
-        //new 2/21------------------------------
 
        velocity.x = uidata.getMoveXDir() * 6f;
 
@@ -63,14 +64,26 @@ public class Player extends GameObj {
         velocity.y += GRAVITY * deltaTime;
 
         hitbox.x += velocity.x * deltaTime;
-
         hitbox.y += velocity.y * deltaTime;
 
         grounded = false;
-        //------------------------------------
+
+        Array<Rectangle> tile_rects = new Array<>();
+        Util.getTiles(
+            map,
+            "Wall",
+            tile_rects,
+            (int)Math.floor(hitbox.x),
+            (int)Math.floor(hitbox.y),
+            (int)Math.ceil(hitbox.x),
+            (int)Math.ceil(hitbox.y)
+        );
+
+        for (Rectangle rect : tile_rects) {
+            resolveCollision(rect);
+        }
     }
 
-    //new 2/21----------------------------------
     public void resolveCollision(Rectangle tile) {
         if (!hitbox.overlaps(tile)) return;
 
@@ -115,10 +128,10 @@ public class Player extends GameObj {
             velocity.y = 0;
         }
     }
-    //-----------------------------
 
     public Player(float x, float y) {
         super(x, y, WIDTH, HEIGHT);
+        coyoteTime = new CoyoteTimeComponent(2f);
     }
 }
 

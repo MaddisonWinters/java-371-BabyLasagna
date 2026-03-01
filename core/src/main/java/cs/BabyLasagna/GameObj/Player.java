@@ -1,51 +1,87 @@
 package cs.BabyLasagna.GameObj;
 
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.utils.Array;
 import cs.BabyLasagna.Game;
+import cs.BabyLasagna.Levels.Util;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.math.Rectangle;
+import org.w3c.dom.css.Rect;
 
-import javax.naming.ldap.ExtendedRequest;
-import java.rmi.server.UID;
 
 public class Player extends GameObj {
 
     private CoyoteTimeComponent coyoteTime;
 
         ///  Constants
-    private static final float  WIDTH=16/(float)(Game.PIXELS_PER_TILE),
-                                HEIGHT=18/(float)(Game.PIXELS_PER_TILE);
+    private static final float  DRAW_WIDTH =16/(float)(Game.PIXELS_PER_TILE),
+                                DRAW_HEIGHT=17/(float)(Game.PIXELS_PER_TILE);
+    private static final float  DRAW_X     =0f,
+                                DRAW_Y     =0f;
+    private static final float  HIT_WIDTH  =16/(float)(Game.PIXELS_PER_TILE),
+                                HIT_HEIGHT =14/(float)(Game.PIXELS_PER_TILE);
+
+    private static final float GRAVITY = -30f;
+    private static final float JUMP_FORCE = 12f;
 
     private static final Texture texture;
-
     private static final UIHandler uidata = UIHandler.getUI();
 
     static {
         texture = new Texture("lasagna_single.png");
     }
 
+    private boolean facingRight = true;
+
     @Override
     public void render(float deltaTime, SpriteBatch batch) {
-        batch.draw(texture, hitbox.x, hitbox.y, hitbox.width, hitbox.height);
+        if(facingRight) {
+            batch.draw(texture,
+                hitbox.x + DRAW_X,
+                hitbox.y + DRAW_Y,
+                DRAW_WIDTH,
+                DRAW_HEIGHT);
+        }
+        else {
+            batch.draw(texture,
+                hitbox.x + DRAW_X + hitbox.width,
+                hitbox.y + DRAW_Y,
+                -DRAW_WIDTH,
+                DRAW_HEIGHT
+            );
+        }
     }
 
     @Override
-    public void update(float deltaTime) {
+    public void update(float deltaTime, TiledMap map) {
         uidata.update();
-        velocity.set(uidata.getMoveVector());
-        velocity.scl(6f);
 
-        Vector2 vel_scl = new Vector2(velocity);
-        vel_scl.scl(deltaTime);
-        hitbox.x += vel_scl.x;
-        hitbox.y += vel_scl.y;
+       velocity.x = uidata.getMoveXDir() * 6f;
+
+        if (uidata.move_x == UIHandler.Ternary.Neg) {
+            facingRight = false;
+        }
+        else if (uidata.move_x == UIHandler.Ternary.Pos) {
+            facingRight = true;
+        }
+
+        // Jump (only if grounded/on ground)
+        if (uidata.jump_pressed && grounded) {
+            velocity.y = JUMP_FORCE;
+        }
+        velocity.y += GRAVITY * deltaTime;
+
+        // Move and collide with tilemap
+        moveWithCollisions(deltaTime, map);
     }
 
     public Player(float x, float y) {
-        super(x, y, WIDTH, HEIGHT);
+        super(x, y, HIT_WIDTH, HIT_HEIGHT);
         coyoteTime = new CoyoteTimeComponent(2f);
     }
 }
@@ -62,9 +98,9 @@ class UIHandler {
 
     // Store -1,0,1 with an enum, convert to float with .toFloat()
     public enum Ternary {
-        Pos(-1f),
+        Neg(-1f),
         Zero(0f),
-        Neg(1f);
+        Pos(1f);
 
         final float i;
         Ternary(float i) { this.i = i; }
@@ -98,17 +134,17 @@ class UIHandler {
         if (right == left)
             move_x = Ternary.Zero;
         else if (right)
-            move_x = Ternary.Neg;
-        else
             move_x = Ternary.Pos;
+        else
+            move_x = Ternary.Neg;
 
         // Set `move_y`
         if (up == down)
             move_y = Ternary.Zero;
         else if (up)
-            move_y = Ternary.Neg;
-        else
             move_y = Ternary.Pos;
+        else
+            move_y = Ternary.Neg;
 
         // Set jump state
         jump_pressed = up && (!jump_held);

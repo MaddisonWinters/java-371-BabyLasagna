@@ -4,12 +4,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Vector2;
 import cs.BabyLasagna.GameObj.Player;
-
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-import java.rmi.server.UID;
 
 public class Game {
     private static final float MAX_VIEWPORT_SIZE=12;
@@ -19,8 +16,16 @@ public class Game {
     private final OrthogonalTiledMapRenderer renderer;
     private final Player player;
 
+    private final TiledMap map;
+
     public void update(float deltaTime) {
-        player.update(deltaTime);
+        player.update(deltaTime, map);
+
+        camera.position.set(
+            player.getX() + player.getHitbox().width / 2f,
+            player.getY() + player.getHitbox().height / 2f,
+            0
+        );
     }
 
     // Renders map and all objects to `batch`
@@ -54,8 +59,9 @@ public class Game {
     public Game(String level) {
         camera = new OrthographicCamera();
         updateViewport(1,1);
-        player = new Player(1,1);
-        TiledMap map = new TmxMapLoader().load("levels/level1.tmx");
+        player = new Player(3,3);
+
+        map = new TmxMapLoader().load("levels/level1.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, 1/16f);
     }
 

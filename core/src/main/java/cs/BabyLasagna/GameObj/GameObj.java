@@ -9,6 +9,9 @@ import cs.BabyLasagna.Levels.Util;
 
 // A generic object that has a hitbox, velocity, and movement/collision functions
 public abstract class GameObj {
+        ///  Constants
+    protected static final float GRAVITY = -30f;
+
         /// Positional members
     protected final Rectangle hitbox = new Rectangle();
     protected final Vector2 velocity = new Vector2();

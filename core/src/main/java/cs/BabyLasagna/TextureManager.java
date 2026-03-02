@@ -23,6 +23,8 @@ public class TextureManager {
 
             public final RectInt rect;
             Region(int x, int y, int w, int h) { rect = new RectInt(x,y,w,h); }
+
+            public boolean isLayer() { return this == Layer1 || this == Layer2 || this == Layer3; }
         }
 
         public enum Flavor {

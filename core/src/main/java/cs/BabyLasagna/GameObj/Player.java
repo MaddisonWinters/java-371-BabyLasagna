@@ -26,7 +26,6 @@ public class Player extends GameObj {
     private static final float  HIT_WIDTH  =16/(float)(Game.PIXELS_PER_TILE),
                                 HIT_HEIGHT =14/(float)(Game.PIXELS_PER_TILE);
 
-    private static final float GRAVITY = -30f;
     private static final float JUMP_FORCE = 12f;
 
     private static final UIHandler uidata = UIHandler.getUI();

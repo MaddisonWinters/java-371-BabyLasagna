@@ -3,22 +3,20 @@ package cs.BabyLasagna.GameObj;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import cs.BabyLasagna.Game;
-import cs.BabyLasagna.TextureManager.PlayerTex;
-import cs.BabyLasagna.TextureManager.PlayerTex.Flavor;
-import cs.BabyLasagna.TextureManager.PlayerTex.Region;
+import cs.BabyLasagna.TextureManager.Lasagna.*;
 
 import java.util.ArrayDeque;
 
 public class LasagnaStack extends GameObj {
 
     public static class Layer {
-        public final Flavor flavor;
-        public final Region region;
+        public final LasagnaFlavor flavor;
+        public final LasagnaRegion region;
 
-        private Layer(Flavor flav, Region reg) { flavor = flav; region = reg; }
+        private Layer(LasagnaFlavor flav, LasagnaRegion reg) { flavor = flav; region = reg; }
 
         // Public "constructor" that returns null if invalid parameters are given
-        public static Layer make(Flavor flav, Region reg) {
+        public static Layer make(LasagnaFlavor flav, LasagnaRegion reg) {
             if (reg.isLayer()) return new Layer(flav, reg);
             return null;
         }
@@ -39,35 +37,35 @@ public class LasagnaStack extends GameObj {
 
         if (hasLegs) {
             batch.draw(
-                PlayerTex.textures[peekBottom().flavor.ordinal()][Region.Legs.ordinal()],
+                peekBottom().flavor.getTex(LasagnaRegion.Legs),
                 hitbox.x,
                 hitbox.y,
-                (float)Region.Legs.rect.w / Game.PIXELS_PER_TILE,
-                (float)Region.Legs.rect.h / Game.PIXELS_PER_TILE
+                LasagnaRegion.Legs.reg.gw,
+                LasagnaRegion.Legs.reg.gh
             );
 
-            yoff += (float)Region.Legs.rect.h / Game.PIXELS_PER_TILE;
+            yoff += LasagnaRegion.Legs.reg.gh;
         }
 
         for (final Layer layer : stack) {
             batch.draw(
-                PlayerTex.textures[layer.flavor.ordinal()][layer.region.ordinal()],
+                layer.flavor.getTex(layer.region),
                 hitbox.x,
                 hitbox.y + yoff,
-                (float)layer.region.rect.w / Game.PIXELS_PER_TILE,
-                (float)layer.region.rect.h / Game.PIXELS_PER_TILE
+                layer.region.reg.gw,
+                layer.region.reg.gh
             );
 
-            yoff += (float)layer.region.rect.h / Game.PIXELS_PER_TILE;
+            yoff += layer.region.reg.gh;
         }
 
         if (hasHead) {
             batch.draw(
-                PlayerTex.textures[peekBottom().flavor.ordinal()][Region.Head.ordinal()],
+                peekBottom().flavor.getTex(LasagnaRegion.Head),
                 hitbox.x,
                 hitbox.y + yoff,
-                (float)Region.Head.rect.w / Game.PIXELS_PER_TILE,
-                (float)Region.Head.rect.h / Game.PIXELS_PER_TILE
+                LasagnaRegion.Head.reg.gw,
+                LasagnaRegion.Head.reg.gh
             );
         }
 

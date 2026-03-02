@@ -3,9 +3,7 @@ package cs.BabyLasagna.GameObj;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import cs.BabyLasagna.Game;
-import cs.BabyLasagna.TextureManager.PlayerTex;
-import cs.BabyLasagna.TextureManager.PlayerTex.Flavor;
-import cs.BabyLasagna.TextureManager.PlayerTex.Region;
+import cs.BabyLasagna.TextureManager.Lasagna.*;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -34,7 +32,7 @@ public class Player extends GameObj {
 
     @Override
     public void render(float deltaTime, SpriteBatch batch) {
-        TextureRegion texture = PlayerTex.textures[Flavor.Plain.ordinal()][Region.FULL.ordinal()];
+        TextureRegion texture = LasagnaFlavor.Plain.getTex(LasagnaRegion.FULL);
 
         if(facingRight) {
             batch.draw(texture,

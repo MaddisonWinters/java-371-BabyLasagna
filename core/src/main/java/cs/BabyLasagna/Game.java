@@ -6,8 +6,8 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import cs.BabyLasagna.GameObj.LasagnaStack;
 import cs.BabyLasagna.GameObj.Player;
-import cs.BabyLasagna.TextureManager.PlayerTex;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import cs.BabyLasagna.TextureManager.Lasagna.*;
 
 
 public class Game {
@@ -67,13 +67,13 @@ public class Game {
         player = new Player(3,3);
 
         lasagna = new LasagnaStack(4,6, true, true);
-        lasagna.addTop(LasagnaStack.Layer.make(PlayerTex.Flavor.Plain, PlayerTex.Region.Layer1));
-        lasagna.addTop(LasagnaStack.Layer.make(PlayerTex.Flavor.Plain, PlayerTex.Region.Layer2));
-        lasagna.addTop(LasagnaStack.Layer.make(PlayerTex.Flavor.Plain, PlayerTex.Region.Layer3));
-        lasagna.addTop(LasagnaStack.Layer.make(PlayerTex.Flavor.Plain, PlayerTex.Region.Layer2));
-        lasagna.addTop(LasagnaStack.Layer.make(PlayerTex.Flavor.Plain, PlayerTex.Region.Layer3));
-        lasagna.addTop(LasagnaStack.Layer.make(PlayerTex.Flavor.Plain, PlayerTex.Region.Layer2));
-        lasagna.addTop(LasagnaStack.Layer.make(PlayerTex.Flavor.Plain, PlayerTex.Region.Layer3));
+        lasagna.addTop(LasagnaStack.Layer.make(LasagnaFlavor.Plain, LasagnaRegion.Layer1));
+        lasagna.addTop(LasagnaStack.Layer.make(LasagnaFlavor.Plain, LasagnaRegion.Layer2));
+        lasagna.addTop(LasagnaStack.Layer.make(LasagnaFlavor.Plain, LasagnaRegion.Layer3));
+        lasagna.addTop(LasagnaStack.Layer.make(LasagnaFlavor.Plain, LasagnaRegion.Layer2));
+        lasagna.addTop(LasagnaStack.Layer.make(LasagnaFlavor.Plain, LasagnaRegion.Layer3));
+        lasagna.addTop(LasagnaStack.Layer.make(LasagnaFlavor.Plain, LasagnaRegion.Layer2));
+        lasagna.addTop(LasagnaStack.Layer.make(LasagnaFlavor.Plain, LasagnaRegion.Layer3));
 
         map = new TmxMapLoader().load("levels/level1.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, 1/16f);

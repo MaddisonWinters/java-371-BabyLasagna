@@ -1,17 +1,17 @@
 package cs.BabyLasagna.GameObj;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.utils.Array;
 import cs.BabyLasagna.Game;
-import cs.BabyLasagna.Levels.Util;
+import cs.BabyLasagna.TextureManager.PlayerTex;
+import cs.BabyLasagna.TextureManager.PlayerTex.Flavor;
+import cs.BabyLasagna.TextureManager.PlayerTex.Region;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.math.Rectangle;
-import org.w3c.dom.css.Rect;
 
 
 public class Player extends GameObj {
@@ -29,17 +29,14 @@ public class Player extends GameObj {
     private static final float GRAVITY = -30f;
     private static final float JUMP_FORCE = 12f;
 
-    private static final Texture texture;
     private static final UIHandler uidata = UIHandler.getUI();
-
-    static {
-        texture = new Texture("lasagna_single.png");
-    }
 
     private boolean facingRight = true;
 
     @Override
     public void render(float deltaTime, SpriteBatch batch) {
+        TextureRegion texture = PlayerTex.textures[Flavor.Plain.ordinal()][Region.FULL.ordinal()];
+
         if(facingRight) {
             batch.draw(texture,
                 hitbox.x + DRAW_X,

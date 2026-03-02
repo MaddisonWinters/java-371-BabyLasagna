@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import cs.BabyLasagna.Game;
 import cs.BabyLasagna.TextureManager.Lasagna.*;
+import cs.BabyLasagna.TextureManager;
 
 import java.util.ArrayDeque;
 
@@ -25,51 +26,59 @@ public class LasagnaStack extends GameObj {
     protected ArrayDeque<Layer> stack = new ArrayDeque<>();
     boolean hasHead = false;
     boolean hasLegs = false;
-    boolean facingRight = true;
+    boolean facingRight = false;
 
     @Override
     public void render(float deltaTime, SpriteBatch batch) {
-        renderFRight(deltaTime, batch);
-    }
-
-    public void renderFRight(float deltaTime, SpriteBatch batch) {
         float yoff = 0f;
 
+        // Draw legs
         if (hasLegs) {
-            batch.draw(
+            TextureManager.draw(
+                batch,
+                // Take the flavor of the bottom layer
                 peekBottom().flavor.getTex(LasagnaRegion.Legs),
                 hitbox.x,
                 hitbox.y,
                 LasagnaRegion.Legs.reg.gw,
-                LasagnaRegion.Legs.reg.gh
+                LasagnaRegion.Legs.reg.gh,
+                !facingRight,
+                false
             );
-
+            // Update y offset
             yoff += LasagnaRegion.Legs.reg.gh;
         }
 
+        // Draw each layer
         for (final Layer layer : stack) {
-            batch.draw(
+            TextureManager.draw(
+                batch,
                 layer.flavor.getTex(layer.region),
                 hitbox.x,
                 hitbox.y + yoff,
                 layer.region.reg.gw,
-                layer.region.reg.gh
+                layer.region.reg.gh,
+                !facingRight,
+                false
             );
-
+            // Update y offset
             yoff += layer.region.reg.gh;
         }
 
+        // Draw head
         if (hasHead) {
-            batch.draw(
+            TextureManager.draw(
+                batch,
+                // Take flavor of top layer
                 peekBottom().flavor.getTex(LasagnaRegion.Head),
                 hitbox.x,
                 hitbox.y + yoff,
                 LasagnaRegion.Head.reg.gw,
-                LasagnaRegion.Head.reg.gh
+                LasagnaRegion.Head.reg.gh,
+                !facingRight,
+                false
             );
         }
-
-
     }
 
     @Override

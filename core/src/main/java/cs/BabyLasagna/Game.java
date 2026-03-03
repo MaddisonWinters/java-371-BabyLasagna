@@ -65,17 +65,17 @@ public class Game {
         camera = new OrthographicCamera();
         updateViewport(1,1);
         player = new Player(3,3);
-        player.addTop(LasagnaStack.Layer.make(LasagnaFlavor.Plain, LasagnaRegion.Layer3));
-        player.addTop(LasagnaStack.Layer.make(LasagnaFlavor.Plain, LasagnaRegion.Layer2));
+        player.addTop(LasagnaFlavor.Cheese);
+        player.addTop(LasagnaFlavor.Plain);
 
         lasagna = new LasagnaStack(4,6, true, true);
-        lasagna.addTop(LasagnaStack.Layer.make(LasagnaFlavor.Plain, LasagnaRegion.Layer1));
-        lasagna.addTop(LasagnaStack.Layer.make(LasagnaFlavor.Plain, LasagnaRegion.Layer2));
-        lasagna.addTop(LasagnaStack.Layer.make(LasagnaFlavor.Plain, LasagnaRegion.Layer3));
-        lasagna.addTop(LasagnaStack.Layer.make(LasagnaFlavor.Plain, LasagnaRegion.Layer2));
-        lasagna.addTop(LasagnaStack.Layer.make(LasagnaFlavor.Plain, LasagnaRegion.Layer3));
-        lasagna.addTop(LasagnaStack.Layer.make(LasagnaFlavor.Plain, LasagnaRegion.Layer2));
-        lasagna.addTop(LasagnaStack.Layer.make(LasagnaFlavor.Plain, LasagnaRegion.Layer3));
+        lasagna.addTop(LasagnaFlavor.Plain);
+        lasagna.addTop(LasagnaFlavor.Cheese);
+        lasagna.addTop(LasagnaFlavor.Cheese);
+        lasagna.addTop(LasagnaFlavor.Cheese);
+        lasagna.addTop(LasagnaFlavor.Plain);
+        lasagna.addTop(LasagnaFlavor.Plain);
+        lasagna.addTop(LasagnaFlavor.Cheese);
 
         map = new TmxMapLoader().load("levels/level1.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, 1/16f);

@@ -82,7 +82,7 @@ public class LasagnaStack extends GameObj {
             TextureManager.draw(
                 batch,
                 // Take flavor of top layer
-                top_flavor.getTex(LasagnaRegion.Head),
+                bot_flavor.getTex(LasagnaRegion.Head),
                 hitbox.x,
                 hitbox.y + yoff,
                 LasagnaRegion.Head.reg.gw,
@@ -104,10 +104,16 @@ public class LasagnaStack extends GameObj {
         stack.push(layer);
         setHitboxHeight();
     }
+    public void addTop(LasagnaFlavor flavor) {
+        addTop(Layer.make(flavor, LasagnaRegion.randLayer()));
+    }
     public void addBottom(Layer layer) {
         stack.addLast(layer);
         setHitboxHeight();
         hitbox.y -= LasagnaRegion.Layer1.reg.gh;
+    }
+    public void addBottom(LasagnaFlavor flavor) {
+        addBottom(Layer.make(flavor, LasagnaRegion.randLayer()));
     }
 
     public LasagnaFlavor popTop() {

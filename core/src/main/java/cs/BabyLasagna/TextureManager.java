@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
+import java.util.Random;
+
 public class TextureManager {
 
     public static class Region {
@@ -42,22 +44,30 @@ public class TextureManager {
 
     public static class Lasagna {
         public enum LasagnaRegion {
-            Head  (0, 0,16, 7),
-            Layer1(0, 7,16, 2), // Three different layers for variety
-            Layer2(0, 9,16, 2),
-            Layer3(0,11,16, 2),
-            Legs  (0,13,16, 4),
+            Head  (0, 0,16, 8),
+            Layer1(0, 8,16, 2), // Three different layers for variety
+            Layer2(0, 10,16, 2),
+            Layer3(0,12,16, 2),
+            Legs  (0,14,16, 5),
             FULL  (0, 0,16,17);
 
+            private static final Random rand = new Random();
             public final Region reg;
             LasagnaRegion(int x, int y, int w, int h) { reg = new Region(x,y,w,h); }
 
             public boolean isLayer() { return this == Layer1 || this == Layer2 || this == Layer3; }
+            public static LasagnaRegion randLayer() {
+                int num = rand.nextInt() % 3;
+                if (num == 0) return Layer1;
+                if (num == 1) return Layer2;
+                return Layer3;
+            }
         }
 
         // Each LasagnaFlavor stores a list of texture regions corresponding to its flavor
         public enum LasagnaFlavor {
-            Plain("BabyLasagna/Plain.png");
+            Plain("BabyLasagna/Plain.png"),
+            Cheese("BabyLasagna/Cheese.png");
 
             public final String file;
             private final TextureRegion[] textures;

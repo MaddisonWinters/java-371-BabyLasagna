@@ -65,6 +65,8 @@ public class Game {
         camera = new OrthographicCamera();
         updateViewport(1,1);
         player = new Player(3,3);
+        player.addTop(LasagnaStack.Layer.make(LasagnaFlavor.Plain, LasagnaRegion.Layer3));
+        player.addTop(LasagnaStack.Layer.make(LasagnaFlavor.Plain, LasagnaRegion.Layer2));
 
         lasagna = new LasagnaStack(4,6, true, true);
         lasagna.addTop(LasagnaStack.Layer.make(LasagnaFlavor.Plain, LasagnaRegion.Layer1));

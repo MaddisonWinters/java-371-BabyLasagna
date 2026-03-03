@@ -1,55 +1,26 @@
 package cs.BabyLasagna.GameObj;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import cs.BabyLasagna.Game;
-import cs.BabyLasagna.TextureManager;
 import cs.BabyLasagna.TextureManager.Lasagna.*;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 
 
-public class Player extends GameObj {
+public class Player extends LasagnaStack {
 
     private CoyoteTimeComponent coyoteTime;
-
-        ///  Constants
-    private static final float  DRAW_WIDTH =16/(float)(Game.PIXELS_PER_TILE),
-                                DRAW_HEIGHT=17/(float)(Game.PIXELS_PER_TILE);
-    private static final float  DRAW_X     =0f,
-                                DRAW_Y     =0f;
-    private static final float  HIT_WIDTH  =16/(float)(Game.PIXELS_PER_TILE),
-                                HIT_HEIGHT =14/(float)(Game.PIXELS_PER_TILE);
 
     private static final float JUMP_FORCE = 12f;
 
     private static final UIHandler uidata = UIHandler.getUI();
 
-    private boolean facingRight = true;
-
-    @Override
-    public void render(float deltaTime, SpriteBatch batch) {
-        TextureRegion texture = LasagnaFlavor.Plain.getTex(LasagnaRegion.FULL);
-            TextureManager.draw(
-                batch,
-                texture,
-                hitbox.x + DRAW_X,
-                hitbox.y + DRAW_Y,
-                DRAW_WIDTH,
-                DRAW_HEIGHT,
-                !facingRight, // flip x based on facing direction
-                false // Never flip y
-            );
-    }
-
     @Override
     public void update(float deltaTime, TiledMap map) {
         uidata.update();
 
-       velocity.x = uidata.getMoveXDir() * 6f;
+        velocity.x = uidata.getMoveXDir() * 6f;
 
         if (uidata.move_x == UIHandler.Ternary.Neg) {
             facingRight = false;
@@ -62,17 +33,16 @@ public class Player extends GameObj {
         if (uidata.jump_pressed && grounded) {
             velocity.y = JUMP_FORCE;
         }
-        velocity.y += GRAVITY * deltaTime;
 
-        // Move and collide with tilemap
-        moveWithCollisions(deltaTime, map);
+        super.update(deltaTime, map);
     }
 
     public Player(float x, float y) {
-        super(x, y, HIT_WIDTH, HIT_HEIGHT);
+        super(x, y, true, true);
         coyoteTime = new CoyoteTimeComponent(2f);
     }
 }
+
 
 // Singleton class for handling player-UI
 class UIHandler {

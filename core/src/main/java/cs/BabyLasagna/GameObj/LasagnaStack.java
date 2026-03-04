@@ -32,17 +32,16 @@ public class LasagnaStack extends GameObj {
 
     @Override
     public void render(float deltaTime, SpriteBatch batch) {
-        float yoff = 0f;
+        if (stack.isEmpty()) return;
+        if (stack.size() < 2) {
+            stack.clear();
+            return;
+        }
 
-        LasagnaFlavor bot_flavor, top_flavor;
-        if (stack.isEmpty()) {
-            bot_flavor = LasagnaFlavor.Plain;
-            top_flavor = LasagnaFlavor.Plain;
-        }
-        else {
-            bot_flavor = peekBottom();
-            top_flavor = peekTop();
-        }
+        LasagnaFlavor bot_flavor = peekBottom();
+        LasagnaFlavor top_flavor = peekTop();
+
+        float yoff = 0f;
 
         // Draw legs
         if (hasLegs) {
@@ -62,7 +61,11 @@ public class LasagnaStack extends GameObj {
         }
 
         // Draw each layer
+        int i = 0;
         for (final Layer layer : stack) {
+            if (++i == 1) continue;
+            if (i == stack.size()) break;
+
             TextureManager.draw(
                 batch,
                 layer.flavor.getTex(layer.region),
@@ -95,6 +98,7 @@ public class LasagnaStack extends GameObj {
 
     @Override
     public void update(float deltaTime, TiledMap map) {
+        if (stack.isEmpty()) return;
         velocity.y += GRAVITY * deltaTime;
         moveWithCollisions(deltaTime, map);
     }
@@ -141,11 +145,18 @@ public class LasagnaStack extends GameObj {
 
     protected void setHitboxHeight() {
         hitbox.height = 0;
+        
         if (hasLegs)
             hitbox.height += LasagnaRegion.Legs.reg.gh;
+        else
+            hitbox.height += LasagnaRegion.Layer1.reg.gh;
+
         if (hasHead)
             hitbox.height += LasagnaRegion.Head.reg.gh - HEAD_DECORATIVE_SIZE;
-        hitbox.height += stack.size() * LasagnaRegion.Layer1.reg.gh;
+        else
+            hitbox.height += LasagnaRegion.Layer1.reg.gh;
+
+        hitbox.height += (stack.size()-2) * LasagnaRegion.Layer1.reg.gh;
     }
 
     public LasagnaStack(float x, float y, boolean head, boolean legs) {

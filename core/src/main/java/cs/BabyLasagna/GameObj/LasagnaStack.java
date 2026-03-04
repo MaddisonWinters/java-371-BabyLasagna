@@ -100,31 +100,33 @@ public class LasagnaStack extends GameObj {
     }
 
         /// Add/Remove layers
-    public void addTop(Layer layer) {
-        stack.push(layer);
-        setHitboxHeight();
-    }
-    public void addTop(LasagnaFlavor flavor) {
-        addTop(Layer.make(flavor, LasagnaRegion.randLayer()));
-    }
     public void addBottom(Layer layer) {
-        stack.addLast(layer);
+        stack.push(layer);
         setHitboxHeight();
         hitbox.y -= LasagnaRegion.Layer1.reg.gh;
     }
     public void addBottom(LasagnaFlavor flavor) {
         addBottom(Layer.make(flavor, LasagnaRegion.randLayer()));
     }
+    public void addTop(Layer layer) {
+        stack.addLast(layer);
+        setHitboxHeight();
+    }
+    public void addTop(LasagnaFlavor flavor) {
+        addTop(Layer.make(flavor, LasagnaRegion.randLayer()));
+    }
 
-    public LasagnaFlavor popTop() {
+    public LasagnaFlavor popBottom() {
+        if (stack.isEmpty()) return null;
         LasagnaFlavor tmp = stack.pop().flavor;
         setHitboxHeight();
+        hitbox.y += LasagnaRegion.Layer1.reg.gh;
         return tmp;
     }
-    public LasagnaFlavor popBottom() {
+    public LasagnaFlavor popTop() {
+        if (stack.isEmpty()) return null;
         LasagnaFlavor tmp = stack.removeLast().flavor;
         setHitboxHeight();
-        hitbox.y += LasagnaRegion.Layer1.reg.gh;
         return tmp;
     }
 

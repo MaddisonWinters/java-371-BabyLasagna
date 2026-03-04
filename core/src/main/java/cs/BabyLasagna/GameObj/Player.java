@@ -16,9 +16,18 @@ public class Player extends LasagnaStack {
 
     private static final UIHandler uidata = UIHandler.getUI();
 
+    private static boolean debug = true;
+
     @Override
     public void update(float deltaTime, TiledMap map) {
         uidata.update();
+
+        if (debug) {
+            if (uidata.addTop.press) addTop(LasagnaFlavor.Plain);
+            if (uidata.addBot.press) addBottom(LasagnaFlavor.Plain);
+            if (uidata.popTop.press) popTop();
+            if (uidata.popBot.press) popBottom();
+        }
 
         velocity.x = uidata.getMoveXDir() * 6f;
 
@@ -30,7 +39,7 @@ public class Player extends LasagnaStack {
         }
 
         // Jump (only if grounded/on ground)
-        if (uidata.jump_pressed && grounded) {
+        if (uidata.jump.keyDown && grounded) {
             velocity.y = JUMP_FORCE;
         }
 
@@ -65,11 +74,42 @@ class UIHandler {
         public float toFloat() { return this.i; }
     }
 
+    public class KeyStatus {
+        public boolean keyDown = false; // The current state of the key (down/up)
+        public boolean press = false; // If the key was just pressed
+        public boolean release = false; // If the key was just released
+
+        private final int[] keys;
+
+        public KeyStatus(int key) { keys = new int[1]; keys[0] = key; }
+        public KeyStatus(int[] keys_) { keys = keys_.clone(); }
+        
+        public void update() {
+            boolean newKeyDown = false;
+            for (int k : keys) {
+                newKeyDown |= Gdx.input.isKeyPressed(k);
+                if (newKeyDown) break;
+            }
+
+            if (keyDown == newKeyDown) {
+                press = false;
+                release = false;
+                return;
+            }
+            keyDown = newKeyDown;
+            press = newKeyDown;
+            release = !newKeyDown;
+        }
+    }
+
     // Not bothering with getters/setters since this class has such a limited scope of use anyways
     public Ternary move_x = Ternary.Zero;
     public Ternary move_y = Ternary.Zero;
-    public boolean jump_held = false;
-    public boolean jump_pressed = false;
+    public KeyStatus jump = new KeyStatus(new int[]{Keys.SPACE, Keys.UP, Keys.W});
+    public KeyStatus addTop = new KeyStatus(Keys.O);
+    public KeyStatus addBot = new KeyStatus(Keys.P);
+    public KeyStatus popTop = new KeyStatus(Keys.L);
+    public KeyStatus popBot = new KeyStatus(Keys.SEMICOLON);
 
     public float getMoveXDir() { return move_x.toFloat(); }
     public float getMoveYDir() { return move_y.toFloat(); }
@@ -81,12 +121,10 @@ class UIHandler {
 
     // Gets all relevant UI and condenses it
     public void update() {
-        boolean right, left, up, down;
+        boolean right, left;
 
         right = Gdx.input.isKeyPressed(Keys.RIGHT) || Gdx.input.isKeyPressed(Keys.D);
         left = Gdx.input.isKeyPressed(Keys.LEFT) || Gdx.input.isKeyPressed(Keys.A);
-        up = Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.SPACE);
-        down = Gdx.input.isKeyPressed(Keys.DOWN) || Gdx.input.isKeyPressed(Keys.S);
 
         // Set `move_x`
         if (right == left)
@@ -96,16 +134,11 @@ class UIHandler {
         else
             move_x = Ternary.Neg;
 
-        // Set `move_y`
-        if (up == down)
-            move_y = Ternary.Zero;
-        else if (up)
-            move_y = Ternary.Pos;
-        else
-            move_y = Ternary.Neg;
-
         // Set jump state
-        jump_pressed = up && (!jump_held);
-        jump_held = up;
+        jump.update();
+        addTop.update();
+        addBot.update();
+        popTop.update();
+        popBot.update();
     }
 }

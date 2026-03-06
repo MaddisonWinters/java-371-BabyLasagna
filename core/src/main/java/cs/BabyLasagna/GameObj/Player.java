@@ -17,6 +17,7 @@ import org.w3c.dom.css.Rect;
 public class Player extends GameObj {
 
     private CoyoteTimeComponent coyoteTime;
+    private FastFallingComponent fastFall;
 
         ///  Constants
     private static final float  DRAW_WIDTH =16/(float)(Game.PIXELS_PER_TILE),
@@ -78,7 +79,14 @@ public class Player extends GameObj {
             velocity.y = JUMP_FORCE;
             coyoteTime.consume(); // prevent double jump
         }
-        velocity.y += GRAVITY * deltaTime;
+
+        velocity.y = fastFall.apply(
+            velocity.y,
+            GRAVITY,
+            deltaTime,
+            grounded,
+            uidata.move_y == UIHandler.Ternary.Neg
+        );
 
         // Move and collide with tilemap
         moveWithCollisions(deltaTime, map);
@@ -86,7 +94,9 @@ public class Player extends GameObj {
 
     public Player(float x, float y) {
         super(x, y, HIT_WIDTH, HIT_HEIGHT);
+
         coyoteTime = new CoyoteTimeComponent(0.12f);
+        fastFall = new FastFallingComponent(2.0f);
     }
 }
 

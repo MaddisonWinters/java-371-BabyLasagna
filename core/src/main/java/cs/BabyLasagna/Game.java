@@ -32,14 +32,15 @@ public class Game {
     public void render(float deltaTime, SpriteBatch batch) {
         // camera.position.set(...)
         camera.update();
+
+        renderer.setView(camera);
+        renderer.render();
+
         batch.setProjectionMatrix(camera.combined);
 
         batch.begin();
         player.render(deltaTime, batch);
         batch.end();
-
-        renderer.setView(camera);
-        renderer.render();
     }
 
     // Updates the viewport of the camera
@@ -61,7 +62,9 @@ public class Game {
         updateViewport(1,1);
         player = new Player(3,3);
 
+        System.out.println("BEFORE MAP LOADED");
         map = new TmxMapLoader().load("levels/level1.tmx");
+        System.out.println("MAP LOADED");
         renderer = new OrthogonalTiledMapRenderer(map, 1/16f);
     }
 

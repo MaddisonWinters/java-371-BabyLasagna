@@ -1,17 +1,14 @@
 package cs.BabyLasagna.GameObj;
 
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.utils.Array;
 import cs.BabyLasagna.Game;
-import cs.BabyLasagna.Levels.Util;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.math.Rectangle;
-import org.w3c.dom.css.Rect;
+import cs.BabyLasagna.SoundManager.GameSnd.PlayerSnd;
 
 
 public class Player extends GameObj {
@@ -73,6 +70,7 @@ public class Player extends GameObj {
         // Jump (only if grounded/on ground)
         if (uidata.jump_pressed && grounded) {
             velocity.y = JUMP_FORCE;
+            PlayerSnd.jump();
         }
         velocity.y += GRAVITY * deltaTime;
 

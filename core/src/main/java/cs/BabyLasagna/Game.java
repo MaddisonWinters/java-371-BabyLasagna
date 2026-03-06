@@ -4,8 +4,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import cs.BabyLasagna.GameObj.Player;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import cs.BabyLasagna.GameObj.Player;
+import cs.BabyLasagna.SoundManager.BGMusic.GameMsc;
 
 
 public class Game {
@@ -63,6 +64,8 @@ public class Game {
 
         map = new TmxMapLoader().load("levels/level1.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, 1/16f);
+
+        GameMsc.playMain();
     }
 
     public void dispose() {}

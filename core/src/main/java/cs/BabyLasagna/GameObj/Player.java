@@ -17,6 +17,7 @@ import org.w3c.dom.css.Rect;
 public class Player extends GameObj {
 
     private CoyoteTimeComponent coyoteTime;
+    private JumpBufferComponent jumpBuffer;
 
         ///  Constants
     private static final float  DRAW_WIDTH =16/(float)(Game.PIXELS_PER_TILE),
@@ -61,6 +62,12 @@ public class Player extends GameObj {
     public void update(float deltaTime, TiledMap map) {
         uidata.update();
 
+        if (uidata.jump_pressed) {
+            jumpBuffer.recordJumpPress();
+        }
+
+        jumpBuffer.update(deltaTime);
+
        velocity.x = uidata.getMoveXDir() * 6f;
 
         if (uidata.move_x == UIHandler.Ternary.Neg) {
@@ -71,8 +78,10 @@ public class Player extends GameObj {
         }
 
         // Jump (only if grounded/on ground)
-        if (uidata.jump_pressed && grounded) {
+        if (jumpBuffer.hasBufferedJump() && (grounded || coyoteTime.canJump())) {
             velocity.y = JUMP_FORCE;
+
+            jumpBuffer.consume();
         }
         velocity.y += GRAVITY * deltaTime;
 
@@ -82,7 +91,9 @@ public class Player extends GameObj {
 
     public Player(float x, float y) {
         super(x, y, HIT_WIDTH, HIT_HEIGHT);
+
         coyoteTime = new CoyoteTimeComponent(2f);
+        jumpBuffer = new JumpBufferComponent(0.12f);
     }
 }
 

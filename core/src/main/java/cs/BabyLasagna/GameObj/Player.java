@@ -86,7 +86,7 @@ public class Player extends GameObj {
 
     public Player(float x, float y) {
         super(x, y, HIT_WIDTH, HIT_HEIGHT);
-        coyoteTime = new CoyoteTimeComponent(2f);
+        coyoteTime = new CoyoteTimeComponent(0.12f);
     }
 }
 

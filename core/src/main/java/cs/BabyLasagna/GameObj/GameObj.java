@@ -46,8 +46,8 @@ public abstract class GameObj {
         // Calculate area of relevance in tilemap
         int startX = (int)Math.floor(Math.min(hitbox.x, hitbox.x+movement_vec.x));
         int startY = (int)Math.floor(Math.min(hitbox.y, hitbox.y+movement_vec.y));
-        int endX   = (int)Math.ceil(Math.max(hitbox.x+hitbox.width,  hitbox.x+hitbox.width+movement_vec.x));
-        int endY   = (int)Math.ceil(Math.max(hitbox.y+hitbox.height, hitbox.y+hitbox.width+movement_vec.y));
+        int endX   = (int)Math.ceil(hitbox.width + Math.max(hitbox.x, hitbox.x+movement_vec.x));
+        int endY   = (int)Math.ceil(hitbox.height+ Math.max(hitbox.y, hitbox.y+movement_vec.y));
 
         // Get relevant tile rectangles/hitboxes
         Util.getTiles(

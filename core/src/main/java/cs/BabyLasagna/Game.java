@@ -64,21 +64,22 @@ public class Game {
     public Game(String level) {
         camera = new OrthographicCamera();
         updateViewport(1,1);
-        player = new Player(3,3);
-        player.addTop(LasagnaFlavor.Cheese);
-        player.addTop(LasagnaFlavor.Plain);
-
-        lasagna = new LasagnaStack(4,6, true, true);
-        lasagna.addTop(LasagnaFlavor.Plain);
-        lasagna.addTop(LasagnaFlavor.Cheese);
-        lasagna.addTop(LasagnaFlavor.Cheese);
-        lasagna.addTop(LasagnaFlavor.Cheese);
-        lasagna.addTop(LasagnaFlavor.Plain);
-        lasagna.addTop(LasagnaFlavor.Plain);
-        lasagna.addTop(LasagnaFlavor.Cheese);
 
         map = new TmxMapLoader().load("levels/level1.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, 1/16f);
+
+        player = new Player(3,3);
+        player.addTop(LasagnaFlavor.Cheese, map);
+        player.addTop(LasagnaFlavor.Plain, map);
+
+        lasagna = new LasagnaStack(4,6, true, true);
+        lasagna.addTop(LasagnaFlavor.Plain, map);
+        lasagna.addTop(LasagnaFlavor.Cheese, map);
+        lasagna.addTop(LasagnaFlavor.Cheese, map);
+        lasagna.addTop(LasagnaFlavor.Cheese, map);
+        lasagna.addTop(LasagnaFlavor.Plain, map);
+        lasagna.addTop(LasagnaFlavor.Plain, map);
+        lasagna.addTop(LasagnaFlavor.Cheese, map);
     }
 
     public void dispose() {}

@@ -23,8 +23,8 @@ public class Player extends LasagnaStack {
         uidata.update();
 
         if (debug) {
-            if (uidata.addTop.press) addTop(LasagnaFlavor.Plain);
-            if (uidata.addBot.press) addBottom(LasagnaFlavor.Plain);
+            if (uidata.addTop.press) addTop(LasagnaFlavor.Plain, map);
+            if (uidata.addBot.press) addBottom(LasagnaFlavor.Plain, map);
             if (uidata.popTop.press) popTop();
             if (uidata.popBot.press) popBottom();
         }

@@ -1,12 +1,17 @@
 package cs.BabyLasagna.GameObj;
 
+import java.util.ArrayDeque;
+
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import cs.BabyLasagna.Game;
-import cs.BabyLasagna.TextureManager.Lasagna.*;
-import cs.BabyLasagna.TextureManager;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
 
-import java.util.ArrayDeque;
+import cs.BabyLasagna.Game;
+import cs.BabyLasagna.TextureManager;
+import cs.BabyLasagna.TextureManager.Lasagna.LasagnaFlavor;
+import cs.BabyLasagna.TextureManager.Lasagna.LasagnaRegion;
+import cs.BabyLasagna.Levels.Util;
 
 public class LasagnaStack extends GameObj {
 
@@ -63,8 +68,8 @@ public class LasagnaStack extends GameObj {
         // Draw each layer
         int i = 0;
         for (final Layer layer : stack) {
-            if (++i == 1) continue;
-            if (i == stack.size()) break;
+            if (++i == 1 && hasLegs) continue;
+            if (hasHead && i == stack.size()) break;
 
             TextureManager.draw(
                 batch,
@@ -103,21 +108,73 @@ public class LasagnaStack extends GameObj {
         moveWithCollisions(deltaTime, map);
     }
 
+    protected boolean checkFit(TiledMap map, boolean up) {
+        Rectangle hb = new Rectangle(
+            hitbox.x,
+            hitbox.y - LasagnaRegion.Layer1.reg.gh,
+            hitbox.width,
+            hitbox.height + 2*LasagnaRegion.Layer1.reg.gh
+        );
+
+        Array<Rectangle> tile_rects = new Array<>();
+        Util.getTiles(
+            map, 
+            "Wall",
+            tile_rects,
+            (int)Math.floor(hb.x),
+            (int)Math.floor(hb.y),
+            (int)Math.ceil(hb.x + hb.width),
+            (int)Math.ceil(hb.y + hb.height)
+        );
+
+        for (final Rectangle tile : tile_rects) {
+            if (!tile.overlaps(hb)) continue;
+
+            float dy = (hb.y + hb.height*0.5f) - (tile.y + tile.height*0.5f);
+
+            if (dy < 0) {
+                hb.height = tile.y - hb.y;
+            }
+            else {
+                float tileTop = tile.y + tile.height;
+                hb.height = (hb.y + hb.height) - tileTop;
+                hb.y = tileTop;
+            }
+        }
+        // If can't fit, then return false
+        hb.height -= hitbox.height + LasagnaRegion.Layer1.reg.gh;
+        if (hb.height < 0) return false;
+        
+        // Can fit, so get correct position for new hitbox
+        if (up) {
+            hitbox.y = Math.min(hitbox.y, hb.y+hb.height);
+        }
+        else {
+            hitbox.y -= LasagnaRegion.Layer1.reg.gh;
+            hitbox.y = Math.max(hitbox.y, hb.y+hb.height);
+        }
+
+        return true;
+    }
+
         /// Add/Remove layers
-    public void addBottom(Layer layer) {
+    public boolean addBottom(Layer layer, TiledMap map) {
+        if (!checkFit(map, false)) return false;
         stack.push(layer);
         setHitboxHeight();
-        hitbox.y -= LasagnaRegion.Layer1.reg.gh;
+        return true;
     }
-    public void addBottom(LasagnaFlavor flavor) {
-        addBottom(Layer.make(flavor, LasagnaRegion.randLayer()));
+    public boolean addBottom(LasagnaFlavor flavor, TiledMap map) {
+        return addBottom(Layer.make(flavor, LasagnaRegion.randLayer()), map);
     }
-    public void addTop(Layer layer) {
+    public boolean addTop(Layer layer, TiledMap map) {
+        if (!checkFit(map, true)) return false;
         stack.addLast(layer);
         setHitboxHeight();
+        return true;
     }
-    public void addTop(LasagnaFlavor flavor) {
-        addTop(Layer.make(flavor, LasagnaRegion.randLayer()));
+    public boolean addTop(LasagnaFlavor flavor, TiledMap map) {
+        return addTop(Layer.make(flavor, LasagnaRegion.randLayer()), map);
     }
 
     public LasagnaFlavor popBottom() {

@@ -26,4 +26,12 @@ public class CoyoteTimeComponent {
         }
     }
 
+    public boolean canJump() {
+        return coyoteTimer > 0f;
+    }
+
+    public void consume() {
+        coyoteTimer = 0f;
+    }
+
 }

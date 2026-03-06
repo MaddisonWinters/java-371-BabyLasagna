@@ -17,6 +17,7 @@ import org.w3c.dom.css.Rect;
 public class Player extends GameObj {
 
     private CoyoteTimeComponent coyoteTime;
+    private FastFallingComponent fastFall;
 
         ///  Constants
     private static final float  DRAW_WIDTH =16/(float)(Game.PIXELS_PER_TILE),
@@ -61,7 +62,10 @@ public class Player extends GameObj {
     public void update(float deltaTime, TiledMap map) {
         uidata.update();
 
-       velocity.x = uidata.getMoveXDir() * 6f;
+        // Update coyote timer
+        coyoteTime.update(deltaTime, grounded);
+
+        velocity.x = uidata.getMoveXDir() * 6f;
 
         if (uidata.move_x == UIHandler.Ternary.Neg) {
             facingRight = false;
@@ -71,10 +75,18 @@ public class Player extends GameObj {
         }
 
         // Jump (only if grounded/on ground)
-        if (uidata.jump_pressed && grounded) {
+        if (uidata.jump_pressed && (grounded || coyoteTime.canJump())) {
             velocity.y = JUMP_FORCE;
+            coyoteTime.consume(); // prevent double jump
         }
-        velocity.y += GRAVITY * deltaTime;
+
+        velocity.y = fastFall.apply(
+            velocity.y,
+            GRAVITY,
+            deltaTime,
+            grounded,
+            uidata.move_y == UIHandler.Ternary.Neg
+        );
 
         // Move and collide with tilemap
         moveWithCollisions(deltaTime, map);
@@ -82,7 +94,9 @@ public class Player extends GameObj {
 
     public Player(float x, float y) {
         super(x, y, HIT_WIDTH, HIT_HEIGHT);
-        coyoteTime = new CoyoteTimeComponent(2f);
+
+        coyoteTime = new CoyoteTimeComponent(0.12f);
+        fastFall = new FastFallingComponent(2.0f);
     }
 }
 

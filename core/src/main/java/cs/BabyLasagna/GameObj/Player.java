@@ -23,8 +23,8 @@ public class Player extends LasagnaStack {
         uidata.update();
 
         if (debug) {
-            if (uidata.addTop.press) addTop(LasagnaFlavor.Plain, map);
-            if (uidata.addBot.press) addBottom(LasagnaFlavor.Plain, map);
+            if (uidata.addTop.press) addTop(LasagnaFlavor.Plain);
+            if (uidata.addBot.press) addBottom(LasagnaFlavor.Plain);
             if (uidata.popTop.press) popTop();
             if (uidata.popBot.press) popBottom();
         }
@@ -46,8 +46,8 @@ public class Player extends LasagnaStack {
         super.update(deltaTime, map);
     }
 
-    public Player(float x, float y) {
-        super(x, y, true, true);
+    public Player(TiledMap map_, float x, float y) {
+        super(map_, x, y, true, true);
         coyoteTime = new CoyoteTimeComponent(2f);
     }
 }

@@ -158,23 +158,23 @@ public class LasagnaStack extends GameObj {
     }
 
         /// Add/Remove layers
-    public boolean addBottom(Layer layer, TiledMap map) {
+    public boolean addBottom(Layer layer) {
         if (!checkFit(map, false)) return false;
         stack.push(layer);
         setHitboxHeight();
         return true;
     }
-    public boolean addBottom(LasagnaFlavor flavor, TiledMap map) {
-        return addBottom(Layer.make(flavor, LasagnaRegion.randLayer()), map);
+    public boolean addBottom(LasagnaFlavor flavor) {
+        return addBottom(Layer.make(flavor, LasagnaRegion.randLayer()));
     }
-    public boolean addTop(Layer layer, TiledMap map) {
+    public boolean addTop(Layer layer) {
         if (!checkFit(map, true)) return false;
         stack.addLast(layer);
         setHitboxHeight();
         return true;
     }
-    public boolean addTop(LasagnaFlavor flavor, TiledMap map) {
-        return addTop(Layer.make(flavor, LasagnaRegion.randLayer()), map);
+    public boolean addTop(LasagnaFlavor flavor) {
+        return addTop(Layer.make(flavor, LasagnaRegion.randLayer()));
     }
 
     public LasagnaFlavor popBottom() {
@@ -216,8 +216,8 @@ public class LasagnaStack extends GameObj {
         hitbox.height += (stack.size()-2) * LasagnaRegion.Layer1.reg.gh;
     }
 
-    public LasagnaStack(float x, float y, boolean head, boolean legs) {
-        super(x,y,1f,1f);
+    public LasagnaStack(TiledMap map_, float x, float y, boolean head, boolean legs) {
+        super(map_, x,y,1f,1f);
         hasHead = head;
         hasLegs = legs;
         setHitboxHeight();

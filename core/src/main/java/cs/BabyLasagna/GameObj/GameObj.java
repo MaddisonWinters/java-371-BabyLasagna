@@ -17,9 +17,8 @@ public abstract class GameObj {
     protected final Vector2 velocity = new Vector2();
     protected boolean grounded = false;
 
-    public GameObj() {
-
-    }
+        /// Environment
+    protected final TiledMap map;
 
         /// Getters
     public final Vector2 getPosition() { return new Vector2(hitbox.x, hitbox.y); }
@@ -116,11 +115,12 @@ public abstract class GameObj {
     }
 
         /// Constructors
-    GameObj(float x, float y, float width, float height, float vx, float vy) {
+    GameObj(TiledMap map_, float x, float y, float width, float height, float vx, float vy) {
         hitbox.set(x, y, width, height);
         velocity.set(vx, vy);
+        map = map_;
     }
-    GameObj(float x, float y, float width, float height) {
-        this(x,y,width,height,0,0);
+    GameObj(TiledMap map_, float x, float y, float width, float height) {
+        this(map_,x,y,width,height,0,0);
     }
 }

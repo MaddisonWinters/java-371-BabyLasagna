@@ -61,7 +61,10 @@ public class Player extends GameObj {
     public void update(float deltaTime, TiledMap map) {
         uidata.update();
 
-       velocity.x = uidata.getMoveXDir() * 6f;
+        // Update coyote timer
+        coyoteTime.update(deltaTime, grounded);
+
+        velocity.x = uidata.getMoveXDir() * 6f;
 
         if (uidata.move_x == UIHandler.Ternary.Neg) {
             facingRight = false;
@@ -71,8 +74,9 @@ public class Player extends GameObj {
         }
 
         // Jump (only if grounded/on ground)
-        if (uidata.jump_pressed && grounded) {
+        if (uidata.jump_pressed && (grounded || coyoteTime.canJump())) {
             velocity.y = JUMP_FORCE;
+            coyoteTime.consume(); // prevent double jump
         }
         velocity.y += GRAVITY * deltaTime;
 

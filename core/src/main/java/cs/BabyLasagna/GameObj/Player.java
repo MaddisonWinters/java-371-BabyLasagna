@@ -6,6 +6,7 @@ import cs.BabyLasagna.TextureManager.Lasagna.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import cs.BabyLasagna.SoundManager.GameSnd.PlayerSnd;
 
 
 public class Player extends LasagnaStack {
@@ -35,10 +36,10 @@ public class Player extends LasagnaStack {
         jumpBuffer.update(deltaTime);
 
         if (debug) {
-            if (uidata.addTop.press) addTop(LasagnaFlavor.Plain);
-            if (uidata.addBot.press) addBottom(LasagnaFlavor.Plain);
-            if (uidata.popTop.press) popTop();
-            if (uidata.popBot.press) popBottom();
+            if (uidata.addTop.press) { addTop(LasagnaFlavor.Plain); PlayerSnd.grow(); }
+            if (uidata.addBot.press) { addBottom(LasagnaFlavor.Plain); PlayerSnd.grow(); }
+            if (uidata.popTop.press) { popTop(); PlayerSnd.shrink(); }
+            if (uidata.popBot.press) { popBottom(); PlayerSnd.shrink(); }
         }
 
         velocity.x = uidata.getMoveXDir() * 6f;
@@ -55,6 +56,7 @@ public class Player extends LasagnaStack {
             velocity.y = JUMP_FORCE;
             coyoteTime.consume(); // prevent double jump
             jumpBuffer.consume();
+            PlayerSnd.jump();
         }
 
         velocity.y = fastFall.apply(

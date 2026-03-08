@@ -8,6 +8,7 @@ import cs.BabyLasagna.GameObj.LasagnaStack;
 import cs.BabyLasagna.GameObj.Player;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import cs.BabyLasagna.TextureManager.Lasagna.*;
+import cs.BabyLasagna.SoundManager.BGMusic.GameMsc;
 
 
 public class Game {
@@ -80,6 +81,7 @@ public class Game {
         lasagna.addTop(LasagnaFlavor.Plain);
         lasagna.addTop(LasagnaFlavor.Plain);
         lasagna.addTop(LasagnaFlavor.Cheese);
+        GameMsc.playMain();
     }
 
     public void dispose() {}

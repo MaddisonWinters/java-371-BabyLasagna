@@ -2,7 +2,6 @@ package cs.BabyLasagna;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 
@@ -34,8 +33,6 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void resize(int width, int height) {
-        final int MAX_VIEWPORT_SIZE = 20;
-
         // If the window is minimized on a desktop (LWJGL3) platform, width and height are 0
         if(width <= 0 || height <= 0) return;
 

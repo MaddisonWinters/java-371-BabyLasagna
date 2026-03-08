@@ -9,14 +9,16 @@ import cs.BabyLasagna.Levels.Util;
 
 // A generic object that has a hitbox, velocity, and movement/collision functions
 public abstract class GameObj {
+        ///  Constants
+    protected static final float GRAVITY = -30f;
+
         /// Positional members
     protected final Rectangle hitbox = new Rectangle();
     protected final Vector2 velocity = new Vector2();
     protected boolean grounded = false;
 
-    public GameObj() {
-
-    }
+        /// Environment
+    protected final TiledMap map;
 
         /// Getters
     public final Vector2 getPosition() { return new Vector2(hitbox.x, hitbox.y); }
@@ -43,8 +45,8 @@ public abstract class GameObj {
         // Calculate area of relevance in tilemap
         int startX = (int)Math.floor(Math.min(hitbox.x, hitbox.x+movement_vec.x));
         int startY = (int)Math.floor(Math.min(hitbox.y, hitbox.y+movement_vec.y));
-        int endX   = (int)Math.ceil(Math.max(hitbox.x+hitbox.width,  hitbox.x+hitbox.width+movement_vec.x));
-        int endY   = (int)Math.ceil(Math.max(hitbox.y+hitbox.height, hitbox.y+hitbox.width+movement_vec.y));
+        int endX   = (int)Math.ceil(hitbox.width + Math.max(hitbox.x, hitbox.x+movement_vec.x));
+        int endY   = (int)Math.ceil(hitbox.height+ Math.max(hitbox.y, hitbox.y+movement_vec.y));
 
         // Get relevant tile rectangles/hitboxes
         Util.getTiles(
@@ -113,11 +115,12 @@ public abstract class GameObj {
     }
 
         /// Constructors
-    GameObj(float x, float y, float width, float height, float vx, float vy) {
+    GameObj(TiledMap map_, float x, float y, float width, float height, float vx, float vy) {
         hitbox.set(x, y, width, height);
         velocity.set(vx, vy);
+        map = map_;
     }
-    GameObj(float x, float y, float width, float height) {
-        this(x,y,width,height,0,0);
+    GameObj(TiledMap map_, float x, float y, float width, float height) {
+        this(map_,x,y,width,height,0,0);
     }
 }

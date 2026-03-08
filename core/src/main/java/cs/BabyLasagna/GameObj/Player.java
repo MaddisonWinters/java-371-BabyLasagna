@@ -1,63 +1,24 @@
 package cs.BabyLasagna.GameObj;
 
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.utils.Array;
-import cs.BabyLasagna.Game;
-import cs.BabyLasagna.Levels.Util;
+import cs.BabyLasagna.TextureManager.Lasagna.*;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.math.Rectangle;
-import org.w3c.dom.css.Rect;
 
 
-public class Player extends GameObj {
+public class Player extends LasagnaStack {
 
     private CoyoteTimeComponent coyoteTime;
     private FastFallingComponent fastFall;
     private JumpBufferComponent jumpBuffer;
 
-        ///  Constants
-    private static final float  DRAW_WIDTH =16/(float)(Game.PIXELS_PER_TILE),
-                                DRAW_HEIGHT=17/(float)(Game.PIXELS_PER_TILE);
-    private static final float  DRAW_X     =0f,
-                                DRAW_Y     =0f;
-    private static final float  HIT_WIDTH  =16/(float)(Game.PIXELS_PER_TILE),
-                                HIT_HEIGHT =14/(float)(Game.PIXELS_PER_TILE);
-
-    private static final float GRAVITY = -30f;
     private static final float JUMP_FORCE = 12f;
 
-    private static final Texture texture;
     private static final UIHandler uidata = UIHandler.getUI();
 
-    static {
-        texture = new Texture("lasagna_single.png");
-    }
-
-    private boolean facingRight = true;
-
-    @Override
-    public void render(float deltaTime, SpriteBatch batch) {
-        if(facingRight) {
-            batch.draw(texture,
-                hitbox.x + DRAW_X,
-                hitbox.y + DRAW_Y,
-                DRAW_WIDTH,
-                DRAW_HEIGHT);
-        }
-        else {
-            batch.draw(texture,
-                hitbox.x + DRAW_X + hitbox.width,
-                hitbox.y + DRAW_Y,
-                -DRAW_WIDTH,
-                DRAW_HEIGHT
-            );
-        }
-    }
+    private static boolean debug = true;
 
     @Override
     public void update(float deltaTime, TiledMap map) {
@@ -67,11 +28,18 @@ public class Player extends GameObj {
 
         velocity.x = uidata.getMoveXDir() * 6f;
 
-        if (uidata.jump_pressed) {
+        if (uidata.jump.press) {
             jumpBuffer.recordJumpPress();
         }
 
         jumpBuffer.update(deltaTime);
+
+        if (debug) {
+            if (uidata.addTop.press) addTop(LasagnaFlavor.Plain);
+            if (uidata.addBot.press) addBottom(LasagnaFlavor.Plain);
+            if (uidata.popTop.press) popTop();
+            if (uidata.popBot.press) popBottom();
+        }
 
         velocity.x = uidata.getMoveXDir() * 6f;
 
@@ -97,18 +65,16 @@ public class Player extends GameObj {
             uidata.move_y == UIHandler.Ternary.Neg
         );
 
-        // Move and collide with tilemap
-        moveWithCollisions(deltaTime, map);
+        super.update(deltaTime, map);
     }
-
-    public Player(float x, float y) {
-        super(x, y, HIT_WIDTH, HIT_HEIGHT);
-
+    public Player(TiledMap map_, float x, float y) {
+        super(map_, x, y, true, true);
         coyoteTime = new CoyoteTimeComponent(0.12f);
         fastFall = new FastFallingComponent(2.0f);
         jumpBuffer = new JumpBufferComponent(0.12f);
     }
 }
+
 
 // Singleton class for handling player-UI
 class UIHandler {
@@ -131,11 +97,42 @@ class UIHandler {
         public float toFloat() { return this.i; }
     }
 
+    public class KeyStatus {
+        public boolean keyDown = false; // The current state of the key (down/up)
+        public boolean press = false; // If the key was just pressed
+        public boolean release = false; // If the key was just released
+
+        private final int[] keys;
+
+        public KeyStatus(int key) { keys = new int[1]; keys[0] = key; }
+        public KeyStatus(int[] keys_) { keys = keys_.clone(); }
+        
+        public void update() {
+            boolean newKeyDown = false;
+            for (int k : keys) {
+                newKeyDown |= Gdx.input.isKeyPressed(k);
+                if (newKeyDown) break;
+            }
+
+            if (keyDown == newKeyDown) {
+                press = false;
+                release = false;
+                return;
+            }
+            keyDown = newKeyDown;
+            press = newKeyDown;
+            release = !newKeyDown;
+        }
+    }
+
     // Not bothering with getters/setters since this class has such a limited scope of use anyways
     public Ternary move_x = Ternary.Zero;
     public Ternary move_y = Ternary.Zero;
-    public boolean jump_held = false;
-    public boolean jump_pressed = false;
+    public KeyStatus jump = new KeyStatus(new int[]{Keys.SPACE, Keys.UP, Keys.W});
+    public KeyStatus addTop = new KeyStatus(Keys.O);
+    public KeyStatus addBot = new KeyStatus(Keys.P);
+    public KeyStatus popTop = new KeyStatus(Keys.L);
+    public KeyStatus popBot = new KeyStatus(Keys.SEMICOLON);
 
     public float getMoveXDir() { return move_x.toFloat(); }
     public float getMoveYDir() { return move_y.toFloat(); }
@@ -171,7 +168,10 @@ class UIHandler {
             move_y = Ternary.Neg;
 
         // Set jump state
-        jump_pressed = up && (!jump_held);
-        jump_held = up;
+        jump.update();
+        addTop.update();
+        addBot.update();
+        popTop.update();
+        popBot.update();
     }
 }

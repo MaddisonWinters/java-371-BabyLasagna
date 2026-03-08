@@ -11,9 +11,9 @@ public class FastFallingComponent {
     public float apply(float velocityY, float gravity, float delta, boolean grounded, boolean pressingDown) {
 
         if (!grounded && pressingDown && velocityY < 0f) {
-            return velocityY + gravity * multiplier * delta;
+            return velocityY + gravity * (multiplier-1f) * delta;
         }
 
-        return velocityY + gravity * delta;
+        return velocityY;
     }
 }

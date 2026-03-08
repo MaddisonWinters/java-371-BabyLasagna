@@ -18,6 +18,7 @@ public class Player extends GameObj {
 
     private CoyoteTimeComponent coyoteTime;
     private FastFallingComponent fastFall;
+    private JumpBufferComponent jumpBuffer;
 
         ///  Constants
     private static final float  DRAW_WIDTH =16/(float)(Game.PIXELS_PER_TILE),
@@ -61,9 +62,16 @@ public class Player extends GameObj {
     @Override
     public void update(float deltaTime, TiledMap map) {
         uidata.update();
-
         // Update coyote timer
         coyoteTime.update(deltaTime, grounded);
+
+        velocity.x = uidata.getMoveXDir() * 6f;
+
+        if (uidata.jump_pressed) {
+            jumpBuffer.recordJumpPress();
+        }
+
+        jumpBuffer.update(deltaTime);
 
         velocity.x = uidata.getMoveXDir() * 6f;
 
@@ -75,9 +83,10 @@ public class Player extends GameObj {
         }
 
         // Jump (only if grounded/on ground)
-        if (uidata.jump_pressed && (grounded || coyoteTime.canJump())) {
+        if (jumpBuffer.hasBufferedJump() && (grounded || coyoteTime.canJump())) {
             velocity.y = JUMP_FORCE;
             coyoteTime.consume(); // prevent double jump
+            jumpBuffer.consume();
         }
 
         velocity.y = fastFall.apply(
@@ -97,6 +106,7 @@ public class Player extends GameObj {
 
         coyoteTime = new CoyoteTimeComponent(0.12f);
         fastFall = new FastFallingComponent(2.0f);
+        jumpBuffer = new JumpBufferComponent(0.12f);
     }
 }
 

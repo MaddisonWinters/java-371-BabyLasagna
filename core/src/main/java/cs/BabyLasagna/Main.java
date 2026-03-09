@@ -18,10 +18,10 @@ public class Main extends ApplicationAdapter {
     private Texture name;
 
     //button pos (Sorry Michael ik how u feel ab floats)
-    float buttonXpos = 200;
-    float buttonYpos = 200;
-    float buttonWidth = 200;
-    float buttonHeight = 100;
+    float buttonXpos = 192;
+    float buttonYpos = 150;
+    float buttonWidth = 220;
+    float buttonHeight = 120;
 
     @Override
     public void create() {
@@ -36,10 +36,15 @@ public class Main extends ApplicationAdapter {
     public void render() {
         float deltaTime = Gdx.graphics.getDeltaTime();
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
-        batch.begin();
-
+        //if esc is pressed need to paused game & bring up map
+        //add exit button
+        //add level options
+        //add mini pop up for user tutorial
+        //reset button on death
         if(menu){
-            batch.draw(name, 200, 400, 400, 100);
+            batch.begin();
+
+            batch.draw(name, 130, 250, 350, 250);
             batch.draw(button,buttonXpos,buttonYpos,buttonWidth,buttonHeight);
 
             //if clicked on
@@ -49,19 +54,17 @@ public class Main extends ApplicationAdapter {
                 float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
                 //does click happen on button
                 if(mouseX > buttonXpos && mouseX < buttonXpos + buttonWidth && mouseY > buttonYpos && mouseY < buttonYpos + buttonHeight){
-                   System.out.println("button is pressed");
-                    System.out.println("GAME CONSTRUCTOR START");
                     game = new Game("test");
                     menu = false;
                 }
             }
+
             batch.end();
             return;
         }
 
         game.update(deltaTime);
         game.render(deltaTime, batch);
-
     }
 
     @Override

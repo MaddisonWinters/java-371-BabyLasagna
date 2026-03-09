@@ -62,9 +62,7 @@ public class Game {
         updateViewport(1,1);
         player = new Player(3,3);
 
-        System.out.println("BEFORE MAP LOADED");
         map = new TmxMapLoader().load("levels/level1.tmx");
-        System.out.println("MAP LOADED");
         renderer = new OrthogonalTiledMapRenderer(map, 1/16f);
     }
 

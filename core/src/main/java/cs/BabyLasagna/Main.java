@@ -13,7 +13,7 @@ public class Main extends ApplicationAdapter {
     @Override
     public void create() {
         batch = new SpriteBatch();
-        game = new Game("test");
+        game = new Game("levels/level1.tmx");
     }
 
     @Override

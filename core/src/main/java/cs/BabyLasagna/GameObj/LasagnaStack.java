@@ -31,9 +31,9 @@ public class LasagnaStack extends GameObj {
     }
 
     protected ArrayDeque<Layer> stack = new ArrayDeque<>();
-    boolean hasHead = false;
-    boolean hasLegs = false;
-    boolean facingRight = false;
+    protected boolean hasHead = false;
+    protected boolean hasLegs = false;
+    protected boolean facingRight = false;
 
     @Override
     public void render(float deltaTime, SpriteBatch batch) {
@@ -53,7 +53,7 @@ public class LasagnaStack extends GameObj {
             TextureManager.draw(
                 batch,
                 // Take the flavor of the bottom layer
-                top_flavor.getTex(LasagnaRegion.Legs),
+                bot_flavor.getTex(LasagnaRegion.Legs),
                 hitbox.x,
                 hitbox.y,
                 LasagnaRegion.Legs.reg.gw,
@@ -90,7 +90,7 @@ public class LasagnaStack extends GameObj {
             TextureManager.draw(
                 batch,
                 // Take flavor of top layer
-                bot_flavor.getTex(LasagnaRegion.Head),
+                top_flavor.getTex(LasagnaRegion.Head),
                 hitbox.x,
                 hitbox.y + yoff,
                 LasagnaRegion.Head.reg.gw,
@@ -108,6 +108,7 @@ public class LasagnaStack extends GameObj {
         moveWithCollisions(deltaTime, map);
     }
 
+    // Perform Y collisions to see if the lasagna stack has room to grow
     protected boolean checkFit(TiledMap map, boolean up) {
         Rectangle hb = new Rectangle(
             hitbox.x,
@@ -167,6 +168,7 @@ public class LasagnaStack extends GameObj {
     public boolean addBottom(LasagnaFlavor flavor) {
         return addBottom(Layer.make(flavor, LasagnaRegion.randLayer()));
     }
+
     public boolean addTop(Layer layer) {
         if (!checkFit(map, true)) return false;
         stack.addLast(layer);
@@ -184,6 +186,7 @@ public class LasagnaStack extends GameObj {
         hitbox.y += LasagnaRegion.Layer1.reg.gh;
         return tmp;
     }
+
     public LasagnaFlavor popTop() {
         if (stack.isEmpty()) return null;
         LasagnaFlavor tmp = stack.removeLast().flavor;
@@ -193,11 +196,12 @@ public class LasagnaStack extends GameObj {
 
     public LasagnaFlavor peekTop()    {
         if (stack.isEmpty()) return null;
-        return stack.peekFirst().flavor;
+        return stack.peekLast().flavor;
     }
+
     public LasagnaFlavor peekBottom() {
         if (stack.isEmpty()) return null;
-        return stack.peekLast().flavor;
+        return stack.peekFirst().flavor;
     }
 
     protected void setHitboxHeight() {

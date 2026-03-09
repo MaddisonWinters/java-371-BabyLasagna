@@ -18,13 +18,11 @@ public class Game {
     private final OrthographicCamera camera;
     private final OrthogonalTiledMapRenderer renderer;
     private final Player player;
-    private final LasagnaStack lasagna;
 
     private final TiledMap map;
 
     public void update(float deltaTime) {
         player.update(deltaTime, map);
-        lasagna.update(deltaTime, map);
 
         camera.position.set(
             player.getX() + player.getHitbox().width / 2f,
@@ -41,7 +39,6 @@ public class Game {
 
         batch.begin();
         player.render(deltaTime, batch);
-        lasagna.render(deltaTime, batch);
         batch.end();
 
         renderer.setView(camera);
@@ -66,21 +63,12 @@ public class Game {
         camera = new OrthographicCamera();
         updateViewport(1,1);
 
-        map = new TmxMapLoader().load("levels/level1.tmx");
+        map = new TmxMapLoader().load(level);
         renderer = new OrthogonalTiledMapRenderer(map, 1/16f);
 
         player = new Player(map, 3,3);
         player.addTop(LasagnaFlavor.Cheese);
         player.addTop(LasagnaFlavor.Plain);
-
-        lasagna = new LasagnaStack(map, 4,6, true, true);
-        lasagna.addTop(LasagnaFlavor.Plain);
-        lasagna.addTop(LasagnaFlavor.Cheese);
-        lasagna.addTop(LasagnaFlavor.Cheese);
-        lasagna.addTop(LasagnaFlavor.Cheese);
-        lasagna.addTop(LasagnaFlavor.Plain);
-        lasagna.addTop(LasagnaFlavor.Plain);
-        lasagna.addTop(LasagnaFlavor.Cheese);
         GameMsc.playMain();
     }
 

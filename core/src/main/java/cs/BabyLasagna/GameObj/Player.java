@@ -1,6 +1,10 @@
 package cs.BabyLasagna.GameObj;
 
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import cs.BabyLasagna.GameObj.MyComponents.CoyoteTimeComponent;
+import cs.BabyLasagna.GameObj.MyComponents.FastFallingComponent;
+import cs.BabyLasagna.GameObj.MyComponents.JumpBufferComponent;
+import cs.BabyLasagna.GameObj.MyComponents.StateControllerComponent;
 import cs.BabyLasagna.TextureManager.Lasagna.*;
 
 import com.badlogic.gdx.math.Vector2;
@@ -8,12 +12,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import cs.BabyLasagna.SoundManager.GameSnd.PlayerSnd;
 
+// Return Later
 
 public class Player extends LasagnaStack {
 
     private CoyoteTimeComponent coyoteTime;
     private FastFallingComponent fastFall;
     private JumpBufferComponent jumpBuffer;
+    private StateControllerComponent<Player> stateController;
 
     private static final float JUMP_FORCE = 12f;
 
@@ -23,7 +29,12 @@ public class Player extends LasagnaStack {
 
     @Override
     public void update(float deltaTime, TiledMap map) {
+        if (stateComponent.isDead()) {
+            return;
+        }
+
         uidata.update();
+
         // Update coyote timer
         coyoteTime.update(deltaTime, grounded);
 
@@ -74,6 +85,10 @@ public class Player extends LasagnaStack {
         coyoteTime = new CoyoteTimeComponent(0.12f);
         fastFall = new FastFallingComponent(2.0f);
         jumpBuffer = new JumpBufferComponent(0.12f);
+        stateController = new StateControllerComponent<>(
+            this,
+            new IdleState()
+        );
     }
 }
 
@@ -108,7 +123,7 @@ class UIHandler {
 
         public KeyStatus(int key) { keys = new int[1]; keys[0] = key; }
         public KeyStatus(int[] keys_) { keys = keys_.clone(); }
-        
+
         public void update() {
             boolean newKeyDown = false;
             for (int k : keys) {

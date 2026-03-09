@@ -1,4 +1,4 @@
-package cs.BabyLasagna.GameObj;
+package cs.BabyLasagna.GameObj.MyComponents;
 
 public class JumpBufferComponent {
 

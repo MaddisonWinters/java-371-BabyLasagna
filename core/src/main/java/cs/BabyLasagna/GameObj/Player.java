@@ -25,6 +25,7 @@ public class Player extends LasagnaStack {
     private static final float JUMP_FORCE = 12f;
 
     private static final UIHandler uidata = UIHandler.getUI();
+    public UIHandler getUIData() { return uidata; }
 
     private static boolean debug = true;
 
@@ -87,6 +88,10 @@ public class Player extends LasagnaStack {
             this,
             new IdleState()
         );
+    }
+
+    public StateControllerComponent<Player> getStateController() {
+        return stateController;
     }
 }
 

@@ -5,6 +5,7 @@ import cs.BabyLasagna.GameObj.MyComponents.CoyoteTimeComponent;
 import cs.BabyLasagna.GameObj.MyComponents.FastFallingComponent;
 import cs.BabyLasagna.GameObj.MyComponents.JumpBufferComponent;
 import cs.BabyLasagna.GameObj.MyComponents.StateControllerComponent;
+import cs.BabyLasagna.GameObj.States.Player.*;
 import cs.BabyLasagna.TextureManager.Lasagna.*;
 
 import com.badlogic.gdx.math.Vector2;
@@ -29,9 +30,6 @@ public class Player extends LasagnaStack {
 
     @Override
     public void update(float deltaTime, TiledMap map) {
-        if (stateComponent.isDead()) {
-            return;
-        }
 
         uidata.update();
 

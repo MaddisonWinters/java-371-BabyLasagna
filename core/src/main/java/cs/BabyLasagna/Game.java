@@ -21,6 +21,8 @@ public class Game {
     private final LasagnaStack lasagna;
 
     private final TiledMap map;
+    private final int[] backgroundLayers;
+    private final int[] foregroundLayers;
 
     public void update(float deltaTime) {
         player.update(deltaTime, map);
@@ -38,14 +40,16 @@ public class Game {
         // camera.position.set(...)
         camera.update();
         batch.setProjectionMatrix(camera.combined);
+        renderer.setView(camera);
+
+        renderer.render(backgroundLayers);
 
         batch.begin();
         player.render(deltaTime, batch);
         lasagna.render(deltaTime, batch);
         batch.end();
 
-        renderer.setView(camera);
-        renderer.render();
+        renderer.render(foregroundLayers);
     }
 
     // Updates the viewport of the camera
@@ -68,6 +72,8 @@ public class Game {
 
         map = new TmxMapLoader().load("levels/level1.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, 1/16f);
+        backgroundLayers = new int[] {0, 1};
+        foregroundLayers = new int[] {2};
 
         player = new Player(map, 3,3);
         player.addTop(LasagnaFlavor.Cheese);

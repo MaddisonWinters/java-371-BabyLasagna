@@ -2,33 +2,22 @@ package cs.BabyLasagna;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
-    private static SpriteBatch batch;
+    public static SpriteBatch batch;
     private static Game game = null;
+    private Menu menu;
 
-    private boolean menu = true;
-    private Texture button;
-    private Texture name;
-
-    //button pos (Sorry Michael ik how u feel ab floats)
-    float buttonXpos = 192;
-    float buttonYpos = 150;
-    float buttonWidth = 220;
-    float buttonHeight = 120;
+    private boolean inMenu = true;
 
     @Override
     public void create() {
         batch = new SpriteBatch();
 
-        name = new Texture ("game_name.png");
-        button = new Texture ("play_button.png");
+        menu = new Menu();
 
     }
 
@@ -36,30 +25,25 @@ public class Main extends ApplicationAdapter {
     public void render() {
         float deltaTime = Gdx.graphics.getDeltaTime();
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
-        //if esc is pressed need to paused game & bring up map
-        //add exit button
-        //add level options
-        //add mini pop up for user tutorial
-        //reset button on death
-        if(menu){
-            batch.begin();
-
-            batch.draw(name, 130, 250, 350, 250);
-            batch.draw(button,buttonXpos,buttonYpos,buttonWidth,buttonHeight);
-
-            //if clicked on
-            if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
-                //get mouse pos
-                float mouseX = Gdx.input.getX();
-                float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
-                //does click happen on button
-                if(mouseX > buttonXpos && mouseX < buttonXpos + buttonWidth && mouseY > buttonYpos && mouseY < buttonYpos + buttonHeight){
-                    game = new Game("test");
-                    menu = false;
+//        if esc is pressed need to paused game & bring up map
+//        add exit button
+//        add level options
+//        add mini pop up for user tutorial
+//        reset button on death
+        if(inMenu){
+            menu.render();
+            if(menu.startGame()){
+                int level = menu.getLevel();
+                if(level ==1 ){
+                    game = new Game("level1");
+                    inMenu = false;
                 }
-            }
+                if(level == 2) {
+                    game = new Game("level2");
+                    inMenu = false;
+                }
 
-            batch.end();
+            }
             return;
         }
 
@@ -71,8 +55,7 @@ public class Main extends ApplicationAdapter {
     public void dispose() {
         batch.dispose();
         game.dispose();
-        button.dispose();
-        name.dispose();
+        menu.dispose();
 
     }
 

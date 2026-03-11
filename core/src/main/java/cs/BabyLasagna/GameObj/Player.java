@@ -7,6 +7,7 @@ import cs.BabyLasagna.GameObj.MyComponents.JumpBufferComponent;
 import cs.BabyLasagna.GameObj.MyComponents.StateControllerComponent;
 import cs.BabyLasagna.GameObj.States.Player.*;
 import cs.BabyLasagna.TextureManager.Lasagna.*;
+//import cs.BabyLasagna.GameObj.UIHandler;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.Gdx;
@@ -24,8 +25,9 @@ public class Player extends LasagnaStack {
 
     private static final float JUMP_FORCE = 12f;
 
-    private static final UIHandler uidata = UIHandler.getUI();
-    public UIHandler getUIData() { return uidata; }
+//    private static final UIHandler uidata = UIHandler.getUI();
+//    public UIHandler getUIData() { return uidata; }
+    private UIHandler uidata;
 
     private static boolean debug = true;
 
@@ -81,6 +83,7 @@ public class Player extends LasagnaStack {
     }
     public Player(TiledMap map_, float x, float y) {
         super(map_, x, y, true, true);
+        uidata = UIHandler.getUI();
         coyoteTime = new CoyoteTimeComponent(0.12f);
         fastFall = new FastFallingComponent(2.0f);
         jumpBuffer = new JumpBufferComponent(0.12f);
@@ -90,108 +93,109 @@ public class Player extends LasagnaStack {
         );
     }
 
+    public UIHandler getUIData() { return uidata; }
     public StateControllerComponent<Player> getStateController() {
         return stateController;
     }
 }
 
 
-// Singleton class for handling player-UI
-class UIHandler {
-    //  Singleton class shenanigans
-    private static UIHandler INSTANCE = null;
-    private UIHandler() {}
-    public static UIHandler getUI() {
-        if (INSTANCE == null) INSTANCE = new UIHandler();
-        return INSTANCE;
-    }
-
-    // Store -1,0,1 with an enum, convert to float with .toFloat()
-    public enum Ternary {
-        Neg(-1f),
-        Zero(0f),
-        Pos(1f);
-
-        final float i;
-        Ternary(float i) { this.i = i; }
-        public float toFloat() { return this.i; }
-    }
-
-    public class KeyStatus {
-        public boolean keyDown = false; // The current state of the key (down/up)
-        public boolean press = false; // If the key was just pressed
-        public boolean release = false; // If the key was just released
-
-        private final int[] keys;
-
-        public KeyStatus(int key) { keys = new int[1]; keys[0] = key; }
-        public KeyStatus(int[] keys_) { keys = keys_.clone(); }
-
-        public void update() {
-            boolean newKeyDown = false;
-            for (int k : keys) {
-                newKeyDown |= Gdx.input.isKeyPressed(k);
-                if (newKeyDown) break;
-            }
-
-            if (keyDown == newKeyDown) {
-                press = false;
-                release = false;
-                return;
-            }
-            keyDown = newKeyDown;
-            press = newKeyDown;
-            release = !newKeyDown;
-        }
-    }
-
-    // Not bothering with getters/setters since this class has such a limited scope of use anyways
-    public Ternary move_x = Ternary.Zero;
-    public Ternary move_y = Ternary.Zero;
-    public KeyStatus jump = new KeyStatus(new int[]{Keys.SPACE, Keys.UP, Keys.W});
-    public KeyStatus addTop = new KeyStatus(Keys.O);
-    public KeyStatus addBot = new KeyStatus(Keys.P);
-    public KeyStatus popTop = new KeyStatus(Keys.L);
-    public KeyStatus popBot = new KeyStatus(Keys.SEMICOLON);
-
-    public float getMoveXDir() { return move_x.toFloat(); }
-    public float getMoveYDir() { return move_y.toFloat(); }
-    public Vector2 getMoveVector() {
-        Vector2 v = new Vector2(move_x.toFloat(), move_y.toFloat());
-        v.nor();
-        return v;
-    }
-
-    // Gets all relevant UI and condenses it
-    public void update() {
-        boolean right, left, up, down;
-
-        right = Gdx.input.isKeyPressed(Keys.RIGHT) || Gdx.input.isKeyPressed(Keys.D);
-        left = Gdx.input.isKeyPressed(Keys.LEFT) || Gdx.input.isKeyPressed(Keys.A);
-        up = Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.SPACE);
-        down = Gdx.input.isKeyPressed(Keys.DOWN) || Gdx.input.isKeyPressed(Keys.S);
-
-        // Set `move_x`
-        if (right == left)
-            move_x = Ternary.Zero;
-        else if (right)
-            move_x = Ternary.Pos;
-        else
-            move_x = Ternary.Neg;
-
-        // Set `move_y`
-        if (up == down)
-            move_y = Ternary.Zero;
-        else if (up)
-            move_y = Ternary.Pos;
-        else
-            move_y = Ternary.Neg;
-
-        // Set jump state
-        jump.update();
-        addTop.update();
-        addBot.update();
-        popTop.update();
-        popBot.update();
-    }
-}
+//// Singleton class for handling player-UI
+//class UIHandler {
+//    //  Singleton class shenanigans
+//    private static UIHandler INSTANCE = null;
+//    private UIHandler() {}
+//    public static UIHandler getUI() {
+//        if (INSTANCE == null) INSTANCE = new UIHandler();
+//        return INSTANCE;
+//    }
+//
+//    // Store -1,0,1 with an enum, convert to float with .toFloat()
+//    public enum Ternary {
+//        Neg(-1f),
+//        Zero(0f),
+//        Pos(1f);
+//
+//        final float i;
+//        Ternary(float i) { this.i = i; }
+//        public float toFloat() { return this.i; }
+//    }
+//
+//    public class KeyStatus {
+//        public boolean keyDown = false; // The current state of the key (down/up)
+//        public boolean press = false; // If the key was just pressed
+//        public boolean release = false; // If the key was just released
+//
+//        private final int[] keys;
+//
+//        public KeyStatus(int key) { keys = new int[1]; keys[0] = key; }
+//        public KeyStatus(int[] keys_) { keys = keys_.clone(); }
+//
+//        public void update() {
+//            boolean newKeyDown = false;
+//            for (int k : keys) {
+//                newKeyDown |= Gdx.input.isKeyPressed(k);
+//                if (newKeyDown) break;
+//            }
+//
+//            if (keyDown == newKeyDown) {
+//                press = false;
+//                release = false;
+//                return;
+//            }
+//            keyDown = newKeyDown;
+//            press = newKeyDown;
+//            release = !newKeyDown;
+//        }
+//    }
+//
+//    // Not bothering with getters/setters since this class has such a limited scope of use anyways
+//    public Ternary move_x = Ternary.Zero;
+//    public Ternary move_y = Ternary.Zero;
+//    public KeyStatus jump = new KeyStatus(new int[]{Keys.SPACE, Keys.UP, Keys.W});
+//    public KeyStatus addTop = new KeyStatus(Keys.O);
+//    public KeyStatus addBot = new KeyStatus(Keys.P);
+//    public KeyStatus popTop = new KeyStatus(Keys.L);
+//    public KeyStatus popBot = new KeyStatus(Keys.SEMICOLON);
+//
+//    public float getMoveXDir() { return move_x.toFloat(); }
+//    public float getMoveYDir() { return move_y.toFloat(); }
+//    public Vector2 getMoveVector() {
+//        Vector2 v = new Vector2(move_x.toFloat(), move_y.toFloat());
+//        v.nor();
+//        return v;
+//    }
+//
+//    // Gets all relevant UI and condenses it
+//    public void update() {
+//        boolean right, left, up, down;
+//
+//        right = Gdx.input.isKeyPressed(Keys.RIGHT) || Gdx.input.isKeyPressed(Keys.D);
+//        left = Gdx.input.isKeyPressed(Keys.LEFT) || Gdx.input.isKeyPressed(Keys.A);
+//        up = Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.SPACE);
+//        down = Gdx.input.isKeyPressed(Keys.DOWN) || Gdx.input.isKeyPressed(Keys.S);
+//
+//        // Set `move_x`
+//        if (right == left)
+//            move_x = Ternary.Zero;
+//        else if (right)
+//            move_x = Ternary.Pos;
+//        else
+//            move_x = Ternary.Neg;
+//
+//        // Set `move_y`
+//        if (up == down)
+//            move_y = Ternary.Zero;
+//        else if (up)
+//            move_y = Ternary.Pos;
+//        else
+//            move_y = Ternary.Neg;
+//
+//        // Set jump state
+//        jump.update();
+//        addTop.update();
+//        addBot.update();
+//        popTop.update();
+//        popBot.update();
+//    }
+//}

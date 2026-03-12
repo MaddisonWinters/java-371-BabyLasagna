@@ -7,7 +7,6 @@ import cs.BabyLasagna.GameObj.MyComponents.JumpBufferComponent;
 import cs.BabyLasagna.GameObj.MyComponents.StateControllerComponent;
 import cs.BabyLasagna.GameObj.States.Player.*;
 import cs.BabyLasagna.TextureManager.Lasagna.*;
-//import cs.BabyLasagna.GameObj.UIHandler;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.Gdx;
@@ -35,6 +34,13 @@ public class Player extends LasagnaStack {
     public void update(float deltaTime, TiledMap map) {
 
         uidata.update();
+
+        // Makes sure the player doesn't stay in Idle
+        stateController.update(deltaTime); // Results in crash on launch
+
+        if (this.getStateController().isInState(IdleState.class)) {
+            System.out.println("Player is idle");
+        }
 
         // Update coyote timer
         coyoteTime.update(deltaTime, grounded);
@@ -84,13 +90,10 @@ public class Player extends LasagnaStack {
     public Player(TiledMap map_, float x, float y) {
         super(map_, x, y, true, true);
         uidata = UIHandler.getUI();
+        stateController = new StateControllerComponent<>(this, new IdleState());
         coyoteTime = new CoyoteTimeComponent(0.12f);
         fastFall = new FastFallingComponent(2.0f);
         jumpBuffer = new JumpBufferComponent(0.12f);
-        stateController = new StateControllerComponent<>(
-            this,
-            new IdleState()
-        );
     }
 
     public UIHandler getUIData() { return uidata; }

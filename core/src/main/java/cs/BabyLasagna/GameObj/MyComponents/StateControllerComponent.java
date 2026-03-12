@@ -16,6 +16,12 @@ public class StateControllerComponent<T> {
         }
     }
 
+    public State<T> getCurrentState() { return currentState; }
+
+    public boolean isInState(Class<? extends State<T>> stateType) {
+        return stateType.isInstance(currentState);
+    }
+
     public void update(float deltaTime) {
         if (currentState != null) {
             currentState.update(entity, deltaTime);

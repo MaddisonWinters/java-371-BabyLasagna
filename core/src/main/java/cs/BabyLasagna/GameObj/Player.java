@@ -35,8 +35,12 @@ public class Player extends LasagnaStack {
 
         uidata.update();
 
+        if (this.getStateController().isInState(IdleState.class)) {
+            System.out.println("Player is idle");
+        }
+
         // Makes sure the player doesn't stay in Idle
-        stateController.update(deltaTime); // Results in crash on launch
+        stateController.update(deltaTime);
 
         if (this.getStateController().isInState(IdleState.class)) {
             System.out.println("Player is idle");

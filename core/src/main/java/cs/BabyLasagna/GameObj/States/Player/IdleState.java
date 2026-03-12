@@ -19,7 +19,7 @@ public class IdleState implements State<Player> {
         }
 
         if (player.getUIData().getMoveXDir() != 0) {
-            player.getStateController().changeState((State<Player>) new RunState());
+            player.getStateController().changeState(new RunState());
         }
     }
 

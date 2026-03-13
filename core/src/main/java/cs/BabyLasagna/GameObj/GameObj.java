@@ -27,6 +27,7 @@ public abstract class GameObj {
     public final Rectangle getHitbox() { return new Rectangle(hitbox); }
     public final Vector2 getVelocity() { return new Vector2(velocity); }
     public boolean isGrounded() { return grounded; }
+    public float getGravity() { return GRAVITY; }
 
         ///  Setters
     protected final void setPosition(Vector2 v) { hitbox.x=v.x; hitbox.y=v.y; }

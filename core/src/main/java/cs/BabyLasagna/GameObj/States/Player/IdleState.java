@@ -14,12 +14,12 @@ public class IdleState implements State<Player> {
     public void update(Player player, float deltaTime) {
 
         if (!player.isGrounded()) {
-            player.getStateController().changeState((State<Player>) new FallState());
+            player.getStateController().changeState(player.fallState);
             return;
         }
 
         if (player.getUIData().getMoveXDir() != 0) {
-            player.getStateController().changeState(new RunState());
+            player.getStateController().changeState(player.runState);
         }
     }
 

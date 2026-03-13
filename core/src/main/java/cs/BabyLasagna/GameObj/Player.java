@@ -22,7 +22,13 @@ public class Player extends LasagnaStack {
     private JumpBufferComponent jumpBuffer;
     private StateControllerComponent<Player> stateController;
 
+    public final IdleState idleState = new IdleState();
+    public final RunState runState = new RunState();
+    public final FallState fallState = new FallState();
+    public final DeathState deathState = new DeathState();
+
     private static final float JUMP_FORCE = 12f;
+    private static final float MOVE_SPEED = 6f;
 
 //    private static final UIHandler uidata = UIHandler.getUI();
 //    public UIHandler getUIData() { return uidata; }
@@ -49,7 +55,7 @@ public class Player extends LasagnaStack {
         // Update coyote timer
         coyoteTime.update(deltaTime, grounded);
 
-        velocity.x = uidata.getMoveXDir() * 6f;
+        velocity.x = uidata.getMoveXDir() * MOVE_SPEED;
 
         if (uidata.jump.press) {
             jumpBuffer.recordJumpPress();
@@ -64,7 +70,7 @@ public class Player extends LasagnaStack {
             if (uidata.popBot.press) { popBottom(); PlayerSnd.shrink(); }
         }
 
-        velocity.x = uidata.getMoveXDir() * 6f;
+        velocity.x = uidata.getMoveXDir() * MOVE_SPEED;
 
         if (uidata.move_x == UIHandler.Ternary.Neg) {
             facingRight = false;
@@ -94,13 +100,14 @@ public class Player extends LasagnaStack {
     public Player(TiledMap map_, float x, float y) {
         super(map_, x, y, true, true);
         uidata = UIHandler.getUI();
-        stateController = new StateControllerComponent<>(this, new IdleState());
+        stateController = new StateControllerComponent<>(this, idleState);
         coyoteTime = new CoyoteTimeComponent(0.12f);
         fastFall = new FastFallingComponent(2.0f);
         jumpBuffer = new JumpBufferComponent(0.12f);
     }
 
     public UIHandler getUIData() { return uidata; }
+    public float getMoveSpeed() { return MOVE_SPEED; }
     public StateControllerComponent<Player> getStateController() {
         return stateController;
     }

@@ -29,6 +29,7 @@ public class Player extends LasagnaStack {
 
     private static final float JUMP_FORCE = 12f;
     private static final float MOVE_SPEED = 6f;
+    private final Vector2 spawnPosition;
 
 //    private static final UIHandler uidata = UIHandler.getUI();
 //    public UIHandler getUIData() { return uidata; }
@@ -107,6 +108,10 @@ public class Player extends LasagnaStack {
     }
     public Player(TiledMap map_, float x, float y) {
         super(map_, x, y, true, true);
+
+        // Save spawn point for respawn
+        spawnPosition = new Vector2(x, y);
+
         uidata = UIHandler.getUI();
         stateController = new StateControllerComponent<>(this, idleState);
         coyoteTime = new CoyoteTimeComponent(0.12f);
@@ -118,6 +123,31 @@ public class Player extends LasagnaStack {
     public float getMoveSpeed() { return MOVE_SPEED; }
     public StateControllerComponent<Player> getStateController() {
         return stateController;
+    }
+
+    public void kill() {
+
+        if (this.getStateController().isInState(DeathState.class))
+            return; // already dead
+
+        stateController.changeState(deathState);
+
+    }
+
+    public void respawn() {
+        // Reset position
+        setPosition(spawnPosition);
+
+        // Reset velocity
+        getVelocity().x = 0;
+        getVelocity().y = 0;
+
+        // Reset jump state
+        coyoteTime.consume();
+        jumpBuffer.consume();
+
+        // Reset facing direction if desired
+        facingRight = true;
     }
 }
 

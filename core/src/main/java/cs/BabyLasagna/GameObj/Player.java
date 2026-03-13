@@ -42,8 +42,16 @@ public class Player extends LasagnaStack {
 
         uidata.update();
 
+        // === Manual reset for testing ===
+        boolean reset = Gdx.input.isKeyPressed(Keys.X);
+        if (reset) {
+            kill();  // triggers DeathState
+        }
+
         // Makes sure the player doesn't stay in Idle
         stateController.update(deltaTime);
+
+
 
         if (this.getStateController().isInState(IdleState.class)) {
             System.out.println("Player is idle");

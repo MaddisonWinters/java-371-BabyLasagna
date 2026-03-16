@@ -2,6 +2,7 @@ package cs.BabyLasagna.GameObj;
 
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import cs.BabyLasagna.GameObj.MyComponents.CoyoteTimeComponent;
+import cs.BabyLasagna.GameObj.MyComponents.Facades.PlayerMovementFacade;
 import cs.BabyLasagna.GameObj.MyComponents.FastFallingComponent;
 import cs.BabyLasagna.GameObj.MyComponents.JumpBufferComponent;
 import cs.BabyLasagna.GameObj.MyComponents.StateControllerComponent;
@@ -17,9 +18,10 @@ import cs.BabyLasagna.SoundManager.GameSnd.PlayerSnd;
 
 public class Player extends LasagnaStack {
 
-    private CoyoteTimeComponent coyoteTime;
-    private FastFallingComponent fastFall;
-    private JumpBufferComponent jumpBuffer;
+//    private CoyoteTimeComponent coyoteTime;
+//    private FastFallingComponent fastFall;
+//    private JumpBufferComponent jumpBuffer;
+    private PlayerMovementFacade playerMovementFacade;
     private StateControllerComponent<Player> stateController;
 
     public final IdleState idleState = new IdleState();
@@ -114,7 +116,7 @@ public class Player extends LasagnaStack {
 
         super.update(deltaTime, map);
     }
-    public Player(TiledMap map_, float x, float y) {
+    public Player(TiledMap map_, float x, float y, PlayerMovementFacade playerMovementFacade) {
         super(map_, x, y, true, true);
 
         // Save spawn point for respawn
@@ -122,9 +124,11 @@ public class Player extends LasagnaStack {
 
         uidata = UIHandler.getUI();
         stateController = new StateControllerComponent<>(this, idleState);
-        coyoteTime = new CoyoteTimeComponent(0.12f);
-        fastFall = new FastFallingComponent(2.0f);
-        jumpBuffer = new JumpBufferComponent(0.12f);
+
+        this.playerMovementFacade = playerMovementFacade;
+//        coyoteTime = new CoyoteTimeComponent(0.12f);
+//        fastFall = new FastFallingComponent(2.0f);
+//        jumpBuffer = new JumpBufferComponent(0.12f);
     }
 
     public UIHandler getUIData() { return uidata; }

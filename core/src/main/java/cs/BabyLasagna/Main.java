@@ -4,12 +4,16 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.Input;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
     public static SpriteBatch batch;
     private static Game game = null;
     private Menu menu;
+    private PausedMenu pausedMenu;
+    private boolean paused = false;
+    private String currentLevel;
 
     private boolean inMenu = true;
 
@@ -18,37 +22,69 @@ public class Main extends ApplicationAdapter {
         batch = new SpriteBatch();
 
         menu = new Menu();
-
+        pausedMenu = new PausedMenu();
     }
 
     @Override
     public void render() {
         float deltaTime = Gdx.graphics.getDeltaTime();
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
-//        if esc is pressed need to paused game & bring up map
-//        add exit button
-//        add level options
-//        add mini pop up for user tutorial
-//        reset button on death
-        if(inMenu){
+
+        if(game == null){
+            paused = false;
             menu.render();
             if(menu.startGame()){
                 int level = menu.getLevel();
                 if(level ==1 ){
-                    game = new Game("level1");
+                    currentLevel = "level1";
+                    game = new Game(currentLevel);
                     inMenu = false;
+                    paused = false;
                 }
                 if(level == 2) {
-                    game = new Game("level2");
+                    currentLevel = "level2";
+                    game = new Game(currentLevel);
                     inMenu = false;
+                    paused = false;
                 }
 
             }
             return;
         }
+        // if esc is pressed need to paused game & bring up menu
+        if (game != null && Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            if (paused) {
+                paused = false;
+            } else {
+                paused = true;
+            }
+        }
+        game.render(deltaTime, batch);
+        if(paused){
+            //game.render(deltaTime, batch);
+            pausedMenu.render();
+
+            if(pausedMenu.resume()){
+                paused = false;
+            }
+
+            if(pausedMenu.restart()){
+                game = new Game(currentLevel);
+                paused = false;
+            }
+
+            if(pausedMenu.mainMenu()){
+                game.dispose();
+                game = null;
+                paused = false;
+                return;
+                //inMenu = true;
+                //menu.render();
+            }
+            return;
+        }
 
         game.update(deltaTime);
-        game.render(deltaTime, batch);
     }
 
     @Override
@@ -56,6 +92,7 @@ public class Main extends ApplicationAdapter {
         batch.dispose();
         game.dispose();
         menu.dispose();
+        pausedMenu.dispose();
 
     }
 

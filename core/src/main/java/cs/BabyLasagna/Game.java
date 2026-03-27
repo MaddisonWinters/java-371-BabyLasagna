@@ -75,6 +75,8 @@ public class Game {
         player = new Player(map, 3,3);
         player.addTop(LasagnaFlavor.Cheese);
         player.addTop(LasagnaFlavor.Plain);
+        player.addTop(LasagnaFlavor.Cheese);
+        player.addTop(LasagnaFlavor.Cheese);
         GameMsc.playMain();
     }
 

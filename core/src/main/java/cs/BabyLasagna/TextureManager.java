@@ -45,22 +45,19 @@ public class TextureManager {
     public static class Lasagna {
         public enum LasagnaRegion {
             Head  (0, 0,16, 8),
-            Layer1(0, 8,16, 2), // Three different layers for variety
+            Layer1(0, 8,16, 2), // Different layers for variety
             Layer2(0, 10,16, 2),
-            Layer3(0,12,16, 2),
-            Legs  (0,14,16, 5),
+            Legs  (0,12,16, 5),
             FULL  (0, 0,16,17);
 
             private static final Random rand = new Random();
             public final Region reg;
             LasagnaRegion(int x, int y, int w, int h) { reg = new Region(x,y,w,h); }
 
-            public boolean isLayer() { return this == Layer1 || this == Layer2 || this == Layer3; }
+            public boolean isLayer() { return this == Layer1 || this == Layer2; }
             public static LasagnaRegion randLayer() {
-                int num = rand.nextInt() % 3;
-                if (num == 0) return Layer1;
-                if (num == 1) return Layer2;
-                return Layer3;
+                // nextInt(2) returns either 0 or 1
+                return rand.nextInt(2) == 0 ? Layer1 : Layer2;
             }
         }
 

@@ -53,7 +53,7 @@ public class Player extends LasagnaStack {
 
 
 
-        if (this.getStateController().isInState(IdleState.class)) {
+        /*if (this.getStateController().isInState(IdleState.class)) {
             System.out.println("Player is idle");
         }
 
@@ -67,7 +67,7 @@ public class Player extends LasagnaStack {
 
         if (this.getStateController().isInState(DeathState.class)) {
             System.out.println("Player is dead");
-        }
+        }*/
 
         // Update coyote timer
         coyoteTime.update(deltaTime, grounded);

@@ -27,7 +27,7 @@ public class PausedMenu {
     float restartX = 220;
     float restartY = 150;
 
-    float menuX = 600;
+    float menuX = 390;
     float menuY = 150;
 
     public PausedMenu(){
@@ -44,26 +44,29 @@ public class PausedMenu {
         Main.batch.setProjectionMatrix(camera.combined);
         Main.batch.begin();
 
-//        Main.batch.draw(paused, 130,250,350,250);
-//        Main.batch.draw(resume, resumeX, resumeY, width, height);
-//        Main.batch.draw(restart, restartX, restartY, width, height);
-//        Main.batch.draw(mainMenu, menuX, menuY, width, height);
+        Main.batch.draw(paused, 130,250,350,250);
+        Main.batch.draw(resume, resumeX, resumeY, width, height);
+        Main.batch.draw(restart, restartX, restartY, width, height);
+        Main.batch.draw(mainMenu, menuX, menuY, width, height);
 
         if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
 
             float mouseX = Gdx.input.getX();
             float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
+            //resume button
             if(mouseX > resumeX && mouseX < resumeX + width
                 && mouseY > resumeY && mouseY < resumeY + height){
                 resumeLevel = true;
             }
 
+            //restart button
             if(mouseX > restartX && mouseX < restartX + width
                 && mouseY > restartY && mouseY < restartY + height){
                 restartLevel = true;
             }
 
+            //main menu button
             if(mouseX > menuX && mouseX < menuX + width
                 && mouseY > menuY && mouseY < menuY + height){
                 goToMenu = true;

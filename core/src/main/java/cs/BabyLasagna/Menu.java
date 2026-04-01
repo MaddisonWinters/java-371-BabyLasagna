@@ -58,19 +58,20 @@ public class Menu {
 
             float mouseX = Gdx.input.getX() * (camera.viewportWidth / Gdx.graphics.getWidth());;
             float mouseY = (Gdx.graphics.getHeight() - Gdx.input.getY()) * (camera.viewportHeight / Gdx.graphics.getHeight());
-            //level1
+
+            //level1 button
             if(mouseX > buttonXpos1 && mouseX < buttonXpos1 + levelButtonWidth
                 && mouseY > buttonYpos1 && mouseY < buttonYpos1 + levelButtonHeight){
                 levelChoice = 1;
                 startGame = true;
             }
-            //level2
+            //level2 button
             if(mouseX > buttonXpos2 && mouseX < buttonXpos2 + levelButtonWidth
                 && mouseY > buttonYpos2 && mouseY < buttonYpos2 + levelButtonHeight){
                 levelChoice = 2;
                 startGame = true;
             }
-            //exit
+            //exit button
             if(mouseX > exitXpos && mouseX < exitXpos + levelButtonWidth
                 && mouseY > exitYpos && mouseY < exitYpos + levelButtonHeight){
                 Gdx.app.exit();
@@ -82,12 +83,17 @@ public class Menu {
 
     public void updateViewport(int width, int height) {camera.setToOrtho(false, width, height);}
     public boolean startGame(){
-        return startGame;
+        if(startGame){
+            startGame = false; //needs to be here this is what caused main me nu not to pop up when the button is pressed from pause menu
+            return true;
+        }
+        return false;
     }
 
     public int getLevel(){
         return levelChoice;
     }
+    public void reset(){startGame = false;}
 
     public void dispose(){
         name.dispose();

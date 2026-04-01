@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import cs.BabyLasagna.GameObj.LasagnaStack;
 import cs.BabyLasagna.GameObj.Player;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import cs.BabyLasagna.TextureManager.Lasagna.*;
@@ -73,10 +72,10 @@ public class Game {
         foregroundLayers = new int[] {2};
 
         player = new Player(map, 3,3);
+        player.addTop(LasagnaFlavor.Pasta);
         player.addTop(LasagnaFlavor.Cheese);
-        player.addTop(LasagnaFlavor.Plain);
-        player.addTop(LasagnaFlavor.Cheese);
-        player.addTop(LasagnaFlavor.Cheese);
+        player.addTop(LasagnaFlavor.Pasta);
+        player.addTop(LasagnaFlavor.Pasta);
         GameMsc.playMain();
     }
 

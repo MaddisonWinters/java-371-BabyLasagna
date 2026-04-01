@@ -63,8 +63,10 @@ public class TextureManager {
 
         // Each LasagnaFlavor stores a list of texture regions corresponding to its flavor
         public enum LasagnaFlavor {
-            Plain("BabyLasagna/Plain.png"),
-            Cheese("BabyLasagna/Cheese.png");
+            Pasta("BabyLasagna/Pasta.png"),
+            Cheese("BabyLasagna/Cheese.png"),
+            Meat("BabyLasagna/Meat.png"),
+            Pepper("BabyLasagna/Pepper.png");
 
             public final String file;
             private final TextureRegion[] textures;

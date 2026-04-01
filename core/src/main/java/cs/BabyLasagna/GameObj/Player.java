@@ -11,11 +11,14 @@ import cs.BabyLasagna.GameObj.States.Player.*;
 import cs.BabyLasagna.TextureManager.Lasagna.*;
 
 import com.badlogic.gdx.math.Vector2;
+
+import java.util.Iterator;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import cs.BabyLasagna.SoundManager.GameSnd.PlayerSnd;
+import cs.BabyLasagna.GameObj.UIHandler;
 
-// Return Later
 
 public class Player extends LasagnaStack {
 
@@ -50,24 +53,6 @@ public class Player extends LasagnaStack {
 
         // Makes sure the player doesn't stay in Idle
         stateController.update(deltaTime);
-
-
-
-        if (this.getStateController().isInState(IdleState.class)) {
-            System.out.println("Player is idle");
-        }
-
-        if (this.getStateController().isInState(RunState.class)) {
-            System.out.println("Player is running");
-        }
-
-        if (this.getStateController().isInState(FallState.class)) {
-            System.out.println("Player is falling");
-        }
-
-        if (this.getStateController().isInState(DeathState.class)) {
-            System.out.println("Player is dead");
-        }
 
         // Update coyote timer
         coyoteTime.update(deltaTime, grounded);
@@ -111,6 +96,18 @@ public class Player extends LasagnaStack {
         );
 
         super.update(deltaTime);
+
+        // Collectables
+        Iterator<GameObj> oi = gameInt.getObjects().iterator();
+        while(oi.hasNext()) {
+            GameObj obj = oi.next();
+
+            if (!(obj instanceof Collectable)) continue;
+            
+            if (hitbox.overlaps(obj.hitbox)) {
+                oi.remove();
+            }
+        }
     }
     
     public Player(GameInterface g, float x, float y) {

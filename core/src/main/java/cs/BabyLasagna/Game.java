@@ -1,5 +1,7 @@
 package cs.BabyLasagna;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -8,6 +10,8 @@ import cs.BabyLasagna.GameObj.Player;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import cs.BabyLasagna.TextureManager.Lasagna.*;
 import cs.BabyLasagna.SoundManager.BGMusic.GameMsc;
+import cs.BabyLasagna.GameObj.Collectable;
+import cs.BabyLasagna.GameObj.GameObj;
 
 
 public class Game {
@@ -16,7 +20,6 @@ public class Game {
 
     private final OrthographicCamera camera;
     private final OrthogonalTiledMapRenderer renderer;
-    private final Player player;
 
     private final TiledMap map;
     private static final int[] backgroundLayers = new int[] {0, 1};
@@ -24,17 +27,25 @@ public class Game {
 
     private final GameInterface gameInterface;
 
+    private final Player player;
+    private final ArrayList<GameObj> objects;
+
 
     // For functionality that entities within the game need
     public class GameInterface {
         private final Game game;
         public GameInterface(Game g) { game = g; }
 
-        // Return the tilemap
         public final TiledMap getMap() { return game.map; }
+        public final Player getPlayer() { return game.player; }
+        public final ArrayList<GameObj> getObjects() { return game.objects; }
     }
 
     public void update(float deltaTime) {
+        for (GameObj obj : objects) {
+            obj.update(deltaTime);
+        }
+
         player.update(deltaTime);
 
         camera.position.set(
@@ -53,8 +64,15 @@ public class Game {
 
         renderer.render(backgroundLayers);
 
+        // Object rendering
         batch.begin();
+
+        for (GameObj obj : objects) {
+            obj.render(deltaTime, batch);
+        }
+
         player.render(deltaTime, batch);
+
         batch.end();
 
         renderer.render(foregroundLayers);
@@ -86,8 +104,13 @@ public class Game {
         player = new Player(gameInterface, 3,3);
         player.addTop(LasagnaFlavor.Cheese);
         player.addTop(LasagnaFlavor.Plain);
-        GameMsc.playMain();
+        
+        Collectable c = new Collectable(gameInterface, 5, 5, 1, 1);
 
+        objects = new ArrayList<>();
+        objects.add(c);
+
+        GameMsc.playMain();
     }
 
     public void dispose() {}

@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import cs.BabyLasagna.GameObj.LasagnaStack;
 import cs.BabyLasagna.GameObj.Player;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import cs.BabyLasagna.TextureManager.Lasagna.*;
@@ -20,11 +19,23 @@ public class Game {
     private final Player player;
 
     private final TiledMap map;
-    private final int[] backgroundLayers;
-    private final int[] foregroundLayers;
+    private static final int[] backgroundLayers = new int[] {0, 1};
+    private static final int[] foregroundLayers = new int[] {2};
+
+    private final GameInterface gameInterface;
+
+
+    // For functionality that entities within the game need
+    public class GameInterface {
+        private final Game game;
+        public GameInterface(Game g) { game = g; }
+
+        // Return the tilemap
+        public final TiledMap getMap() { return game.map; }
+    }
 
     public void update(float deltaTime) {
-        player.update(deltaTime, map);
+        player.update(deltaTime);
 
         camera.position.set(
             player.getX() + player.getHitbox().width / 2f,
@@ -64,18 +75,19 @@ public class Game {
     }
 
     public Game(String level) {
+        gameInterface = new GameInterface(this);
+
         camera = new OrthographicCamera();
         updateViewport(1,1);
 
         map = new TmxMapLoader().load(level);
         renderer = new OrthogonalTiledMapRenderer(map, 1/16f);
-        backgroundLayers = new int[] {0, 1};
-        foregroundLayers = new int[] {2};
 
-        player = new Player(map, 3,3);
+        player = new Player(gameInterface, 3,3);
         player.addTop(LasagnaFlavor.Cheese);
         player.addTop(LasagnaFlavor.Plain);
         GameMsc.playMain();
+
     }
 
     public void dispose() {}

@@ -1,6 +1,8 @@
 package cs.BabyLasagna.GameObj;
 
 import com.badlogic.gdx.maps.tiled.TiledMap;
+
+import cs.BabyLasagna.Game.GameInterface;
 import cs.BabyLasagna.GameObj.MyComponents.CoyoteTimeComponent;
 import cs.BabyLasagna.GameObj.MyComponents.FastFallingComponent;
 import cs.BabyLasagna.GameObj.MyComponents.JumpBufferComponent;
@@ -31,14 +33,12 @@ public class Player extends LasagnaStack {
     private static final float MOVE_SPEED = 6f;
     private final Vector2 spawnPosition;
 
-//    private static final UIHandler uidata = UIHandler.getUI();
-//    public UIHandler getUIData() { return uidata; }
     private UIHandler uidata;
 
     private static boolean debug = true;
 
     @Override
-    public void update(float deltaTime, TiledMap map) {
+    public void update(float deltaTime) {
 
         uidata.update();
 
@@ -87,8 +87,6 @@ public class Player extends LasagnaStack {
             if (uidata.popBot.press) { popBottom(); PlayerSnd.shrink(); }
         }
 
-        velocity.x = uidata.getMoveXDir() * MOVE_SPEED;
-
         if (uidata.move_x == UIHandler.Ternary.Neg) {
             facingRight = false;
         }
@@ -112,10 +110,11 @@ public class Player extends LasagnaStack {
             uidata.move_y == UIHandler.Ternary.Neg
         );
 
-        super.update(deltaTime, map);
+        super.update(deltaTime);
     }
-    public Player(TiledMap map_, float x, float y) {
-        super(map_, x, y, true, true);
+    
+    public Player(GameInterface g, float x, float y) {
+        super(g, x, y, true, true);
 
         // Save spawn point for respawn
         spawnPosition = new Vector2(x, y);

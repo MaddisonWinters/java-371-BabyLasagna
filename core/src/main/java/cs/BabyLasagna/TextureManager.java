@@ -93,4 +93,19 @@ public class TextureManager {
             public final TextureRegion getTex(LasagnaRegion reg) { return this.textures[reg.ordinal()]; }
         }
     }
+
+    public static class CollectableTex {
+        public static class Generic {
+            private static final String file = "lasagna_single.png";
+            private static final Texture tex;
+            private static final TextureRegion texReg;
+            
+            static {
+                tex = new Texture(file);
+                texReg = new TextureRegion(tex);
+            }
+
+            public static final TextureRegion getTex() { return texReg; }
+        }
+    }
 }

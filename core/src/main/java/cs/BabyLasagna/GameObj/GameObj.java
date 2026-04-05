@@ -118,12 +118,12 @@ public abstract class GameObj {
     }
 
         /// Constructors
-    GameObj(GameInterface g, float x, float y, float width, float height, float vx, float vy) {
+    public GameObj(GameInterface g, float x, float y, float width, float height, float vx, float vy) {
         hitbox.set(x, y, width, height);
         velocity.set(vx, vy);
         gameInt = g;
     }
-    GameObj(GameInterface g, float x, float y, float width, float height) {
+    public GameObj(GameInterface g, float x, float y, float width, float height) {
         this(g,x,y,width,height,0,0);
     }
 }

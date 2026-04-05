@@ -1,14 +1,15 @@
-package cs.BabyLasagna.GameObj;
+package cs.BabyLasagna.GameObj.Collectables;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.maps.tiled.TiledMap;
 import cs.BabyLasagna.TextureManager;
 import cs.BabyLasagna.Game.GameInterface;
+import cs.BabyLasagna.GameObj.GameObj;
+import cs.BabyLasagna.GameObj.Player;
 import cs.BabyLasagna.TextureManager.CollectableTex.Generic;
 
-public class Collectable extends GameObj {
+public abstract class Collectable extends GameObj {
 
-    public void render(float detaTime, SpriteBatch batch) {
+    public final void render(float detaTime, SpriteBatch batch) {
         TextureManager.draw(
             batch,
             Generic.getTex(),
@@ -25,6 +26,8 @@ public class Collectable extends GameObj {
         velocity.y += GRAVITY * deltaTime;
         moveWithCollisions(deltaTime);
     }
+
+    public abstract void collect(Player player);
 
     public Collectable(GameInterface g, float x, float y, float width, float height) {
         super(g,x,y,width,height,0,0);

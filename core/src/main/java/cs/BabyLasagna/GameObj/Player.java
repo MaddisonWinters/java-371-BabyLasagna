@@ -1,7 +1,5 @@
 package cs.BabyLasagna.GameObj;
 
-import com.badlogic.gdx.maps.tiled.TiledMap;
-
 import cs.BabyLasagna.Game.GameInterface;
 import cs.BabyLasagna.GameObj.MyComponents.CoyoteTimeComponent;
 import cs.BabyLasagna.GameObj.MyComponents.FastFallingComponent;
@@ -18,6 +16,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import cs.BabyLasagna.SoundManager.GameSnd.PlayerSnd;
 import cs.BabyLasagna.GameObj.UIHandler;
+import cs.BabyLasagna.GameObj.Collectables.Collectable;
 
 
 public class Player extends LasagnaStack {
@@ -103,8 +102,10 @@ public class Player extends LasagnaStack {
             GameObj obj = oi.next();
 
             if (!(obj instanceof Collectable)) continue;
+            Collectable col = (Collectable) obj;
             
             if (hitbox.overlaps(obj.hitbox)) {
+                col.collect(this);
                 oi.remove();
             }
         }

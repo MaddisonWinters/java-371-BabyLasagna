@@ -7,10 +7,12 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import cs.BabyLasagna.GameObj.Player;
+import cs.BabyLasagna.GameObj.Collectables.Collectable;
+import cs.BabyLasagna.GameObj.Collectables.Ingredient;
+
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import cs.BabyLasagna.TextureManager.Lasagna.*;
 import cs.BabyLasagna.SoundManager.BGMusic.GameMsc;
-import cs.BabyLasagna.GameObj.Collectable;
 import cs.BabyLasagna.GameObj.GameObj;
 
 
@@ -104,11 +106,10 @@ public class Game {
         player = new Player(gameInterface, 3,3);
         player.addTop(LasagnaFlavor.Cheese);
         player.addTop(LasagnaFlavor.Plain);
-        
-        Collectable c = new Collectable(gameInterface, 5, 5, 1, 1);
 
+        Ingredient p = new Ingredient(gameInterface, LasagnaFlavor.Plain, 5, 5);
         objects = new ArrayList<>();
-        objects.add(c);
+        objects.add(p);
 
         GameMsc.playMain();
     }

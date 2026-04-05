@@ -45,42 +45,41 @@ public class TextureManager {
     public static class Lasagna {
         public enum LasagnaRegion {
             Head  (0, 0,16, 8),
-            Layer1(0, 8,16, 2), // Three different layers for variety
+            Layer1(0, 8,16, 2), // Different layers for variety
             Layer2(0, 10,16, 2),
-            Layer3(0,12,16, 2),
-            Legs  (0,14,16, 5),
+            Legs  (0,12,16, 5),
             FULL  (0, 0,16,17);
 
             private static final Random rand = new Random();
             public final Region reg;
             LasagnaRegion(int x, int y, int w, int h) { reg = new Region(x,y,w,h); }
 
-            public boolean isLayer() { return this == Layer1 || this == Layer2 || this == Layer3; }
+            public boolean isLayer() { return this == Layer1 || this == Layer2; }
             public static LasagnaRegion randLayer() {
-                int num = rand.nextInt() % 3;
-                if (num == 0) return Layer1;
-                if (num == 1) return Layer2;
-                return Layer3;
+                // nextInt(2) returns either 0 or 1
+                return rand.nextInt(2) == 0 ? Layer1 : Layer2;
             }
         }
 
         // Each LasagnaFlavor stores a list of texture regions corresponding to its flavor
         public enum LasagnaFlavor {
-            Plain("BabyLasagna/Plain.png"),
-            Cheese("BabyLasagna/Cheese.png");
+            Pasta("BabyLasagna/Pasta.png"),
+            Cheese("BabyLasagna/Cheese.png"),
+            Meat("BabyLasagna/Meat.png"),
+            Pepper("BabyLasagna/Pepper.png");
 
-            public final String file;
-            private final TextureRegion[] textures;
+            public final String stackFile;
+            private final TextureRegion[] stackTextures;
 
             // Loads texture and creates all TextureRegions
             private LasagnaFlavor(String filepath) {
-                file = filepath;
+                stackFile = filepath;
 
-                Texture sheet = new Texture(this.file);
-                textures = new TextureRegion[LasagnaRegion.values().length];
+                Texture stackSheet = new Texture(this.stackFile);
+                stackTextures = new TextureRegion[LasagnaRegion.values().length];
                 for (final LasagnaRegion reg : LasagnaRegion.values()) {
-                    textures[reg.ordinal()] = new TextureRegion(
-                        sheet,
+                    stackTextures[reg.ordinal()] = new TextureRegion(
+                        stackSheet,
                         reg.reg.tx,
                         reg.reg.ty,
                         reg.reg.tw,
@@ -90,7 +89,7 @@ public class TextureManager {
             }
 
             // Returns the texture for the specified region
-            public final TextureRegion getTex(LasagnaRegion reg) { return this.textures[reg.ordinal()]; }
+            public final TextureRegion getTex(LasagnaRegion reg) { return this.stackTextures[reg.ordinal()]; }
         }
     }
 

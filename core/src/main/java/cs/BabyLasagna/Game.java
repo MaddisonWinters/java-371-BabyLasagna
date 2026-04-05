@@ -105,9 +105,9 @@ public class Game {
 
         player = new Player(gameInterface, 3,3);
         player.addTop(LasagnaFlavor.Cheese);
-        player.addTop(LasagnaFlavor.Plain);
+        player.addTop(LasagnaFlavor.Pasta);
 
-        Ingredient p = new Ingredient(gameInterface, LasagnaFlavor.Plain, 5, 5);
+        Ingredient p = new Ingredient(gameInterface, LasagnaFlavor.Pasta, 5, 5);
         objects = new ArrayList<>();
         objects.add(p);
 

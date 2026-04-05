@@ -65,8 +65,8 @@ public class Player extends LasagnaStack {
         jumpBuffer.update(deltaTime);
 
         if (debug) {
-            if (uidata.addTop.press) { addTop(LasagnaFlavor.Plain); PlayerSnd.grow(); }
-            if (uidata.addBot.press) { addBottom(LasagnaFlavor.Plain); PlayerSnd.grow(); }
+            if (uidata.addTop.press) { addTop(LasagnaFlavor.Pasta); PlayerSnd.grow(); }
+            if (uidata.addBot.press) { addBottom(LasagnaFlavor.Pasta); PlayerSnd.grow(); }
             if (uidata.popTop.press) { popTop(); PlayerSnd.shrink(); }
             if (uidata.popBot.press) { popBottom(); PlayerSnd.shrink(); }
         }

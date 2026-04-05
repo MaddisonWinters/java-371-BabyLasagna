@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
+import cs.BabyLasagna.Game;
 import cs.BabyLasagna.Game.GameInterface;
 import cs.BabyLasagna.Levels.Util;
 
@@ -12,6 +13,8 @@ import cs.BabyLasagna.Levels.Util;
 public abstract class GameObj {
         ///  Constants
     protected static final float GRAVITY = -30f;
+    public static final float MAX_TILES_PER_FRAME = 0.48f;
+    public static final float MAX_VELOCITY = MAX_TILES_PER_FRAME / Game.MAX_DELTA_TIME;
 
         /// Positional members
     protected final Rectangle hitbox = new Rectangle();
@@ -66,6 +69,14 @@ public abstract class GameObj {
     // Move and collide with general list of hitboxes | Primary collision function
     public void moveWithCollisions(Array<Rectangle> tile_rects, Vector2 movement_vec) {
         grounded = false;
+
+        // Cap speed
+        if (Math.abs(movement_vec.x) > MAX_TILES_PER_FRAME) {
+            movement_vec.x = MAX_TILES_PER_FRAME * Math.signum(movement_vec.x);
+        }
+        if (Math.abs(movement_vec.y) > MAX_TILES_PER_FRAME) {
+            movement_vec.y = MAX_TILES_PER_FRAME * Math.signum(movement_vec.y);
+        }
 
         // Handle x-movement and x-collisions first
         hitbox.x += movement_vec.x;

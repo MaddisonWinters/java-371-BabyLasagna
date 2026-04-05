@@ -20,6 +20,9 @@ public class Game {
     private static final float MAX_VIEWPORT_SIZE=12;
     public static final int PIXELS_PER_TILE=16;
 
+    private static final int MINIMUM_FPS=24;
+    public static final float MAX_DELTA_TIME = 1.0f / (float)MINIMUM_FPS;
+
     private final OrthographicCamera camera;
     private final OrthogonalTiledMapRenderer renderer;
 
@@ -44,6 +47,8 @@ public class Game {
     }
 
     public void update(float deltaTime) {
+        deltaTime = Math.min(deltaTime, MAX_DELTA_TIME);
+
         for (GameObj obj : objects) {
             obj.update(deltaTime);
         }
@@ -59,6 +64,8 @@ public class Game {
 
     // Renders map and all objects to `batch`
     public void render(float deltaTime, SpriteBatch batch) {
+        deltaTime = Math.min(deltaTime, MAX_DELTA_TIME);
+
         // camera.position.set(...)
         camera.update();
         batch.setProjectionMatrix(camera.combined);
@@ -107,9 +114,17 @@ public class Game {
         player.addTop(LasagnaFlavor.Cheese);
         player.addTop(LasagnaFlavor.Pasta);
 
-        Ingredient p = new Ingredient(gameInterface, LasagnaFlavor.Pasta, 5, 5);
+        // INGREDIENT TEST CODE
+        Ingredient p = new Ingredient(gameInterface, LasagnaFlavor.Pasta, 5, 12);
+        Ingredient c = new Ingredient(gameInterface, LasagnaFlavor.Cheese, 6, 12);
+        Ingredient m = new Ingredient(gameInterface, LasagnaFlavor.Meat, 7, 12);
+        Ingredient r = new Ingredient(gameInterface, LasagnaFlavor.Pepper, 8, 12);
         objects = new ArrayList<>();
         objects.add(p);
+        objects.add(c);
+        objects.add(m);
+        objects.add(r);
+        // END INGREDIENT TEST CODE
 
         GameMsc.playMain();
     }

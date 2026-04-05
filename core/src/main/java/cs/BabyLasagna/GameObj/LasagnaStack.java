@@ -54,7 +54,7 @@ public class LasagnaStack extends GameObj {
             TextureManager.draw(
                 batch,
                 // Take the flavor of the bottom layer
-                bot_flavor.getTex(LasagnaRegion.Legs),
+                bot_flavor.getStackTex(LasagnaRegion.Legs),
                 hitbox.x,
                 hitbox.y,
                 LasagnaRegion.Legs.reg.gw,
@@ -74,7 +74,7 @@ public class LasagnaStack extends GameObj {
 
             TextureManager.draw(
                 batch,
-                layer.flavor.getTex(layer.region),
+                layer.flavor.getStackTex(layer.region),
                 hitbox.x,
                 hitbox.y + yoff,
                 layer.region.reg.gw,
@@ -91,7 +91,7 @@ public class LasagnaStack extends GameObj {
             TextureManager.draw(
                 batch,
                 // Take flavor of top layer
-                top_flavor.getTex(LasagnaRegion.Head),
+                top_flavor.getStackTex(LasagnaRegion.Head),
                 hitbox.x,
                 hitbox.y + yoff,
                 LasagnaRegion.Head.reg.gw,

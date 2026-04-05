@@ -63,17 +63,20 @@ public class TextureManager {
 
         // Each LasagnaFlavor stores a list of texture regions corresponding to its flavor
         public enum LasagnaFlavor {
-            Pasta("BabyLasagna/Pasta.png"),
-            Cheese("BabyLasagna/Cheese.png"),
-            Meat("BabyLasagna/Meat.png"),
-            Pepper("BabyLasagna/Pepper.png");
+            Pasta("Pasta.png"),
+            Cheese("Cheese.png"),
+            Meat("Meat.png"),
+            Pepper("Pepper.png");
 
             public final String stackFile;
+            public final String ingredientFile;
             private final TextureRegion[] stackTextures;
+            private final TextureRegion[] ingredientTextures;
 
             // Loads texture and creates all TextureRegions
-            private LasagnaFlavor(String filepath) {
-                stackFile = filepath;
+            private LasagnaFlavor(String filename) {
+                stackFile = "BabyLasagna/" + filename;
+                ingredientFile = "Collectable/" + filename;
 
                 Texture stackSheet = new Texture(this.stackFile);
                 stackTextures = new TextureRegion[LasagnaRegion.values().length];
@@ -86,25 +89,16 @@ public class TextureManager {
                         reg.reg.th
                     );
                 }
+
+                Texture ingredientSheet = new Texture(this.ingredientFile);
+                ingredientTextures = new TextureRegion[1];
+                ingredientTextures[0] = new TextureRegion(ingredientSheet); // Later: animated spritesheet
             }
 
-            // Returns the texture for the specified region
-            public final TextureRegion getTex(LasagnaRegion reg) { return this.stackTextures[reg.ordinal()]; }
-        }
-    }
+            // Returns the texture for the specified region of a lasagna stack
+            public final TextureRegion getStackTex(LasagnaRegion reg) { return this.stackTextures[reg.ordinal()]; }
 
-    public static class CollectableTex {
-        public static class Generic {
-            private static final String file = "lasagna_single.png";
-            private static final Texture tex;
-            private static final TextureRegion texReg;
-            
-            static {
-                tex = new Texture(file);
-                texReg = new TextureRegion(tex);
-            }
-
-            public static final TextureRegion getTex() { return texReg; }
+            public final TextureRegion getIngredientTex() { return ingredientTextures[0]; }
         }
     }
 }

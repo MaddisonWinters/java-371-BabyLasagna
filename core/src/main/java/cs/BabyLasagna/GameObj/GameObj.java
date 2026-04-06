@@ -1,16 +1,20 @@
 package cs.BabyLasagna.GameObj;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+
+import cs.BabyLasagna.Game;
+import cs.BabyLasagna.Game.GameInterface;
 import cs.BabyLasagna.Levels.Util;
 
 // A generic object that has a hitbox, velocity, and movement/collision functions
 public abstract class GameObj {
         ///  Constants
     protected static final float GRAVITY = -30f;
+    public static final float MAX_TILES_PER_FRAME = 0.48f;
+    public static final float MAX_VELOCITY = MAX_TILES_PER_FRAME / Game.MAX_DELTA_TIME;
 
         /// Positional members
     protected final Rectangle hitbox = new Rectangle();
@@ -18,7 +22,7 @@ public abstract class GameObj {
     protected boolean grounded = false;
 
         /// Environment
-    protected final TiledMap map;
+    protected final GameInterface gameInt;
 
         /// Getters
     public final Vector2 getPosition() { return new Vector2(hitbox.x, hitbox.y); }
@@ -39,11 +43,11 @@ public abstract class GameObj {
         /// Abstract member functions
     // batch.begin() and batch.end() are not to be called within this function
     public abstract void render(float deltaTime, SpriteBatch batch);
-    public abstract void update(float deltaTime, TiledMap map);
+    public abstract void update(float deltaTime);
 
         /// Collision-related functions
     // Adds hitboxes of nearby tiles to the Array `tiles`
-    public void getTilesFromMap(Array<Rectangle> tiles, TiledMap map, Vector2 movement_vec) {
+    public void getTilesFromMap(Array<Rectangle> tiles, Vector2 movement_vec) {
         // Calculate area of relevance in tilemap
         int startX = (int)Math.floor(Math.min(hitbox.x, hitbox.x+movement_vec.x));
         int startY = (int)Math.floor(Math.min(hitbox.y, hitbox.y+movement_vec.y));
@@ -52,7 +56,7 @@ public abstract class GameObj {
 
         // Get relevant tile rectangles/hitboxes
         Util.getTiles(
-            map,
+            gameInt.getMap(),
             "Wall",
             tiles,
             startX,
@@ -65,6 +69,14 @@ public abstract class GameObj {
     // Move and collide with general list of hitboxes | Primary collision function
     public void moveWithCollisions(Array<Rectangle> tile_rects, Vector2 movement_vec) {
         grounded = false;
+
+        // Cap speed
+        if (Math.abs(movement_vec.x) > MAX_TILES_PER_FRAME) {
+            movement_vec.x = MAX_TILES_PER_FRAME * Math.signum(movement_vec.x);
+        }
+        if (Math.abs(movement_vec.y) > MAX_TILES_PER_FRAME) {
+            movement_vec.y = MAX_TILES_PER_FRAME * Math.signum(movement_vec.y);
+        }
 
         // Handle x-movement and x-collisions first
         hitbox.x += movement_vec.x;
@@ -104,25 +116,25 @@ public abstract class GameObj {
     }
 
     // Move and collide with tilemap
-    public void moveWithCollisions(float deltaTime, TiledMap map) {
+    public void moveWithCollisions(float deltaTime) {
         // Calculate movement vector
         Vector2 velocity_scaled = new Vector2(velocity);
         velocity_scaled.scl(deltaTime);
 
         // Get nearby tiles
         Array<Rectangle> near_tiles = new Array<>();
-        getTilesFromMap(near_tiles, map, velocity_scaled);
+        getTilesFromMap(near_tiles, velocity_scaled);
 
         moveWithCollisions(near_tiles, velocity_scaled);
     }
 
         /// Constructors
-    GameObj(TiledMap map_, float x, float y, float width, float height, float vx, float vy) {
+    public GameObj(GameInterface g, float x, float y, float width, float height, float vx, float vy) {
         hitbox.set(x, y, width, height);
         velocity.set(vx, vy);
-        map = map_;
+        gameInt = g;
     }
-    GameObj(TiledMap map_, float x, float y, float width, float height) {
-        this(map_,x,y,width,height,0,0);
+    public GameObj(GameInterface g, float x, float y, float width, float height) {
+        this(g,x,y,width,height,0,0);
     }
 }

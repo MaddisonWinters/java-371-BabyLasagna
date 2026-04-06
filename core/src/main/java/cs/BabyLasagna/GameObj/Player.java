@@ -1,6 +1,6 @@
 package cs.BabyLasagna.GameObj;
 
-import com.badlogic.gdx.maps.tiled.TiledMap;
+import cs.BabyLasagna.Game.GameInterface;
 import cs.BabyLasagna.GameObj.MyComponents.CoyoteTimeComponent;
 import cs.BabyLasagna.GameObj.MyComponents.FastFallingComponent;
 import cs.BabyLasagna.GameObj.MyComponents.JumpBufferComponent;
@@ -9,11 +9,15 @@ import cs.BabyLasagna.GameObj.States.Player.*;
 import cs.BabyLasagna.TextureManager.Lasagna.*;
 
 import com.badlogic.gdx.math.Vector2;
+
+import java.util.Iterator;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import cs.BabyLasagna.SoundManager.GameSnd.PlayerSnd;
+import cs.BabyLasagna.GameObj.UIHandler;
+import cs.BabyLasagna.GameObj.Collectables.Collectable;
 
-// Return Later
 
 public class Player extends LasagnaStack {
 
@@ -31,14 +35,12 @@ public class Player extends LasagnaStack {
     private static final float MOVE_SPEED = 6f;
     private final Vector2 spawnPosition;
 
-//    private static final UIHandler uidata = UIHandler.getUI();
-//    public UIHandler getUIData() { return uidata; }
     private UIHandler uidata;
 
     private static boolean debug = true;
 
     @Override
-    public void update(float deltaTime, TiledMap map) {
+    public void update(float deltaTime) {
 
         uidata.update();
 
@@ -50,25 +52,7 @@ public class Player extends LasagnaStack {
 
         // Makes sure the player doesn't stay in Idle
         stateController.update(deltaTime);
-
-
-
-        /*if (this.getStateController().isInState(IdleState.class)) {
-            System.out.println("Player is idle");
-        }
-
-        if (this.getStateController().isInState(RunState.class)) {
-            System.out.println("Player is running");
-        }
-
-        if (this.getStateController().isInState(FallState.class)) {
-            System.out.println("Player is falling");
-        }
-
-        if (this.getStateController().isInState(DeathState.class)) {
-            System.out.println("Player is dead");
-        }*/
-
+        
         // Update coyote timer
         coyoteTime.update(deltaTime, grounded);
 
@@ -86,8 +70,6 @@ public class Player extends LasagnaStack {
             if (uidata.popTop.press) { popTop(); PlayerSnd.shrink(); }
             if (uidata.popBot.press) { popBottom(); PlayerSnd.shrink(); }
         }
-
-        velocity.x = uidata.getMoveXDir() * MOVE_SPEED;
 
         if (uidata.move_x == UIHandler.Ternary.Neg) {
             facingRight = false;
@@ -112,10 +94,25 @@ public class Player extends LasagnaStack {
             uidata.move_y == UIHandler.Ternary.Neg
         );
 
-        super.update(deltaTime, map);
+        super.update(deltaTime);
+
+        // Collectables
+        Iterator<GameObj> oi = gameInt.getObjects().iterator();
+        while(oi.hasNext()) {
+            GameObj obj = oi.next();
+
+            if (!(obj instanceof Collectable)) continue;
+            Collectable col = (Collectable) obj;
+            
+            if (hitbox.overlaps(obj.hitbox)) {
+                col.collect(this);
+                oi.remove();
+            }
+        }
     }
-    public Player(TiledMap map_, float x, float y) {
-        super(map_, x, y, true, true);
+    
+    public Player(GameInterface g, float x, float y) {
+        super(g, x, y, true, true);
 
         // Save spawn point for respawn
         spawnPosition = new Vector2(x, y);

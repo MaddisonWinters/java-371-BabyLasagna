@@ -1,29 +1,59 @@
 package cs.BabyLasagna;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import cs.BabyLasagna.GameObj.Player;
+import cs.BabyLasagna.GameObj.Collectables.Collectable;
+import cs.BabyLasagna.GameObj.Collectables.Ingredient;
+
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import cs.BabyLasagna.TextureManager.Lasagna.*;
 import cs.BabyLasagna.SoundManager.BGMusic.GameMsc;
+import cs.BabyLasagna.GameObj.GameObj;
 
 
 public class Game {
     private static final float MAX_VIEWPORT_SIZE=12;
     public static final int PIXELS_PER_TILE=16;
 
+    private static final int MINIMUM_FPS=24;
+    public static final float MAX_DELTA_TIME = 1.0f / (float)MINIMUM_FPS;
+
     private final OrthographicCamera camera;
     private final OrthogonalTiledMapRenderer renderer;
-    private final Player player;
 
     private final TiledMap map;
-    private final int[] backgroundLayers;
-    private final int[] foregroundLayers;
+    private static final int[] backgroundLayers = new int[] {0, 1};
+    private static final int[] foregroundLayers = new int[] {2};
+
+    private final GameInterface gameInterface;
+
+    private final Player player;
+    private final ArrayList<GameObj> objects;
+
+
+    // For functionality that entities within the game need
+    public class GameInterface {
+        private final Game game;
+        public GameInterface(Game g) { game = g; }
+
+        public final TiledMap getMap() { return game.map; }
+        public final Player getPlayer() { return game.player; }
+        public final ArrayList<GameObj> getObjects() { return game.objects; }
+    }
 
     public void update(float deltaTime) {
-        player.update(deltaTime, map);
+        deltaTime = Math.min(deltaTime, MAX_DELTA_TIME);
+
+        for (GameObj obj : objects) {
+            obj.update(deltaTime);
+        }
+
+        player.update(deltaTime);
 
         camera.position.set(
             player.getX() + player.getHitbox().width / 2f,
@@ -34,6 +64,8 @@ public class Game {
 
     // Renders map and all objects to `batch`
     public void render(float deltaTime, SpriteBatch batch) {
+        deltaTime = Math.min(deltaTime, MAX_DELTA_TIME);
+
         // camera.position.set(...)
         camera.update();
         batch.setProjectionMatrix(camera.combined);
@@ -41,8 +73,15 @@ public class Game {
 
         renderer.render(backgroundLayers);
 
+        // Object rendering
         batch.begin();
+
+        for (GameObj obj : objects) {
+            obj.render(deltaTime, batch);
+        }
+
         player.render(deltaTime, batch);
+
         batch.end();
 
         renderer.render(foregroundLayers);
@@ -63,19 +102,30 @@ public class Game {
     }
 
     public Game(String level) {
+        gameInterface = new GameInterface(this);
+
         camera = new OrthographicCamera();
         updateViewport(1,1);
 
         map = new TmxMapLoader().load(level);
         renderer = new OrthogonalTiledMapRenderer(map, 1/16f);
-        backgroundLayers = new int[] {0, 1};
-        foregroundLayers = new int[] {2};
 
-        player = new Player(map, 3,3);
-        player.addTop(LasagnaFlavor.Pasta);
+        player = new Player(gameInterface, 3,3);
         player.addTop(LasagnaFlavor.Cheese);
         player.addTop(LasagnaFlavor.Pasta);
-        player.addTop(LasagnaFlavor.Pasta);
+
+        // INGREDIENT TEST CODE
+        Ingredient p = new Ingredient(gameInterface, LasagnaFlavor.Pasta, 5, 12);
+        Ingredient c = new Ingredient(gameInterface, LasagnaFlavor.Cheese, 6, 12);
+        Ingredient m = new Ingredient(gameInterface, LasagnaFlavor.Meat, 7, 12);
+        Ingredient r = new Ingredient(gameInterface, LasagnaFlavor.Pepper, 8, 12);
+        objects = new ArrayList<>();
+        objects.add(p);
+        objects.add(c);
+        objects.add(m);
+        objects.add(r);
+        // END INGREDIENT TEST CODE
+
         GameMsc.playMain();
     }
 

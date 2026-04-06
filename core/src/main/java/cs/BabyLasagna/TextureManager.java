@@ -63,33 +63,42 @@ public class TextureManager {
 
         // Each LasagnaFlavor stores a list of texture regions corresponding to its flavor
         public enum LasagnaFlavor {
-            Pasta("BabyLasagna/Pasta.png"),
-            Cheese("BabyLasagna/Cheese.png"),
-            Meat("BabyLasagna/Meat.png"),
-            Pepper("BabyLasagna/Pepper.png");
+            Pasta("Pasta.png"),
+            Cheese("Cheese.png"),
+            Meat("Meat.png"),
+            Pepper("Pepper.png");
 
-            public final String file;
-            private final TextureRegion[] textures;
+            public final String stackFile;
+            public final String ingredientFile;
+            private final TextureRegion[] stackTextures;
+            private final TextureRegion[] ingredientTextures;
 
             // Loads texture and creates all TextureRegions
-            private LasagnaFlavor(String filepath) {
-                file = filepath;
+            private LasagnaFlavor(String filename) {
+                stackFile = "BabyLasagna/" + filename;
+                ingredientFile = "Collectable/" + filename;
 
-                Texture sheet = new Texture(this.file);
-                textures = new TextureRegion[LasagnaRegion.values().length];
+                Texture stackSheet = new Texture(this.stackFile);
+                stackTextures = new TextureRegion[LasagnaRegion.values().length];
                 for (final LasagnaRegion reg : LasagnaRegion.values()) {
-                    textures[reg.ordinal()] = new TextureRegion(
-                        sheet,
+                    stackTextures[reg.ordinal()] = new TextureRegion(
+                        stackSheet,
                         reg.reg.tx,
                         reg.reg.ty,
                         reg.reg.tw,
                         reg.reg.th
                     );
                 }
+
+                Texture ingredientSheet = new Texture(this.ingredientFile);
+                ingredientTextures = new TextureRegion[1];
+                ingredientTextures[0] = new TextureRegion(ingredientSheet); // Later: animated spritesheet
             }
 
-            // Returns the texture for the specified region
-            public final TextureRegion getTex(LasagnaRegion reg) { return this.textures[reg.ordinal()]; }
+            // Returns the texture for the specified region of a lasagna stack
+            public final TextureRegion getStackTex(LasagnaRegion reg) { return this.stackTextures[reg.ordinal()]; }
+
+            public final TextureRegion getIngredientTex() { return ingredientTextures[0]; }
         }
     }
 }

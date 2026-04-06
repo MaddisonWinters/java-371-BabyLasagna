@@ -30,8 +30,6 @@ public class Menu {
 
     float exitXpos = 470;
     float exitYpos = 375;
-    float howXPos = 195;
-    float howYPos = 300;
 
     public Menu(){
 
@@ -84,7 +82,7 @@ public class Menu {
     public void updateViewport(int width, int height) {camera.setToOrtho(false, width, height);}
     public boolean startGame(){
         if(startGame){
-            startGame = false; //needs to be here this is what caused main me nu not to pop up when the button is pressed from pause menu
+            startGame = false; //needs to be here this is what caused main menu not to pop up when the button is pressed from pause menu
             return true;
         }
         return false;

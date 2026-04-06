@@ -61,6 +61,7 @@ public class UIHandler {
     public KeyStatus addBot = new KeyStatus(Input.Keys.P);
     public KeyStatus popTop = new KeyStatus(Input.Keys.L);
     public KeyStatus popBot = new KeyStatus(Input.Keys.SEMICOLON);
+    public KeyStatus useAbility = new KeyStatus(Input.Keys.Q);
 
     public float getMoveXDir() { return move_x.toFloat(); }
     public float getMoveYDir() { return move_y.toFloat(); }
@@ -101,5 +102,6 @@ public class UIHandler {
         addBot.update();
         popTop.update();
         popBot.update();
+        useAbility.update();
     }
 }

@@ -37,11 +37,8 @@ public class Player extends LasagnaStack {
 
     private UIHandler uidata;
 
-    private static boolean debug = true;
-
     @Override
     public void update(float deltaTime) {
-
         uidata.update();
 
         // === Manual reset for testing ===
@@ -50,35 +47,34 @@ public class Player extends LasagnaStack {
             kill();  // triggers DeathState
         }
 
+        // Use ability
+        if (uidata.useAbility.press) {
+            this.useAbilityTop();
+        }
+
         // Makes sure the player doesn't stay in Idle
         stateController.update(deltaTime);
+
+        // Set horizontal velocity
+        velocity.x = uidata.getMoveXDir() * MOVE_SPEED;
+
+        // Handle facing direction
+        if (uidata.move_x == UIHandler.Ternary.Neg)
+            facingRight = false;
+        else if (uidata.move_x == UIHandler.Ternary.Pos)
+            facingRight = true;
+
         
         // Update coyote timer
         coyoteTime.update(deltaTime, grounded);
 
-        velocity.x = uidata.getMoveXDir() * MOVE_SPEED;
-
+        // Buffer jump button
         if (uidata.jump.press) {
             jumpBuffer.recordJumpPress();
         }
-
         jumpBuffer.update(deltaTime);
 
-        if (debug) {
-            if (uidata.addTop.press) { addTop(LasagnaFlavor.Pasta); PlayerSnd.grow(); }
-            if (uidata.addBot.press) { addBottom(LasagnaFlavor.Pasta); PlayerSnd.grow(); }
-            if (uidata.popTop.press) { popTop(); PlayerSnd.shrink(); }
-            if (uidata.popBot.press) { popBottom(); PlayerSnd.shrink(); }
-        }
-
-        if (uidata.move_x == UIHandler.Ternary.Neg) {
-            facingRight = false;
-        }
-        else if (uidata.move_x == UIHandler.Ternary.Pos) {
-            facingRight = true;
-        }
-
-        // Jump (only if grounded/on ground)
+        // Jump (only if grounded/on ground)        
         if (jumpBuffer.hasBufferedJump() && (grounded || coyoteTime.canJump())) {
             velocity.y = JUMP_FORCE;
             coyoteTime.consume(); // prevent double jump
@@ -86,6 +82,7 @@ public class Player extends LasagnaStack {
             PlayerSnd.jump();
         }
 
+        // Apply fast fall
         velocity.y = fastFall.apply(
             velocity.y,
             GRAVITY,
@@ -94,6 +91,7 @@ public class Player extends LasagnaStack {
             uidata.move_y == UIHandler.Ternary.Neg
         );
 
+        // Movement with collisions
         super.update(deltaTime);
 
         // Collectables
@@ -128,6 +126,25 @@ public class Player extends LasagnaStack {
     public float getMoveSpeed() { return MOVE_SPEED; }
     public StateControllerComponent<Player> getStateController() {
         return stateController;
+    }
+
+    // Uses an ability using the top layer of the lasagna stack
+    public void useAbilityTop() {
+        LasagnaFlavor f = this.popTop();
+        switch (f) {
+            case Pasta:
+                break;
+            case Cheese:
+                break;
+            case Meat:
+                break;
+            case Pepper:
+                break;
+            default:
+                System.err.print("Error: Unknown LasagnaFlavor: ");
+                System.err.println(f);
+                break;
+        }
     }
 
     public void kill() {

@@ -118,8 +118,8 @@ public class LasagnaStack extends GameObj {
         );
 
         Array<Rectangle> tile_rects = new Array<>();
-        Util.getTiles(
-            map, 
+        Util.getRect(
+            map,
             "Wall",
             tile_rects,
             (int)Math.floor(hb.x),
@@ -145,7 +145,7 @@ public class LasagnaStack extends GameObj {
         // If can't fit, then return false
         hb.height -= hitbox.height + LasagnaRegion.Layer1.reg.gh;
         if (hb.height < 0) return false;
-        
+
         // Can fit, so get correct position for new hitbox
         if (up) {
             hitbox.y = Math.min(hitbox.y, hb.y+hb.height);
@@ -206,7 +206,7 @@ public class LasagnaStack extends GameObj {
 
     protected void setHitboxHeight() {
         hitbox.height = 0;
-        
+
         if (hasLegs)
             hitbox.height += LasagnaRegion.Legs.reg.gh;
         else

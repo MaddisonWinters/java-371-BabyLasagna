@@ -43,7 +43,7 @@ public abstract class GameObj {
 
         /// Collision-related functions
     // Adds hitboxes of nearby tiles to the Array `tiles`
-    public void getTilesFromMap(Array<Rectangle> tiles, TiledMap map, Vector2 movement_vec) {
+    public void getNearbyTiles(Array<Rectangle> tiles, TiledMap map, Vector2 movement_vec) {
         // Calculate area of relevance in tilemap
         int startX = (int)Math.floor(Math.min(hitbox.x, hitbox.x+movement_vec.x));
         int startY = (int)Math.floor(Math.min(hitbox.y, hitbox.y+movement_vec.y));
@@ -51,7 +51,7 @@ public abstract class GameObj {
         int endY   = (int)Math.ceil(hitbox.height+ Math.max(hitbox.y, hitbox.y+movement_vec.y));
 
         // Get relevant tile rectangles/hitboxes
-        Util.getTiles(
+        Util.getRect(
             map,
             "Wall",
             tiles,
@@ -60,6 +60,20 @@ public abstract class GameObj {
             endX,
             endY
         );
+    }
+
+    public void getNearbyTags(TiledMap map, Vector2 movement_vec) {
+        int startX = (int) Math.floor(hitbox.x);
+        int startY = (int) Math.floor(hitbox.y);
+        int endX   = (int) Math.ceil(hitbox.x + hitbox.width);
+        int endY   = (int) Math.ceil(hitbox.y + hitbox.height);
+
+        Array<String> currentTags = new Array<>();
+        Util.getTags(map, "Object", currentTags, startX, startY, endX, endY);
+
+        if (currentTags.size > 0) {
+            System.out.println("Tags: " + currentTags.toString(", "));
+        }
     }
 
     // Move and collide with general list of hitboxes | Primary collision function
@@ -111,7 +125,10 @@ public abstract class GameObj {
 
         // Get nearby tiles
         Array<Rectangle> near_tiles = new Array<>();
-        getTilesFromMap(near_tiles, map, velocity_scaled);
+        getNearbyTiles(near_tiles, map, velocity_scaled);
+
+        // Get tags
+        getNearbyTags(map, velocity_scaled);
 
         moveWithCollisions(near_tiles, velocity_scaled);
     }

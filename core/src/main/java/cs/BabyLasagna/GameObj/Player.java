@@ -47,6 +47,10 @@ public class Player extends LasagnaStack {
             kill();  // triggers DeathState
         }
 
+        if (stack.isEmpty()) {
+            kill();  // triggers DeathState
+        }
+
         // Use ability
         if (uidata.useAbility.press) {
             this.useAbilityTop();

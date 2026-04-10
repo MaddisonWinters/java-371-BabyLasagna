@@ -175,6 +175,9 @@ public class Player extends LasagnaStack {
 
         // Reset facing direction if desired
         facingRight = true;
+
+        addTop(LasagnaFlavor.Cheese);
+        addTop(LasagnaFlavor.Pasta);
     }
     private void throwMeat() {
         float spawnX;

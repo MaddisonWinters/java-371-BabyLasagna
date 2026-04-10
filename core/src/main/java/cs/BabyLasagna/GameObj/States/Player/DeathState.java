@@ -6,7 +6,7 @@ import cs.BabyLasagna.GameObj.State;
 public class DeathState implements State<Player> {
 
     private float respawnTimer;
-    private static final float RESPAWN_DELAY = 0.0f;
+    private static final float RESPAWN_DELAY = 1.0f;
 
     @Override
     public void enter(Player player) {

@@ -20,26 +20,25 @@ public class Menu {
     private boolean startGame = false;
     private int levelChoice = 0;
 
-    //button pos (Sorry Michael ik how u feel ab floats)
-    float buttonXpos1 = 50;
-    float buttonYpos1 = 150;
-    float buttonXpos2 = 200;
-    float buttonYpos2 = 145;
-    float levelButtonWidth = 150;
-    float levelButtonHeight = 100;
+    float levelButtonWidth = 112*2;
+    float levelButtonHeight = 32*2;
 
-    float exitXpos = 470;
-    float exitYpos = 375;
-    float howXPos = 195;
-    float howYPos = 300;
+    //button pos (Sorry Michael ik how u feel ab floats)
+    float buttonXpos1 = (Gdx.graphics.getWidth() / 2f) - (176*3 / 2f);
+    float buttonXpos2 = (Gdx.graphics.getWidth() / 2f) - (176*3 / 2f);
+    float buttonYpos1 = 175;
+    float buttonYpos2 = 115;
+
+    float exitXpos = Gdx.graphics.getWidth() - 80;
+    float exitYpos = Gdx.graphics.getHeight() - 80;
 
     public Menu(){
 
-        name = new Texture("game_name.png");
-        //button = new Texture("play_button.png");
-        level1 = new Texture ("level1.png");
-        level2 = new Texture ("level2.png");
-        exit = new Texture ("exit.png");
+        name = new Texture("menu/logo.png");
+        //button = new Texture("menu/play.png");
+        level1 = new Texture ("menu/level1.png");
+        level2 = new Texture ("menu/level2.png");
+        exit = new Texture ("menu/exit.png");
         camera = new OrthographicCamera();
         updateViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
@@ -49,28 +48,29 @@ public class Menu {
         Main.batch.setProjectionMatrix(camera.combined);
         Main.batch.begin();
 
-        Main.batch.draw(name,130,250,350,250);
+        Main.batch.draw(name,(Gdx.graphics.getWidth() / 2f) - (176*3 / 2f),250,176*3,32*3);
         Main.batch.draw(level1,buttonXpos1,buttonYpos1,levelButtonWidth,levelButtonHeight);
         Main.batch.draw(level2,buttonXpos2,buttonYpos2,levelButtonWidth,levelButtonHeight);
-        Main.batch.draw(exit,exitXpos,exitYpos,levelButtonWidth,levelButtonHeight);
+        Main.batch.draw(exit,exitXpos,exitYpos,96,96);
 
         if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
 
             float mouseX = Gdx.input.getX() * (camera.viewportWidth / Gdx.graphics.getWidth());;
             float mouseY = (Gdx.graphics.getHeight() - Gdx.input.getY()) * (camera.viewportHeight / Gdx.graphics.getHeight());
-            //level1
+
+            //level1 button
             if(mouseX > buttonXpos1 && mouseX < buttonXpos1 + levelButtonWidth
                 && mouseY > buttonYpos1 && mouseY < buttonYpos1 + levelButtonHeight){
                 levelChoice = 1;
                 startGame = true;
             }
-            //level2
+            //level2 button
             if(mouseX > buttonXpos2 && mouseX < buttonXpos2 + levelButtonWidth
                 && mouseY > buttonYpos2 && mouseY < buttonYpos2 + levelButtonHeight){
                 levelChoice = 2;
                 startGame = true;
             }
-            //exit
+            //exit button
             if(mouseX > exitXpos && mouseX < exitXpos + levelButtonWidth
                 && mouseY > exitYpos && mouseY < exitYpos + levelButtonHeight){
                 Gdx.app.exit();
@@ -82,12 +82,17 @@ public class Menu {
 
     public void updateViewport(int width, int height) {camera.setToOrtho(false, width, height);}
     public boolean startGame(){
-        return startGame;
+        if(startGame){
+            startGame = false; //needs to be here this is what caused main menu not to pop up when the button is pressed from pause menu
+            return true;
+        }
+        return false;
     }
 
     public int getLevel(){
         return levelChoice;
     }
+    public void reset(){startGame = false;}
 
     public void dispose(){
         name.dispose();

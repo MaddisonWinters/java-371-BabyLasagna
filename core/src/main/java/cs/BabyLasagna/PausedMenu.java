@@ -18,23 +18,25 @@ public class PausedMenu {
     private boolean restartLevel = false;
     private boolean goToMenu = false;
 
-    float width = 150;
-    float height = 100;
+    // Button sizes
+    float width = 64*3;
+    float height = 16*3;
 
-    float resumeX = 50;
-    float resumeY = 150;
+    // Button X/Y Positions
+    float pausedX = (Gdx.graphics.getWidth() / 2f) - (96*3 / 2f);
+    float resumeX = (Gdx.graphics.getWidth() / 2f) - (width / 2f);
+    float restartX = (Gdx.graphics.getWidth() / 2f) - (width / 2f);
+    float menuX = (Gdx.graphics.getWidth() / 2f) - (width / 2f);
 
-    float restartX = 220;
-    float restartY = 150;
-
-    float menuX = 600;
-    float menuY = 150;
+    float resumeY = 225;
+    float restartY = 175;
+    float menuY = 125;
 
     public PausedMenu(){
-        paused = new Texture("game_paused.png");
-        resume = new Texture("resume.png");
-        restart = new Texture("restart.png");
-        mainMenu = new Texture("return.png");
+        paused = new Texture("menu/paused.png");
+        resume = new Texture("menu/resume.png");
+        restart = new Texture("menu/restart.png");
+        mainMenu = new Texture("menu/menu.png");
         camera = new OrthographicCamera();
         updateViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
@@ -44,26 +46,29 @@ public class PausedMenu {
         Main.batch.setProjectionMatrix(camera.combined);
         Main.batch.begin();
 
-//        Main.batch.draw(paused, 130,250,350,250);
-//        Main.batch.draw(resume, resumeX, resumeY, width, height);
-//        Main.batch.draw(restart, restartX, restartY, width, height);
-//        Main.batch.draw(mainMenu, menuX, menuY, width, height);
+        Main.batch.draw(paused, pausedX,70, 112*3, 112*3);
+        Main.batch.draw(resume, resumeX, resumeY, width, height);
+        Main.batch.draw(restart, restartX, restartY, width, height);
+        Main.batch.draw(mainMenu, menuX, menuY, width, height);
 
         if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
 
-            float mouseX = Gdx.input.getX();
-            float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
+            float mouseX = Gdx.input.getX() * (camera.viewportWidth / Gdx.graphics.getWidth());;
+            float mouseY = (Gdx.graphics.getHeight() - Gdx.input.getY()) * (camera.viewportHeight / Gdx.graphics.getHeight());
 
+            //resume button
             if(mouseX > resumeX && mouseX < resumeX + width
                 && mouseY > resumeY && mouseY < resumeY + height){
                 resumeLevel = true;
             }
 
+            //restart button
             if(mouseX > restartX && mouseX < restartX + width
                 && mouseY > restartY && mouseY < restartY + height){
                 restartLevel = true;
             }
 
+            //main menu button
             if(mouseX > menuX && mouseX < menuX + width
                 && mouseY > menuY && mouseY < menuY + height){
                 goToMenu = true;

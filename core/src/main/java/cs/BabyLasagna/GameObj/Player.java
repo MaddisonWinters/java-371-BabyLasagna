@@ -48,26 +48,12 @@ public class Player extends LasagnaStack {
             kill();  // triggers DeathState
         }
 
+        if (stack.isEmpty()) {
+            kill();
+        }
+
         // Makes sure the player doesn't stay in Idle
         stateController.update(deltaTime);
-
-
-
-        /*if (this.getStateController().isInState(IdleState.class)) {
-            System.out.println("Player is idle");
-        }
-
-        if (this.getStateController().isInState(RunState.class)) {
-            System.out.println("Player is running");
-        }
-
-        if (this.getStateController().isInState(FallState.class)) {
-            System.out.println("Player is falling");
-        }
-
-        if (this.getStateController().isInState(DeathState.class)) {
-            System.out.println("Player is dead");
-        }*/
 
         // Update coyote timer
         coyoteTime.update(deltaTime, grounded);

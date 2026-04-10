@@ -64,7 +64,7 @@ public class Player extends LasagnaStack {
         else if (uidata.move_x == UIHandler.Ternary.Pos)
             facingRight = true;
 
-        
+
         // Update coyote timer
         coyoteTime.update(deltaTime, grounded);
 
@@ -74,7 +74,7 @@ public class Player extends LasagnaStack {
         }
         jumpBuffer.update(deltaTime);
 
-        // Jump (only if grounded/on ground)        
+        // Jump (only if grounded/on ground)
         if (jumpBuffer.hasBufferedJump() && (grounded || coyoteTime.canJump())) {
             velocity.y = JUMP_FORCE;
             coyoteTime.consume(); // prevent double jump
@@ -101,14 +101,14 @@ public class Player extends LasagnaStack {
 
             if (!(obj instanceof Collectable)) continue;
             Collectable col = (Collectable) obj;
-            
+
             if (hitbox.overlaps(obj.hitbox)) {
                 col.collect(this);
                 oi.remove();
             }
         }
     }
-    
+
     public Player(GameInterface g, float x, float y) {
         super(g, x, y, true, true);
 
@@ -137,6 +137,7 @@ public class Player extends LasagnaStack {
             case Cheese:
                 break;
             case Meat:
+                throwMeat();
                 break;
             case Pepper:
                 break;
@@ -170,5 +171,23 @@ public class Player extends LasagnaStack {
 
         // Reset facing direction if desired
         facingRight = true;
+    }
+    private void throwMeat() {
+        float spawnX;
+        float spawnY = (float)Math.floor(hitbox.y + 0.5f);
+
+        if (facingRight) {
+            spawnX = (float)Math.floor(hitbox.x + hitbox.width) + 1f;
+        } else {
+            spawnX = (float)Math.floor(hitbox.x - 1);
+        }
+        // try to make it where meat cant be placed indie another tile
+        for (GameObj obj : gameInt.getObjects()) {
+            if (obj.isSolid() && obj.getHitbox().overlaps(
+                new com.badlogic.gdx.math.Rectangle(spawnX, spawnY, 1, 1))) {
+                return;
+            }
+        }
+        gameInt.addObject(new Meat(gameInt, spawnX, spawnY));
     }
 }

@@ -30,7 +30,7 @@ public class Main extends ApplicationAdapter {
         float deltaTime = Gdx.graphics.getDeltaTime();
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
 
-        if(inMenu){
+        if(game == null){
             paused = false;
             menu.render();
             if(menu.startGame()){
@@ -77,9 +77,8 @@ public class Main extends ApplicationAdapter {
                 game.dispose();
                 game = null;
                 paused = false;
-                inMenu = true;
-                menu.reset(); //startGame = false
                 return;
+                //inMenu = true;
                 //menu.render();
             }
             return;

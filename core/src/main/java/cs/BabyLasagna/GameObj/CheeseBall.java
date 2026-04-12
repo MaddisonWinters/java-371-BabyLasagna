@@ -10,8 +10,11 @@ import com.badlogic.gdx.utils.Array;
 
 public class CheeseBall extends GameObj {
 
-    public static final float INITIAL_VX = 8.0f;
-    public static final float INITIAL_VY = 3.0f;
+    public static final float INITIAL_VX = 12.0f;
+    public static final float INITIAL_VY = 7.0f;
+    public static final float SOURCE_VEL = 0.5f;
+
+    public static final float STICKY_VEL = 1.6f;
     
     private boolean facing_right = false;
     private boolean splatted = false;
@@ -19,12 +22,14 @@ public class CheeseBall extends GameObj {
     public CheeseBall(GameInterface g, float x, float y, float vx, float vy, boolean facing_right) {
         super(
             g, x, y, 0.5f, 0.5f,
-            (facing_right ? vx + INITIAL_VX : vx - INITIAL_VX ),
-            (vy + INITIAL_VY)
+            SOURCE_VEL*vx + (facing_right ? INITIAL_VX : -INITIAL_VX ),
+            SOURCE_VEL*vy + INITIAL_VY
         );
 
         this.facing_right = facing_right;
     }
+
+    public boolean isSplatted() { return splatted; }
 
     @Override
     public void update(float deltaTime) {
@@ -40,6 +45,8 @@ public class CheeseBall extends GameObj {
 
         if (splatted) {
             // For now: Align to tile, since we'll only handle collision with tiles. 
+
+            System.out.println(facing_right);
 
             // Center on nearest tile position
             float cx = hitbox.x + hitbox.width*0.5f;

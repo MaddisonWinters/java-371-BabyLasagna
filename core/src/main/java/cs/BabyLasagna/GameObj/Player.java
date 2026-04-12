@@ -40,13 +40,35 @@ public class Player extends LasagnaStack {
 
     @Override
     public void update(float deltaTime) {
-        uidata.update();
+        boolean cheeseStick = false;
 
-        // === Manual reset for testing ===
-        boolean reset = Gdx.input.isKeyPressed(Keys.R);
-        if (reset) {
-            kill();  // triggers DeathState
+        // Game object interactions
+        Iterator<GameObj> oi = gameInt.getObjects().iterator();
+        while(oi.hasNext()) {
+            GameObj obj = oi.next();
+
+            // Collectables
+            if (obj instanceof Collectable) {
+                Collectable col = (Collectable) obj;
+
+                if (hitbox.overlaps(col.hitbox)) {
+                    col.collect(this);
+                    oi.remove();
+                }
+            }
+            // Cheese
+            else if (obj instanceof CheeseBall) {
+                CheeseBall chb = (CheeseBall) obj;
+                if (!chb.isSplatted()) continue; // Ignore projectile cheese balls
+
+                if (hitbox.overlaps(chb.hitbox)) {
+                    this.grounded = true;
+                    cheeseStick = true;
+                }
+            }
         }
+
+        uidata.update();
 
         // Use ability
         if (uidata.useAbility.press) {
@@ -92,22 +114,11 @@ public class Player extends LasagnaStack {
             uidata.move_y == UIHandler.Ternary.Neg
         );
 
+        if (cheeseStick && velocity.y < 0)
+            velocity.y = Math.max(-CheeseBall.STICKY_VEL, velocity.y);
+
         // Movement with collisions
         super.update(deltaTime);
-
-        // Collectables
-        Iterator<GameObj> oi = gameInt.getObjects().iterator();
-        while(oi.hasNext()) {
-            GameObj obj = oi.next();
-
-            if (!(obj instanceof Collectable)) continue;
-            Collectable col = (Collectable) obj;
-            
-            if (hitbox.overlaps(obj.hitbox)) {
-                col.collect(this);
-                oi.remove();
-            }
-        }
     }
     
     public Player(GameInterface g, float x, float y) {

@@ -17,6 +17,7 @@ import com.badlogic.gdx.Input.Keys;
 import cs.BabyLasagna.SoundManager.GameSnd.PlayerSnd;
 import cs.BabyLasagna.GameObj.UIHandler;
 import cs.BabyLasagna.GameObj.Collectables.Collectable;
+import cs.BabyLasagna.GameObj.CheeseBall;
 
 
 public class Player extends LasagnaStack {
@@ -135,6 +136,7 @@ public class Player extends LasagnaStack {
             case Pasta:
                 break;
             case Cheese:
+                throwCheese();
                 break;
             case Meat:
                 break;
@@ -170,5 +172,19 @@ public class Player extends LasagnaStack {
 
         // Reset facing direction if desired
         facingRight = true;
+    }
+
+    private void throwCheese() {
+        gameInt.getObjects().add(
+            new CheeseBall(
+                gameInt,
+                this.getCenterX(),
+                this.getCenterY(),
+                this.velocity.x,
+                this.velocity.y,
+                this.facingRight
+            )
+        );
+        this.addTop(LasagnaFlavor.Cheese);
     }
 }

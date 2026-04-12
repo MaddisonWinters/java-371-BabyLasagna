@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Array;
 
 import cs.BabyLasagna.Game;
 import cs.BabyLasagna.Game.GameInterface;
+import cs.BabyLasagna.GameObj.GameObj.Collision.Scale;
 import cs.BabyLasagna.Levels.Util;
 
 // A generic object that has a hitbox, velocity, and movement/collision functions
@@ -24,10 +25,31 @@ public abstract class GameObj {
         /// Environment
     protected final GameInterface gameInt;
 
+        /// Inner classes/structures
+    public class Collision {
+        enum Scale {
+            Zero,
+            Neg,
+            Pos
+        }
+
+        // TODO: Information about what object has been collided with.
+        //       Need to dinstinguish between tiles and solid GameObj. 
+
+        public Scale x = Scale.Zero; // Where the solid object is relative to the moving object (in x)
+        public Scale y = Scale.Zero; // Where the solid object is relative to the moving object (in y)
+
+        // Returns true if there was any collision, or false if there was none
+        public boolean hasCollision() { return !(x == Scale.Zero && y == Scale.Zero); }
+    }
+
         /// Getters
-    public final Vector2 getPosition() { return new Vector2(hitbox.x, hitbox.y); }
     public final float getX() { return hitbox.x; }
     public final float getY() { return hitbox.y; }
+    public final Vector2 getPosition() { return new Vector2(hitbox.x, hitbox.y); }
+    public final float getCenterX() { return hitbox.x + hitbox.width*0.5f; }
+    public final float getCenterY() { return hitbox.y + hitbox.height*0.5f; }
+    public final Vector2 getCenterPosition() { return new Vector2(getCenterX(), getCenterY()); }
     public final Rectangle getHitbox() { return new Rectangle(hitbox); }
     public final Vector2 getVelocity() { return new Vector2(velocity); }
     public boolean isGrounded() { return grounded; }
@@ -67,8 +89,9 @@ public abstract class GameObj {
     }
 
     // Move and collide with general list of hitboxes | Primary collision function
-    public void moveWithCollisions(Array<Rectangle> tile_rects, Vector2 movement_vec) {
+    public Collision moveWithCollisions(Array<Rectangle> tile_rects, Vector2 movement_vec) {
         grounded = false;
+        Collision collision = new Collision();
 
         // Cap speed
         if (Math.abs(movement_vec.x) > MAX_TILES_PER_FRAME) {
@@ -86,10 +109,14 @@ public abstract class GameObj {
 
             float dx = (hitbox.x + hitbox.width/2f) - (tile.x + tile.width/2f);
 
-            if (dx > 0)
+            if (dx > 0) {
                 hitbox.x = tile.x + tile.width;
-            else
+                collision.x = Collision.Scale.Pos;
+            }
+            else {
                 hitbox.x = tile.x - hitbox.width;
+                collision.x = Collision.Scale.Neg;
+            }
         }
 
         // Handle y-movement and y-collisions last
@@ -100,23 +127,29 @@ public abstract class GameObj {
 
             float dy = (hitbox.y + hitbox.height/2f) - (tile.y + tile.height/2f);
 
+            // Note: Why are there nested if statements here checking velocity?
+            //       This doesn't happen for x, and I'm not sure what the significance is. 
             if (dy > 0) {
                 if (velocity.y <= 0) {
                     hitbox.y = tile.y + tile.height;
                     grounded = true;
                     velocity.y = 0;
+                    collision.x = Collision.Scale.Pos;
                 }
             } else {
                 if (velocity.y > 0) {
                     hitbox.y = tile.y - hitbox.height;
                     velocity.y = 0;
+                    collision.x = Collision.Scale.Neg;
                 }
             }
         }
+
+        return collision;
     }
 
     // Move and collide with tilemap
-    public void moveWithCollisions(float deltaTime) {
+    public Collision moveWithCollisions(float deltaTime) {
         // Calculate movement vector
         Vector2 velocity_scaled = new Vector2(velocity);
         velocity_scaled.scl(deltaTime);
@@ -125,7 +158,7 @@ public abstract class GameObj {
         Array<Rectangle> near_tiles = new Array<>();
         getTilesFromMap(near_tiles, velocity_scaled);
 
-        moveWithCollisions(near_tiles, velocity_scaled);
+        return moveWithCollisions(near_tiles, velocity_scaled);
     }
 
         /// Constructors

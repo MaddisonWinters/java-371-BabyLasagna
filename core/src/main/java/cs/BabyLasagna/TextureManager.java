@@ -101,4 +101,48 @@ public class TextureManager {
             public final TextureRegion getIngredientTex() { return ingredientTextures[0]; }
         }
     }
+
+    public static class Abilities {
+        public static class Cheese {
+            private static final TextureRegion[] globTextures;
+            private static final TextureRegion[] splatTextures; 
+
+            private static final int GLOB_TEX_CNT = 1;
+            private static final int SPLAT_TEX_CNT = 1;
+
+            static {
+                String globFile = "Collectable/Cheese.png";
+                String splatFile = "Abilities/CheeseSplat.png";
+
+                Texture globSheet = new Texture(globFile);
+                Texture splatSheet = new Texture(splatFile);
+
+                globTextures = new TextureRegion[GLOB_TEX_CNT];
+                splatTextures = new TextureRegion[SPLAT_TEX_CNT];
+
+                for (int i = 0; i < GLOB_TEX_CNT; ++i) {
+                    globTextures[i] = new TextureRegion(
+                        globSheet,
+                        0, // Hardcoded for now
+                        0, // ^
+                        6,
+                        16
+                    );
+                }
+
+                for (int i = 0; i < SPLAT_TEX_CNT; ++i) {
+                    splatTextures[i] = new TextureRegion(
+                        splatSheet,
+                        0, // Hardcoded for now
+                        0, // ^
+                        6,
+                        16
+                    );
+                }
+            }
+
+            public static final TextureRegion getGlobTex() { return globTextures[0]; }
+            public static final TextureRegion getSplatTex() { return splatTextures[0]; }
+        }
+    }
 }

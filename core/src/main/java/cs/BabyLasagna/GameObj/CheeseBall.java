@@ -4,9 +4,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
+import cs.BabyLasagna.Game;
 import cs.BabyLasagna.TextureManager;
 import cs.BabyLasagna.Game.GameInterface;
 import com.badlogic.gdx.utils.Array;
+import cs.BabyLasagna.TextureManager.Abilities.Cheese;
 
 public class CheeseBall extends GameObj {
 
@@ -29,6 +31,28 @@ public class CheeseBall extends GameObj {
         this.facing_right = facing_right;
     }
 
+    public void splat() {
+        // Set height to full tile
+        hitbox.y += hitbox.height*0.5f;
+        hitbox.height = 1.0f;
+        hitbox.y -= hitbox.height*0.5f;
+
+        // Set width to 6 pixels
+        hitbox.x += hitbox.width*0.5f;
+        hitbox.width = 6.0f / Game.PIXELS_PER_TILE;
+        hitbox.x -= hitbox.width*0.5f;
+
+        // Center y on nearest tile
+        float cy = hitbox.y + hitbox.height*0.5f;
+        hitbox.y = (float)Math.floor(cy) + 0.5f - hitbox.height*0.5f;
+
+        // Align center x to tile edge
+        float cx = hitbox.x + hitbox.width*0.5f;
+        hitbox.x = facing_right ? (float)Math.floor(cx) : (float)Math.ceil(cx);
+        hitbox.x -= hitbox.width*0.5f;
+
+    }
+
     public boolean isSplatted() { return splatted; }
 
     @Override
@@ -43,29 +67,19 @@ public class CheeseBall extends GameObj {
 
         moveWithCollisions(deltaTime);
 
-        if (splatted) {
-            // For now: Align to tile, since we'll only handle collision with tiles. 
-
-            System.out.println(facing_right);
-
-            // Center on nearest tile position
-            float cx = hitbox.x + hitbox.width*0.5f;
-            float cy = hitbox.y + hitbox.height*0.5f;
-            hitbox.x = (float)Math.floor(cx) + 0.5f - hitbox.width*0.5f;
-            hitbox.y = (float)Math.floor(cy) + 0.5f - hitbox.height*0.5f;
-        }
+        if (splatted) splat();
     }
 
     @Override
     public void render(float deltaTime, SpriteBatch batch) {
         TextureManager.draw(
             batch,
-            TextureManager.Lasagna.LasagnaFlavor.Cheese.getIngredientTex(),
+            (splatted ? Cheese.getSplatTex() : Cheese.getGlobTex()),
             hitbox.x,
             hitbox.y,
             hitbox.width,
             hitbox.height,
-            false,
+            facing_right,
             false
         );
     }

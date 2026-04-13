@@ -33,7 +33,6 @@ public class Player extends LasagnaStack {
 
     private static final float JUMP_FORCE = 12f;
     private static final float MOVE_SPEED = 6f;
-    private final Vector2 spawnPosition;
 
     private UIHandler uidata;
 
@@ -118,9 +117,6 @@ public class Player extends LasagnaStack {
     public Player(GameInterface g, float x, float y) {
         super(g, x, y, true, true);
 
-        // Save spawn point for respawn
-        spawnPosition = new Vector2(x, y);
-
         uidata = UIHandler.getUI();
         stateController = new StateControllerComponent<>(this, idleState);
         coyoteTime = new CoyoteTimeComponent(0.12f);
@@ -135,26 +131,13 @@ public class Player extends LasagnaStack {
     }
 
     public void kill() {
-
         if (this.getStateController().isInState(DeathState.class))
             return; // already dead
-
-        gameInt.end();
+        
+        stateController.changeState(deathState);
     }
 
-    public void respawn() {
-        // Reset position
-        setPosition(spawnPosition);
-
-        // Reset velocity
-        getVelocity().x = 0;
-        getVelocity().y = 0;
-
-        // Reset jump state
-        coyoteTime.consume();
-        jumpBuffer.consume();
-
-        // Reset facing direction if desired
-        facingRight = true;
-    }
+    // Ending the player ends the game. Distinct from kill() because there can be a post-death animation. 
+    public void end() { gameInt.end(); }
+    public void restart() { gameInt.restart(); }
 }

@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Array;
 
 import cs.BabyLasagna.Game;
 import cs.BabyLasagna.TextureManager;
+import cs.BabyLasagna.Game.GameInterface;
 import cs.BabyLasagna.TextureManager.Lasagna.LasagnaFlavor;
 import cs.BabyLasagna.TextureManager.Lasagna.LasagnaRegion;
 import cs.BabyLasagna.Levels.Util;
@@ -53,7 +54,7 @@ public class LasagnaStack extends GameObj {
             TextureManager.draw(
                 batch,
                 // Take the flavor of the bottom layer
-                bot_flavor.getTex(LasagnaRegion.Legs),
+                bot_flavor.getStackTex(LasagnaRegion.Legs),
                 hitbox.x,
                 hitbox.y,
                 LasagnaRegion.Legs.reg.gw,
@@ -73,7 +74,7 @@ public class LasagnaStack extends GameObj {
 
             TextureManager.draw(
                 batch,
-                layer.flavor.getTex(layer.region),
+                layer.flavor.getStackTex(layer.region),
                 hitbox.x,
                 hitbox.y + yoff,
                 layer.region.reg.gw,
@@ -90,7 +91,7 @@ public class LasagnaStack extends GameObj {
             TextureManager.draw(
                 batch,
                 // Take flavor of top layer
-                top_flavor.getTex(LasagnaRegion.Head),
+                top_flavor.getStackTex(LasagnaRegion.Head),
                 hitbox.x,
                 hitbox.y + yoff,
                 LasagnaRegion.Head.reg.gw,
@@ -102,10 +103,10 @@ public class LasagnaStack extends GameObj {
     }
 
     @Override
-    public void update(float deltaTime, TiledMap map) {
+    public void update(float deltaTime) {
         if (stack.isEmpty()) return;
         velocity.y += GRAVITY * deltaTime;
-        moveWithCollisions(deltaTime, map);
+        moveWithCollisions(deltaTime);
     }
 
     // Perform Y collisions to see if the lasagna stack has room to grow
@@ -160,7 +161,7 @@ public class LasagnaStack extends GameObj {
 
         /// Add/Remove layers
     public boolean addBottom(Layer layer) {
-        if (!checkFit(map, false)) return false;
+        if (!checkFit(gameInt.getMap(), false)) return false;
         stack.push(layer);
         setHitboxHeight();
         return true;
@@ -170,7 +171,7 @@ public class LasagnaStack extends GameObj {
     }
 
     public boolean addTop(Layer layer) {
-        if (!checkFit(map, true)) return false;
+        if (!checkFit(gameInt.getMap(), true)) return false;
         stack.addLast(layer);
         setHitboxHeight();
         return true;
@@ -220,8 +221,8 @@ public class LasagnaStack extends GameObj {
         hitbox.height += (stack.size()-2) * LasagnaRegion.Layer1.reg.gh;
     }
 
-    public LasagnaStack(TiledMap map_, float x, float y, boolean head, boolean legs) {
-        super(map_, x,y,1f,1f);
+    public LasagnaStack(GameInterface g, float x, float y, boolean head, boolean legs) {
+        super(g, x,y,1f,1f);
         hasHead = head;
         hasLegs = legs;
         setHitboxHeight();

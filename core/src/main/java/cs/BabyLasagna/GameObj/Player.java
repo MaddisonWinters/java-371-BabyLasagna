@@ -139,8 +139,7 @@ public class Player extends LasagnaStack {
         if (this.getStateController().isInState(DeathState.class))
             return; // already dead
 
-        stateController.changeState(deathState);
-
+        gameInt.end();
     }
 
     public void respawn() {

@@ -26,6 +26,7 @@ public class Game {
     private final OrthographicCamera camera;
     private final OrthogonalTiledMapRenderer renderer;
 
+    private final String levelFile;
     private final TiledMap map;
     private static final int[] backgroundLayers = new int[] {0, 1};
     private static final int[] foregroundLayers = new int[] {2};
@@ -34,6 +35,8 @@ public class Game {
 
     private final Player player;
     private final ArrayList<GameObj> objects;
+
+    private boolean running=true, shouldRestart=false;
 
 
     // For functionality that entities within the game need
@@ -44,9 +47,12 @@ public class Game {
         public final TiledMap getMap() { return game.map; }
         public final Player getPlayer() { return game.player; }
         public final ArrayList<GameObj> getObjects() { return game.objects; }
+        public final void restart() { game.shouldRestart = true; }
+        public final void end() { game.running = false; }
     }
 
     public void update(float deltaTime) {
+        if (!running || shouldRestart) return;
         deltaTime = Math.min(deltaTime, MAX_DELTA_TIME);
 
         for (GameObj obj : objects) {
@@ -101,13 +107,18 @@ public class Game {
         camera.setToOrtho(false, vp_width, vp_height);
     }
 
+    public boolean isRunning() { return running; }
+    public boolean shouldRestart() { return shouldRestart; }
+    public String getLevelFile() { return levelFile; }
+
     public Game(String level) {
         gameInterface = new GameInterface(this);
 
         camera = new OrthographicCamera();
         updateViewport(1,1);
 
-        map = new TmxMapLoader().load(level);
+        levelFile = level;
+        map = new TmxMapLoader().load(levelFile);
         renderer = new OrthogonalTiledMapRenderer(map, 1/16f);
 
         player = new Player(gameInterface, 3,3);

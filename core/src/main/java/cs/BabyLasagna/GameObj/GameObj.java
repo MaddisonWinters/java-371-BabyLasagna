@@ -25,6 +25,8 @@ public abstract class GameObj {
         /// Environment
     protected final GameInterface gameInt;
 
+    protected final float spawnX, spawnY;
+
         /// Getters
     public final Vector2 getPosition() { return new Vector2(hitbox.x, hitbox.y); }
     public final float getX() { return hitbox.x; }
@@ -34,6 +36,7 @@ public abstract class GameObj {
     public boolean isGrounded() { return grounded; }
     public float getGravity() { return GRAVITY; }
     public boolean isSolid() { return isSolid; }
+    public GameInterface getGameInterface() { return gameInt; }
 
         ///  Setters
     protected final void setPosition(Vector2 v) { hitbox.x=v.x; hitbox.y=v.y; }
@@ -139,11 +142,18 @@ public abstract class GameObj {
 
         /// Constructors
     public GameObj(GameInterface g, float x, float y, float width, float height, float vx, float vy) {
+        spawnX = x;
+        spawnY = y;
         hitbox.set(x, y, width, height);
         velocity.set(vx, vy);
         gameInt = g;
     }
     public GameObj(GameInterface g, float x, float y, float width, float height) {
         this(g,x,y,width,height,0,0);
+    }
+
+    public void reset() {
+        hitbox.setPosition(spawnX, spawnY);
+        velocity.setZero();
     }
 }

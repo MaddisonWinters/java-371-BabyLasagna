@@ -11,6 +11,7 @@ import cs.BabyLasagna.GameObj.Collectables.Collectable;
 import cs.BabyLasagna.GameObj.Collectables.Ingredient;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import cs.BabyLasagna.GameObj.States.Player.DeathState;
 import cs.BabyLasagna.TextureManager.Lasagna.*;
 import cs.BabyLasagna.SoundManager.BGMusic.GameMsc;
 import cs.BabyLasagna.GameObj.GameObj;
@@ -45,6 +46,12 @@ public class Game {
         public final Player getPlayer() { return game.player; }
         public final ArrayList<GameObj> getObjects() { return game.objects; }
         public final void addObject(GameObj obj) { game.objects.add(obj); }
+
+        public void resetLevel() {
+            for (GameObj obj : game.objects) {
+                obj.reset();
+            }
+        }
     }
 
     public void update(float deltaTime) {
@@ -125,6 +132,7 @@ public class Game {
         objects.add(c);
         objects.add(m);
         objects.add(r);
+
         // END INGREDIENT TEST CODE
 
         GameMsc.playMain();

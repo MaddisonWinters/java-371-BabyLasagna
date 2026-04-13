@@ -27,15 +27,13 @@ public class DeathState implements State<Player> {
         respawnTimer -= deltaTime;
 
         if (respawnTimer <= 0) {
-
-            player.respawn();
             player.getStateController().changeState(player.idleState);
-
         }
     }
 
     @Override
     public void exit(Player player) {
-        // Reset any death effects if needed
+        player.respawn();
+        player.getGameInterface().resetLevel();
     }
 }

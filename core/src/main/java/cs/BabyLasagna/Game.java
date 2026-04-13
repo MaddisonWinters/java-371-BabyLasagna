@@ -58,7 +58,9 @@ public class Game {
         deltaTime = Math.min(deltaTime, MAX_DELTA_TIME);
 
         for (GameObj obj : objects) {
-            obj.update(deltaTime);
+            if (obj.isActive()) {
+                obj.update(deltaTime);
+            }
         }
 
         player.update(deltaTime);
@@ -85,7 +87,9 @@ public class Game {
         batch.begin();
 
         for (GameObj obj : objects) {
-            obj.render(deltaTime, batch);
+            if (obj.isActive()) {
+                obj.render(deltaTime, batch);
+            }
         }
 
         player.render(deltaTime, batch);

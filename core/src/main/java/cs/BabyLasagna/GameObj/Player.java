@@ -106,9 +106,9 @@ public class Player extends LasagnaStack {
             if (!(obj instanceof Collectable)) continue;
             Collectable col = (Collectable) obj;
 
-            if (hitbox.overlaps(obj.hitbox)) {
+            if (hitbox.overlaps(obj.hitbox) && col.isActive()) {
                 col.collect(this);
-                oi.remove();
+                col.setActive(false);
             }
         }
     }

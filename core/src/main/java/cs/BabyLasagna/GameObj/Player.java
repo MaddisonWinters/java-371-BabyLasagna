@@ -134,7 +134,9 @@ public class Player extends LasagnaStack {
 
     // Uses an ability using the top layer of the lasagna stack
     public void useAbilityTop() {
+        if (stack.isEmpty()) return;
         LasagnaFlavor f = this.popTop();
+
         switch (f) {
             case Pasta:
                 break;
@@ -176,6 +178,7 @@ public class Player extends LasagnaStack {
         // Reset facing direction if desired
         facingRight = true;
 
+        stack.clear();
         addTop(LasagnaFlavor.Cheese);
         addTop(LasagnaFlavor.Pasta);
     }

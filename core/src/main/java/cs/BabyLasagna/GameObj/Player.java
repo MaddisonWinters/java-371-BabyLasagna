@@ -214,7 +214,6 @@ public class Player extends LasagnaStack {
                 this.facingRight
             )
         );
-        this.addTop(LasagnaFlavor.Cheese);
     }
 
     // Ending the player ends the game. Distinct from kill() because there can be a post-death animation. 

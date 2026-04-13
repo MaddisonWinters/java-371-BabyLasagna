@@ -1,6 +1,8 @@
 package cs.BabyLasagna.GameObj;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.MapProperties;
+import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -50,7 +52,7 @@ public abstract class GameObj {
 
         /// Collision-related functions
     // Adds hitboxes of nearby tiles to the Array `tiles`
-    public void getTilesFromMap(Array<Rectangle> tiles, Vector2 movement_vec) {
+    public void getNearbyTiles(Array<Rectangle> tiles, Vector2 movement_vec) {
         // Calculate area of relevance in tilemap
         int startX = (int)Math.floor(Math.min(hitbox.x, hitbox.x+movement_vec.x));
         int startY = (int)Math.floor(Math.min(hitbox.y, hitbox.y+movement_vec.y));
@@ -58,7 +60,7 @@ public abstract class GameObj {
         int endY   = (int)Math.ceil(hitbox.height+ Math.max(hitbox.y, hitbox.y+movement_vec.y));
 
         // Get relevant tile rectangles/hitboxes
-        Util.getTiles(
+        Util.getRect(
             gameInt.getMap(),
             "Wall",
             tiles,
@@ -67,6 +69,15 @@ public abstract class GameObj {
             endX,
             endY
         );
+    }
+
+    public void getNearbyTags(Array<MapProperties> currentTags, Array<Rectangle> tileRects, Vector2 movement_vec) {
+        int startX = (int) Math.floor(hitbox.x);
+        int startY = (int) Math.floor(hitbox.y);
+        int endX   = (int) Math.ceil(hitbox.x + hitbox.width);
+        int endY   = (int) Math.ceil(hitbox.y + hitbox.height);
+
+        Util.getTags(gameInt.getMap(), "Object", currentTags, tileRects, startX, startY, endX, endY);
     }
 
     // Move and collide with general list of hitboxes | Primary collision function
@@ -128,7 +139,12 @@ public abstract class GameObj {
 
         // Get nearby tiles
         Array<Rectangle> near_tiles = new Array<>();
-        getTilesFromMap(near_tiles, velocity_scaled);
+        getNearbyTiles(near_tiles, velocity_scaled);
+
+        // Get tags
+        Array<MapProperties> tags = new Array<>();
+        Array<Rectangle> tiles = new Array<>();
+        getNearbyTags(tags, tiles, velocity_scaled);
 
         moveWithCollisions(near_tiles, velocity_scaled);
     }

@@ -4,7 +4,10 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import cs.BabyLasagna.GameObj.Player;
 import cs.BabyLasagna.GameObj.Collectables.Collectable;
@@ -26,6 +29,7 @@ public class Game {
     private final OrthographicCamera camera;
     private final OrthogonalTiledMapRenderer renderer;
 
+    private final String levelFile;
     private final TiledMap map;
     private static final int[] backgroundLayers = new int[] {0, 1};
     private static final int[] foregroundLayers = new int[] {2};
@@ -34,6 +38,8 @@ public class Game {
 
     private final Player player;
     private final ArrayList<GameObj> objects;
+
+    private boolean running=true, shouldRestart=false;
 
 
     // For functionality that entities within the game need
@@ -44,9 +50,18 @@ public class Game {
         public final TiledMap getMap() { return game.map; }
         public final Player getPlayer() { return game.player; }
         public final ArrayList<GameObj> getObjects() { return game.objects; }
+        
+        public final void restart() { game.shouldRestart = true; }
+        public final void end(boolean success) { 
+            game.running = false; 
+            if (success) {
+                System.out.println("LEVEL COMPLETE");
+            }
+        }
     }
 
     public void update(float deltaTime) {
+        if (!running || shouldRestart) return;
         deltaTime = Math.min(deltaTime, MAX_DELTA_TIME);
 
         for (GameObj obj : objects) {
@@ -108,30 +123,65 @@ public class Game {
         camera.setToOrtho(false, vp_width, vp_height);
     }
 
+    public boolean isRunning() { return running; }
+    public boolean shouldRestart() { return shouldRestart; }
+    public String getLevelFile() { return levelFile; }
+
+    private void parseCollectables(TiledMapTileLayer colLayer) {
+        for (int x = 0; x < colLayer.getWidth(); ++x) {
+            for (int y = 0; y < colLayer.getHeight(); ++y) {
+                Cell c = colLayer.getCell(x, y);
+                if (c == null) continue;
+                TiledMapTile t = c.getTile();
+                int id = t.getId();
+
+                Ingredient i = null;
+
+                switch(id) {
+                    case 0:
+                        break;
+                    case 1:
+                        i = new Ingredient(gameInterface, LasagnaFlavor.Pasta, x, y);
+                        break;
+                    case 2:
+                        i = new Ingredient(gameInterface, LasagnaFlavor.Cheese, x, y);
+                        break;
+                    case 3:
+                        i = new Ingredient(gameInterface, LasagnaFlavor.Meat, x, y);
+                        break;
+                    case 4:
+                        i = new Ingredient(gameInterface, LasagnaFlavor.Pepper, x, y);
+                        break;
+                    default:
+                        break;
+                }
+
+                if (i == null) continue;
+
+                objects.add(i);
+            }
+        }
+    }
+
     public Game(String level) {
         gameInterface = new GameInterface(this);
 
         camera = new OrthographicCamera();
         updateViewport(1,1);
 
-        map = new TmxMapLoader().load(level);
+        levelFile = level;
+        map = new TmxMapLoader().load(levelFile);
         renderer = new OrthogonalTiledMapRenderer(map, 1/16f);
 
         player = new Player(gameInterface, 3,3);
         player.addTop(LasagnaFlavor.Cheese);
         player.addTop(LasagnaFlavor.Pasta);
 
-        // INGREDIENT TEST CODE
-        Ingredient p = new Ingredient(gameInterface, LasagnaFlavor.Pasta, 5, 12);
-        Ingredient c = new Ingredient(gameInterface, LasagnaFlavor.Cheese, 6, 12);
-        Ingredient m = new Ingredient(gameInterface, LasagnaFlavor.Meat, 7, 12);
-        Ingredient r = new Ingredient(gameInterface, LasagnaFlavor.Pepper, 8, 12);
         objects = new ArrayList<>();
-        objects.add(p);
-        objects.add(c);
-        objects.add(m);
-        objects.add(r);
-        // END INGREDIENT TEST CODE
+
+        // Load collectable ingredients
+        TiledMapTileLayer colLayer = (TiledMapTileLayer)map.getLayers().get("Collectable");
+        if (colLayer != null) parseCollectables(colLayer);
 
         GameMsc.playMain();
     }

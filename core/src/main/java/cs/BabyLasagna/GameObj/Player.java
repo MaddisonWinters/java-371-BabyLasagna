@@ -8,12 +8,16 @@ import cs.BabyLasagna.GameObj.MyComponents.StateControllerComponent;
 import cs.BabyLasagna.GameObj.States.Player.*;
 import cs.BabyLasagna.TextureManager.Lasagna.*;
 
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.maps.MapProperties;
+
 import cs.BabyLasagna.SoundManager.GameSnd.PlayerSnd;
 import cs.BabyLasagna.GameObj.UIHandler;
 import cs.BabyLasagna.GameObj.Collectables.Collectable;
@@ -34,6 +38,9 @@ public class Player extends LasagnaStack {
     private static final float JUMP_FORCE = 12f;
     private static final float MOVE_SPEED = 6f;
 
+    private static final float DAMAGE_COOLDOWN = 0.8f;
+    private float damageTimer = 0.0f;
+
     private UIHandler uidata;
 
     private static boolean debug = true;
@@ -42,6 +49,11 @@ public class Player extends LasagnaStack {
     public void update(float deltaTime) {
 
         uidata.update();
+
+        if (damageTimer > 0) {
+            damageTimer -= deltaTime;
+            damageTimer = Math.max(damageTimer, 0.0f);
+        }
 
         // === Manual reset for testing ===
         boolean reset = Gdx.input.isKeyPressed(Keys.R);
@@ -112,6 +124,27 @@ public class Player extends LasagnaStack {
                 oi.remove();
             }
         }
+
+        // Win condition
+        Array<MapProperties> tags = new Array<>();
+        Array<Rectangle> tiles = new Array<>();
+        getNearbyTags(tags, tiles, new Vector2(0,0));
+
+        for (int i = 0; i < tags.size; ++i) {
+            MapProperties props = tags.get(i);
+            Rectangle tile = tiles.get(i);
+
+            if (!tile.overlaps(hitbox)) continue;
+
+            if (props.containsKey("goal")) {
+                win();
+            }
+
+            if (props.containsKey("hurt") && damageTimer <= 0) {
+                popBottom();
+                damageTimer = DAMAGE_COOLDOWN;
+            }
+        }
     }
     
     public Player(GameInterface g, float x, float y) {
@@ -135,6 +168,11 @@ public class Player extends LasagnaStack {
             return; // already dead
         
         stateController.changeState(deathState);
+    }
+
+    public void win() {
+        // Should add a state transition thingy like in kill()
+        gameInt.end(true);
     }
 
     // Ending the player ends the game. Distinct from kill() because there can be a post-death animation. 

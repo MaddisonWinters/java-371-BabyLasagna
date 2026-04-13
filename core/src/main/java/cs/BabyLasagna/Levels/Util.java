@@ -26,7 +26,7 @@ public class Util {
     }
 
     //Returns any tags of tiles found on the specific layer
-    public static void getTags(TiledMap map, String layer_name, Array<String> foundTags, int startX, int startY, int endX, int endY) {
+    public static void getTags(TiledMap map, String layer_name, Array<MapProperties> foundTags, Array<Rectangle> tileRects, int startX, int startY, int endX, int endY) {
         TiledMapTileLayer layer = (TiledMapTileLayer)map.getLayers().get(layer_name);
         if (layer == null) return;
 
@@ -36,7 +36,8 @@ public class Util {
                 if (cell != null && cell.getTile() != null) {
                     MapProperties props = cell.getTile().getProperties();
                     if (props != null) {
-                        foundTags.add(props.toString());
+                        foundTags.add(props);
+                        tileRects.add(new Rectangle(x, y, 1, 1));
                     }
                 }
             }

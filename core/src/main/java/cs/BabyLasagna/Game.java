@@ -49,7 +49,12 @@ public class Game {
         public final ArrayList<GameObj> getObjects() { return game.objects; }
         
         public final void restart() { game.shouldRestart = true; }
-        public final void end(boolean success) { game.running = false; }
+        public final void end(boolean success) { 
+            game.running = false; 
+            if (success) {
+                System.out.println("LEVEL COMPLETE");
+            }
+        }
     }
 
     public void update(float deltaTime) {

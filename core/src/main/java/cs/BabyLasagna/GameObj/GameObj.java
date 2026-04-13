@@ -1,6 +1,7 @@
 package cs.BabyLasagna.GameObj;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -67,18 +68,13 @@ public abstract class GameObj {
         );
     }
 
-    public void getNearbyTags(Vector2 movement_vec) {
+    public void getNearbyTags(Array<MapProperties> currentTags, Array<Rectangle> tileRects, Vector2 movement_vec) {
         int startX = (int) Math.floor(hitbox.x);
         int startY = (int) Math.floor(hitbox.y);
         int endX   = (int) Math.ceil(hitbox.x + hitbox.width);
         int endY   = (int) Math.ceil(hitbox.y + hitbox.height);
 
-        Array<String> currentTags = new Array<>();
-        Util.getTags(gameInt.getMap(), "Object", currentTags, startX, startY, endX, endY);
-
-        if (currentTags.size > 0) {
-            System.out.println("Tags: " + currentTags.toString(", "));
-        }
+        Util.getTags(gameInt.getMap(), "Object", currentTags, tileRects, startX, startY, endX, endY);
     }
 
     // Move and collide with general list of hitboxes | Primary collision function
@@ -141,7 +137,9 @@ public abstract class GameObj {
         getNearbyTiles(near_tiles, velocity_scaled);
 
         // Get tags
-        getNearbyTags(velocity_scaled);
+        Array<MapProperties> tags = new Array<>();
+        Array<Rectangle> tiles = new Array<>();
+        getNearbyTags(tags, tiles, velocity_scaled);
 
         moveWithCollisions(near_tiles, velocity_scaled);
     }

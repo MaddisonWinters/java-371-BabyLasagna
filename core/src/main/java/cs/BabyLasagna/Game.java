@@ -100,13 +100,6 @@ public class Game {
         batch.end();
 
         renderer.render(foregroundLayers);
-
-        // TEMP FOR DEBUGGING
-        batch.begin();
-        for (GameObj obj : objects) {
-            obj.render(deltaTime, batch);
-        }
-        batch.end();
     }
 
     // Updates the viewport of the camera

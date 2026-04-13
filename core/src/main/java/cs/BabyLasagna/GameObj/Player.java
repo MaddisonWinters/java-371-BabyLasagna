@@ -138,6 +138,6 @@ public class Player extends LasagnaStack {
     }
 
     // Ending the player ends the game. Distinct from kill() because there can be a post-death animation. 
-    public void end() { gameInt.end(); }
+    public void end() { gameInt.end(false); }
     public void restart() { gameInt.restart(); }
 }

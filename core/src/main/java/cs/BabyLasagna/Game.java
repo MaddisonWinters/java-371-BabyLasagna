@@ -47,8 +47,9 @@ public class Game {
         public final TiledMap getMap() { return game.map; }
         public final Player getPlayer() { return game.player; }
         public final ArrayList<GameObj> getObjects() { return game.objects; }
+        
         public final void restart() { game.shouldRestart = true; }
-        public final void end() { game.running = false; }
+        public final void end(boolean success) { game.running = false; }
     }
 
     public void update(float deltaTime) {

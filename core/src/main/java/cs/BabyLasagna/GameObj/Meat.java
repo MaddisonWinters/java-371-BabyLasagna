@@ -14,6 +14,7 @@ public class Meat extends GameObj {
     @Override
     public void update(float deltaTime) {
         //no gravity
+        moveWithCollisions(deltaTime);
     }
 
     @Override

@@ -199,5 +199,6 @@ public class Player extends LasagnaStack {
             }
         }
         Meat spawnMeat = gameInt.addObject(new Meat(gameInt, spawnX, spawnY));
+        spawnMeat.setDisposable(true);
     }
 }

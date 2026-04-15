@@ -50,7 +50,13 @@ public class Game {
 
         public void resetLevel() {
             for (GameObj obj : game.objects) {
-                obj.reset();
+                if (!obj.isActive()) {
+                    obj.reset();
+                }
+
+                if (obj.isDisposable()){
+                    obj.dispose();
+                }
             }
         }
     }

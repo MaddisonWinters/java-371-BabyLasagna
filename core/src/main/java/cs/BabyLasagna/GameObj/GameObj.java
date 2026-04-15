@@ -27,6 +27,7 @@ public abstract class GameObj {
 
     protected final float spawnX, spawnY, spawnVX, spawnVY;
     protected boolean active = true;
+    protected boolean disposable = false;
 
     /// Getters
     public final Vector2 getPosition() { return new Vector2(hitbox.x, hitbox.y); }
@@ -39,7 +40,7 @@ public abstract class GameObj {
     public boolean isSolid() { return isSolid; }
     public GameInterface getGameInterface() { return gameInt; }
     public boolean isActive() { return active; }
-    public void setActive(boolean active) { this.active = active; }
+    public boolean isDisposable() { return false; }
 
 
         ///  Setters
@@ -48,6 +49,8 @@ public abstract class GameObj {
     protected final void setY(float y) { hitbox.y=y; }
     protected final void setHitbox(Rectangle r) { hitbox.set(r); }
     protected final void setVelocity(Vector2 v) { velocity.set(v); }
+    protected final void setActive(boolean active) { this.active = active; }
+    protected final void setDisposable(boolean disposable) { this.disposable = disposable; }
 
         /// Abstract member functions
     // batch.begin() and batch.end() are not to be called within this function
@@ -163,5 +166,9 @@ public abstract class GameObj {
         velocity.set(spawnVX, spawnVY);
         //velocity.setZero();
         active = true;
+    }
+
+    public void dispose() {
+
     }
 }

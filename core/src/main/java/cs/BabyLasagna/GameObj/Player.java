@@ -15,7 +15,6 @@ import java.util.Iterator;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import cs.BabyLasagna.SoundManager.GameSnd.PlayerSnd;
-import cs.BabyLasagna.GameObj.UIHandler;
 import cs.BabyLasagna.GameObj.Collectables.Collectable;
 
 
@@ -52,7 +51,7 @@ public class Player extends LasagnaStack {
 
         // Makes sure the player doesn't stay in Idle
         stateController.update(deltaTime);
-        
+
         // Update coyote timer
         coyoteTime.update(deltaTime, grounded);
 
@@ -103,14 +102,14 @@ public class Player extends LasagnaStack {
 
             if (!(obj instanceof Collectable)) continue;
             Collectable col = (Collectable) obj;
-            
+
             if (hitbox.overlaps(obj.hitbox)) {
                 col.collect(this);
                 oi.remove();
             }
         }
     }
-    
+
     public Player(GameInterface g, float x, float y) {
         super(g, x, y, true, true);
 

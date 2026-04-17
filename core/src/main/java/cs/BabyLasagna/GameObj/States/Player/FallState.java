@@ -2,12 +2,13 @@ package cs.BabyLasagna.GameObj.States.Player;
 
 import cs.BabyLasagna.GameObj.Player;
 import cs.BabyLasagna.GameObj.State;
+import cs.BabyLasagna.TextureManager.LegAnim;
 
 public class FallState implements State<Player> {
 
     @Override
     public void enter(Player player) {
-        // Optional: could trigger falling animation
+        LegAnim.walk.start();
     }
 
     @Override
@@ -34,6 +35,6 @@ public class FallState implements State<Player> {
 
     @Override
     public void exit(Player player) {
-        // Optional: landing effects
+        LegAnim.walk.reset();
     }
 }

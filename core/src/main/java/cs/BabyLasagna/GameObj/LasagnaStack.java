@@ -13,8 +13,10 @@ import cs.BabyLasagna.Game.GameInterface;
 import cs.BabyLasagna.TextureManager.Lasagna.LasagnaFlavor;
 import cs.BabyLasagna.TextureManager.Lasagna.LasagnaRegion;
 import cs.BabyLasagna.Levels.Util;
+import cs.BabyLasagna.TextureManager.LegAnim;
 
 public class LasagnaStack extends GameObj {
+
 
     public final float HEAD_DECORATIVE_SIZE = 3f / Game.PIXELS_PER_TILE;
 
@@ -49,14 +51,28 @@ public class LasagnaStack extends GameObj {
 
         float yoff = 0f;
 
-        // Draw legs
+        // Draw legsS
         if (hasLegs) {
+            // Animated legs when moving
+            if (velocity.x != 0 && isGrounded()) LegAnim.walk.update(deltaTime);
+            TextureManager.draw(
+                batch,
+                LegAnim.walk.getFrame(),
+                hitbox.x,
+                hitbox.y,
+                LasagnaRegion.Legs.reg.gw,
+                LasagnaRegion.Legs.reg.gh,
+                !facingRight,
+                false
+            );
+            yoff += LasagnaRegion.Legs.reg.gh;
+            // Bottom-most layer
             TextureManager.draw(
                 batch,
                 // Take the flavor of the bottom layer
                 bot_flavor.getStackTex(LasagnaRegion.Legs),
                 hitbox.x,
-                hitbox.y,
+                hitbox.y + yoff,
                 LasagnaRegion.Legs.reg.gw,
                 LasagnaRegion.Legs.reg.gh,
                 !facingRight,
@@ -120,7 +136,7 @@ public class LasagnaStack extends GameObj {
 
         Array<Rectangle> tile_rects = new Array<>();
         Util.getTiles(
-            map, 
+            map,
             "Wall",
             tile_rects,
             (int)Math.floor(hb.x),
@@ -146,7 +162,7 @@ public class LasagnaStack extends GameObj {
         // If can't fit, then return false
         hb.height -= hitbox.height + LasagnaRegion.Layer1.reg.gh;
         if (hb.height < 0) return false;
-        
+
         // Can fit, so get correct position for new hitbox
         if (up) {
             hitbox.y = Math.min(hitbox.y, hb.y+hb.height);
@@ -207,9 +223,11 @@ public class LasagnaStack extends GameObj {
 
     protected void setHitboxHeight() {
         hitbox.height = 0;
-        
-        if (hasLegs)
-            hitbox.height += LasagnaRegion.Legs.reg.gh;
+
+        if (hasLegs) {
+            hitbox.height += LasagnaRegion.Legs.reg.gh * 2;
+            hitbox.y += LasagnaRegion.Legs.reg.gh;
+        }
         else
             hitbox.height += LasagnaRegion.Layer1.reg.gh;
 

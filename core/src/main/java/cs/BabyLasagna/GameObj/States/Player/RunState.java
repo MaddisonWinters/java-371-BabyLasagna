@@ -2,11 +2,12 @@ package cs.BabyLasagna.GameObj.States.Player;
 
 import cs.BabyLasagna.GameObj.Player;
 import cs.BabyLasagna.GameObj.State;
+import cs.BabyLasagna.TextureManager.LegAnim;
 
 public class RunState implements State<Player> {
     @Override
     public void enter(Player player) {
-        // Optional: play run animation or sound
+        LegAnim.walk.start();
     }
 
     @Override
@@ -31,6 +32,5 @@ public class RunState implements State<Player> {
 
     @Override
     public void exit(Player player) {
-        // Optional: stop run animation
-    }
+        LegAnim.walk.reset();}
 }

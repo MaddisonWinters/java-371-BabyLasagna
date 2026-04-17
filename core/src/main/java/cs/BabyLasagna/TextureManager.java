@@ -18,26 +18,15 @@ public class TextureManager {
         }
     }
 
+
     // Draws a texture, supports flipping the texture for convenience
     public static void draw(SpriteBatch batch, TextureRegion tex, float x, float y, float w, float h, boolean flipX, boolean flipY) {
         batch.draw(
             tex,
-            (flipX
-                ? x + w
-                : x
-            ),
-            (flipY
-                ? y + h
-                : y
-            ),
-            (flipX
-                ? -w
-                : w
-            ),
-            (flipY
-                ? -h
-                : h
-            )
+            (flipX ? x + w : x),
+            (flipY ? y + h : y),
+            (flipX ? -w : w),
+            (flipY ? -h : h)
         );
     }
 
@@ -47,7 +36,7 @@ public class TextureManager {
             Head  (0, 0,16, 8),
             Layer1(0, 8,16, 2), // Different layers for variety
             Layer2(0, 10,16, 2),
-            Legs  (0,12,16, 5),
+            Legs  (0,12,16, 3),
             FULL  (0, 0,16,17);
 
             private static final Random rand = new Random();
@@ -100,5 +89,41 @@ public class TextureManager {
 
             public final TextureRegion getIngredientTex() { return ingredientTextures[0]; }
         }
+    }
+
+    // Animation logic for the legs
+    public static class LegAnim {
+
+        // Load leg sprite and set its speed
+        public static final LegAnim walk = new LegAnim(
+            new Texture("BabyLasagna/WalkSheet.png"),
+            LegFrame.values(), 0.2f
+        );
+        public enum LegFrame {
+            Walk0 (0, 0, 16, 3),
+            Walk1 (17, 0, 16, 3),
+            Walk2 (32, 0, 16, 3),
+            Walk3 (48, 0, 16, 3);
+
+            public final Region reg;
+            LegFrame(int x, int y, int w, int h) { reg = new Region(x,y,w,h); }
+        }
+
+        private final TextureRegion[] legFrames;
+        private final float frameDuration;
+        private float elapsed = 0f;
+
+        public LegAnim(Texture sheet, LegFrame[] lf, float fd) {
+            frameDuration = fd;
+            legFrames = new  TextureRegion[lf.length];
+            for (int i=0; i < legFrames.length; i++) {
+                Region r = lf[i].reg;
+                legFrames[i] = new TextureRegion(sheet, r.tx, r.ty, r.tw, r.th);
+            }
+        }
+        public void update(float delta){elapsed += delta;};
+        public TextureRegion getFrame(){return legFrames[(int)(elapsed/frameDuration)%legFrames.length];}
+        public void start() { elapsed = 0f; }
+        public void reset(){elapsed = frameDuration;}
     }
 }

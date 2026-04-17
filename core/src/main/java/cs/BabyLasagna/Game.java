@@ -68,6 +68,10 @@ public class Game {
 
         // camera.position.set(...)
         camera.update();
+
+        renderer.setView(camera);
+        renderer.render();
+
         batch.setProjectionMatrix(camera.combined);
         renderer.setView(camera);
 
@@ -107,7 +111,7 @@ public class Game {
         camera = new OrthographicCamera();
         updateViewport(1,1);
 
-        map = new TmxMapLoader().load(level);
+        map = new TmxMapLoader().load("levels/" + level + ".tmx");
         renderer = new OrthogonalTiledMapRenderer(map, 1/16f);
 
         player = new Player(gameInterface, 3,3);

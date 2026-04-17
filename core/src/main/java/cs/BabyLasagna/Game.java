@@ -20,6 +20,8 @@ import cs.BabyLasagna.GameObj.GameObj;
 
 
 public class Game {
+    public enum Result { Ongoing, Win, Loss }
+
     private static final float MAX_VIEWPORT_SIZE=12;
     public static final int PIXELS_PER_TILE=16;
 
@@ -40,6 +42,7 @@ public class Game {
     private final ArrayList<GameObj> objects;
 
     private boolean running=true, shouldRestart=false;
+    private Result result = Result.Ongoing;
 
 
     // For functionality that entities within the game need
@@ -55,7 +58,10 @@ public class Game {
         public final void end(boolean success) { 
             game.running = false; 
             if (success) {
-                System.out.println("LEVEL COMPLETE");
+                result = Result.Win;
+            }
+            else {
+                result = Result.Loss;
             }
         }
     }
@@ -119,6 +125,7 @@ public class Game {
     public boolean isRunning() { return running; }
     public boolean shouldRestart() { return shouldRestart; }
     public String getLevelFile() { return levelFile; }
+    public Result getResult() { return result; }
 
     private void parseCollectables(TiledMapTileLayer colLayer) {
         for (int x = 0; x < colLayer.getWidth(); ++x) {
@@ -163,7 +170,7 @@ public class Game {
         updateViewport(1,1);
 
         levelFile = level;
-        map = new TmxMapLoader().load(levelFile);
+        map = new TmxMapLoader().load("levels/" + levelFile + ".tmx");
         renderer = new OrthogonalTiledMapRenderer(map, 1/16f);
 
         player = new Player(gameInterface, 3,3);

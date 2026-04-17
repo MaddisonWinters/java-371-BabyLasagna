@@ -15,7 +15,7 @@ public class Main extends ApplicationAdapter {
     @Override
     public void create() {
         batch = new SpriteBatch();
-        game = new Game("levels/level2.tmx");
+        game = new Game("level2");
     }
 
     @Override
@@ -27,15 +27,25 @@ public class Main extends ApplicationAdapter {
         if (game != null) {
             // End
             if (!game.isRunning()) {
+                Game.Result res = game.getResult();
+                if (res == Game.Result.Win)
+                    System.out.println("GAME WON");
+                else if (res == Game.Result.Loss)
+                    System.out.println("GAME LOST");
+                else
+                    System.err.println("ERROR: Game not running but has no result");
+                
                 game.dispose();
                 game = null;
                 return;
             }
             // Restart
             else if (game.shouldRestart()) {
+                System.out.println("Restarted level");
                 String level = game.getLevelFile();
                 game.dispose();
                 game = new Game(level);
+                game.updateViewport(winWidth, winHeight);
             }
             // Continue normally
             else {
@@ -44,7 +54,7 @@ public class Main extends ApplicationAdapter {
             }
         }
         else {
-            game = new Game("levels/level1.tmx");
+            game = new Game("level1");
             game.updateViewport(winWidth, winHeight);
         }
     }

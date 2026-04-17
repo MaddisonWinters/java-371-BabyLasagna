@@ -56,9 +56,14 @@ public class Player extends LasagnaStack {
         }
 
         // === Manual reset for testing ===
-        boolean reset = Gdx.input.isKeyPressed(Keys.R);
-        if (reset) {
-            kill();  // triggers DeathState
+        if (uidata.restart.press) {
+            restart();   
+        }
+        if (uidata.lose.press) {
+            kill();
+        }
+        if (uidata.win.press) {
+            win();
         }
 
         if (stack.isEmpty()) {
@@ -176,6 +181,6 @@ public class Player extends LasagnaStack {
     }
 
     // Ending the player ends the game. Distinct from kill() because there can be a post-death animation. 
-    public void end() { gameInt.end(false); }
+    public void end(boolean success) { gameInt.end(success); }
     public void restart() { gameInt.restart(); }
 }

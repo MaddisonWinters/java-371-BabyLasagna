@@ -12,6 +12,10 @@ import cs.BabyLasagna.TextureManager.Abilities.Cheese;
 
 public class CheeseBall extends GameObj {
 
+    public static final float BALL_SIZE    = 0.5f;
+    public static final float SPLAT_WIDTH  = 6.0f / Game.PIXELS_PER_TILE;
+    public static final float SPLAT_HEIGHT = 16.0f / Game.PIXELS_PER_TILE;
+
     public static final float INITIAL_VX = 12.0f;
     public static final float INITIAL_VY = 7.0f;
     public static final float SOURCE_VEL = 0.5f;
@@ -31,26 +35,15 @@ public class CheeseBall extends GameObj {
         this.facing_right = facing_right;
     }
 
-    public void splat() {
-        // Set height to full tile
-        hitbox.y += hitbox.height*0.5f;
-        hitbox.height = 1.0f;
-        hitbox.y -= hitbox.height*0.5f;
+    public void splat(Rectangle alignTile) {
+        splatted = true;
 
-        // Set width to 6 pixels
-        hitbox.x += hitbox.width*0.5f;
-        hitbox.width = 6.0f / Game.PIXELS_PER_TILE;
-        hitbox.x -= hitbox.width*0.5f;
+        hitbox.height = SPLAT_HEIGHT;
+        hitbox.y = alignTile.y + 0.5f*(1.0f - hitbox.height);
 
-        // Center y on nearest tile
-        float cy = hitbox.y + hitbox.height*0.5f;
-        hitbox.y = (float)Math.floor(cy) + 0.5f - hitbox.height*0.5f;
-
-        // Align center x to tile edge
-        float cx = hitbox.x + hitbox.width*0.5f;
-        hitbox.x = facing_right ? (float)Math.floor(cx) : (float)Math.ceil(cx);
-        hitbox.x -= hitbox.width*0.5f;
-
+        hitbox.width = SPLAT_WIDTH;
+        hitbox.x = alignTile.x - 0.5f*hitbox.width;
+        if (facing_right) hitbox.x += 1.0f;
     }
 
     public boolean isSplatted() { return splatted; }
@@ -66,8 +59,6 @@ public class CheeseBall extends GameObj {
         velocity.y += GRAVITY*deltaTime;
 
         moveWithCollisions(deltaTime);
-
-        if (splatted) splat();
     }
 
     @Override
@@ -100,9 +91,11 @@ public class CheeseBall extends GameObj {
         // Handle x-movement and x-collisions first
         hitbox.x += movement_vec.x;
 
+        Rectangle tileForAlign = null;
+
         for (Rectangle tile : tile_rects) {
             if (!hitbox.overlaps(tile)) continue;
-            splatted = true;
+            tileForAlign = new Rectangle(tile);
 
             float dx = (hitbox.x + hitbox.width/2f) - (tile.x + tile.width/2f);
 
@@ -114,6 +107,11 @@ public class CheeseBall extends GameObj {
                 hitbox.x = tile.x - hitbox.width;
                 facing_right = false;
             }
+        }
+
+        if (tileForAlign != null) {
+            splat(tileForAlign);
+            return;
         }
 
         // Handle y-movement and y-collisions last
@@ -135,7 +133,7 @@ public class CheeseBall extends GameObj {
                 }
             }
 
-            velocity.y *= -0.8f;
+            velocity.y *= -0.8f; // Bounce off of top/bottom surface
         }
     }
 }

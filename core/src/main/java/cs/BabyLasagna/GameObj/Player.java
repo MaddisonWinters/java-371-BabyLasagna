@@ -1,10 +1,10 @@
 package cs.BabyLasagna.GameObj;
 
 import cs.BabyLasagna.Game.GameInterface;
-import cs.BabyLasagna.GameObj.MyComponents.CoyoteTimeComponent;
-import cs.BabyLasagna.GameObj.MyComponents.FastFallingComponent;
-import cs.BabyLasagna.GameObj.MyComponents.JumpBufferComponent;
-import cs.BabyLasagna.GameObj.MyComponents.StateControllerComponent;
+import cs.BabyLasagna.GameObj.Components.CoyoteTimeComponent;
+import cs.BabyLasagna.GameObj.Components.FastFallingComponent;
+import cs.BabyLasagna.GameObj.Components.JumpBufferComponent;
+import cs.BabyLasagna.GameObj.Components.StateControllerComponent;
 import cs.BabyLasagna.GameObj.States.Player.*;
 import cs.BabyLasagna.TextureManager.Lasagna.*;
 

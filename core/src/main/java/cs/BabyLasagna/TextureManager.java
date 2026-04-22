@@ -36,7 +36,7 @@ public class TextureManager {
             Head  (0, 0,16, 8),
             Layer1(0, 8,16, 2), // Different layers for variety
             Layer2(0, 10,16, 2),
-            Legs  (0,12,16, 3),
+            Bottom(0,12,16, 3),
             FULL  (0, 0,16,17);
 
             private static final Random rand = new Random();
@@ -100,16 +100,16 @@ public class TextureManager {
             LegFrame.values(), 0.2f
         );
         public enum LegFrame {
-            Walk0 (0, 0, 16, 3),
-            Walk1 (17, 0, 16, 3),
-            Walk2 (32, 0, 16, 3),
-            Walk3 (48, 0, 16, 3);
+            Walk0 (0, 0, 16, 4),
+            Walk1 (16, 0, 16, 4),
+            Walk2 (32, 0, 16, 4),
+            Walk3 (48, 0, 16, 4);
 
             public final Region reg;
             LegFrame(int x, int y, int w, int h) { reg = new Region(x,y,w,h); }
         }
 
-        private final TextureRegion[] legFrames;
+        public final TextureRegion[] legFrames;
         private final float frameDuration;
         private float elapsed = 0f;
 

@@ -42,6 +42,6 @@ public class SoundManager {
     }
 
     public static class InMenu {
-        
+
     }
 }

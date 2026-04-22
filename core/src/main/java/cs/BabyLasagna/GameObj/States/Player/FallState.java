@@ -35,6 +35,5 @@ public class FallState implements State<Player> {
 
     @Override
     public void exit(Player player) {
-        LegAnim.walk.reset();
     }
 }

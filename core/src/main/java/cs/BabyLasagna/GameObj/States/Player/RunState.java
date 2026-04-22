@@ -31,6 +31,5 @@ public class RunState implements State<Player> {
     }
 
     @Override
-    public void exit(Player player) {
-        LegAnim.walk.reset();}
+    public void exit(Player player) { }
 }

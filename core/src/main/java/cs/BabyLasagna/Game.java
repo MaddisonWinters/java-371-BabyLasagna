@@ -126,7 +126,7 @@ public class Game {
         objects.add(r);
         // END INGREDIENT TEST CODE
 
-        GameMsc.playMain();
+        //GameMsc.playMain();
     }
 
     public void dispose() {}

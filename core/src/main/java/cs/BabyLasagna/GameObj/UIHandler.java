@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector2;
 
+import cs.BabyLasagna.GameObj.UIHandler.KeyStatus;
+
 // Singleton class for handling player-UI
 public class UIHandler {
     //  Singleton class shenanigans
@@ -57,6 +59,8 @@ public class UIHandler {
     public Ternary move_x = Ternary.Zero;
     public Ternary move_y = Ternary.Zero;
     public KeyStatus jump = new KeyStatus(new int[]{Input.Keys.SPACE, Input.Keys.UP, Input.Keys.W});
+
+    // DEBUG
     public KeyStatus addTop = new KeyStatus(Input.Keys.O);
     public KeyStatus addBot = new KeyStatus(Input.Keys.P);
     public KeyStatus popTop = new KeyStatus(Input.Keys.L);
@@ -97,6 +101,8 @@ public class UIHandler {
 
         // Set jump state
         jump.update();
+
+        // Update keypresses
         addTop.update();
         addBot.update();
         popTop.update();

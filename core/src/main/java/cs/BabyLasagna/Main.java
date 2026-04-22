@@ -14,7 +14,8 @@ public class Main extends ApplicationAdapter {
     private PausedMenu pausedMenu;
     private boolean paused = false;
     private String currentLevel;
-    private int win_width=1, win_height=1;
+
+    private int winWidth=1, winHeight=1;
 
     @Override
     public void create() {
@@ -36,53 +37,83 @@ public class Main extends ApplicationAdapter {
                 int level = menu.getLevel();
                 if(level ==1 ){
                     currentLevel = "level1";
-                    game = new Game(currentLevel);
-                    game.updateViewport(win_width, win_height);
+                    game = new Game(currentLevel, winWidth, winHeight);
                     paused = false;
                 }
                 if(level == 2) {
                     currentLevel = "level2";
-                    game = new Game(currentLevel);
-                    game.updateViewport(win_width, win_height);
+                    game = new Game(currentLevel, winWidth, winHeight);
                     paused = false;
                 }
 
             }
             return;
         }
+
         // if esc is pressed need to paused game & bring up menu
-        if (game != null && Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             if (paused) {
                 paused = false;
             } else {
                 paused = true;
             }
         }
-        game.render(deltaTime, batch);
-        if(paused){
-            //game.render(deltaTime, batch);
+        
+        // If paused
+        if (paused) {
+            // Render game then pause menu over top
+            game.render(deltaTime, batch);
             pausedMenu.render();
 
+            // Resume
             if(pausedMenu.resume()){
                 paused = false;
             }
 
+            // Set game to restart, then resume
             if(pausedMenu.restart()){
-                game = new Game(currentLevel);
-                game.updateViewport(win_width, win_height);
+                game.gameInterface.restart();
                 paused = false;
             }
 
+            // Set game to end, then resume
             if(pausedMenu.mainMenu()){
-                game.dispose();
-                game = null;
+                game.gameInterface.end(false);
                 paused = false;
                 return;
             }
+
             return;
         }
 
-        game.update(deltaTime);
+        // If game is over
+        if (!game.isRunning()) {
+            Game.Result res = game.getResult();
+            if (res == Game.Result.Win)
+                System.out.println("GAME WON");
+            else if (res == Game.Result.Loss)
+                System.out.println("GAME LOST");
+            else
+                System.err.println("ERROR: Game not running but has no result");
+            
+            game.dispose();
+            game = null;
+            return;
+        }
+
+        // If game needs restart
+        else if (game.shouldRestart()) {
+            System.out.println("Restarted level");
+            String level = game.getLevelFile();
+            game.dispose();
+            game = new Game(level, winWidth, winHeight);
+            game.render(deltaTime, batch);
+        }
+        // Continue normally
+        else {
+            game.update(deltaTime);
+            game.render(deltaTime, batch);
+        }
     }
 
     @Override
@@ -98,11 +129,8 @@ public class Main extends ApplicationAdapter {
         // If the window is minimized on a desktop (LWJGL3) platform, width and height are 0
         if(width <= 0 || height <= 0) return;
 
-        win_width = width;
-        win_height = height;
-
-        if(game !=null) {
-            game.updateViewport(width, height);
-        }
+        winWidth = width;
+        winHeight = height;
+        if (game != null) game.updateViewport(winWidth, winHeight);
     }
 }

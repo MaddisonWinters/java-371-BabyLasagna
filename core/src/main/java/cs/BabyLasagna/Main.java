@@ -20,7 +20,7 @@ public class Main extends ApplicationAdapter {
     public void render() {
         float deltaTime = Gdx.graphics.getDeltaTime();
         deltaTime = Math.min(deltaTime, 0.1f);
-        ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
+        ScreenUtils.clear(157/255f, 133/255f, 151/255f, 1f);
 
         game.update(deltaTime);
         game.render(deltaTime, batch);

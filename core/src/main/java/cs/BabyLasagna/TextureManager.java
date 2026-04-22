@@ -37,6 +37,7 @@ public class TextureManager {
             Layer1(0, 8,16, 2), // Different layers for variety
             Layer2(0, 10,16, 2),
             Bottom(0,12,16, 3),
+            Legs(0,0,16,4),
             FULL  (0, 0,16,17);
 
             private static final Random rand = new Random();
@@ -97,7 +98,7 @@ public class TextureManager {
         // Load leg sprite and set its speed
         public static final LegAnim walk = new LegAnim(
             new Texture("BabyLasagna/WalkSheet.png"),
-            LegFrame.values(), 0.2f
+            LegFrame.values(), 0.15f
         );
         public enum LegFrame {
             Walk0 (0, 0, 16, 4),

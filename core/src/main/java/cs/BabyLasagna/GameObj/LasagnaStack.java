@@ -65,13 +65,13 @@ public class LasagnaStack extends GameObj {
                 batch,
                 LegAnim.walk.getFrame(),
                 hitbox.x,
-                hitbox.y + bob - 1f/Game.PIXELS_PER_TILE,
-                LasagnaRegion.Bottom.reg.gw,
-                LegAnim.walk.getFrame().getRegionHeight() / (float)Game.PIXELS_PER_TILE,
+                hitbox.y + bob,
+                LasagnaRegion.Legs.reg.gw,
+                LasagnaRegion.Legs.reg.gh,
                 !facingRight,
                 false
             );
-            yoff += LasagnaRegion.Bottom.reg.gh;
+            yoff += LasagnaRegion.Legs.reg.gh;
             // Bottom-most layer
             TextureManager.draw(
                 batch,
@@ -231,7 +231,7 @@ public class LasagnaStack extends GameObj {
         hitbox.height = 0;
 
         if (hasLegs) {
-            hitbox.height += LasagnaRegion.Bottom.reg.gh * 2;
+            hitbox.height += LasagnaRegion.Bottom.reg.gh + LasagnaRegion.Legs.reg.gh;
             hitbox.y += LasagnaRegion.Bottom.reg.gh;
         }
         else

@@ -9,6 +9,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import cs.BabyLasagna.GameObj.Player;
+import cs.BabyLasagna.GameObj.PlayerProgress;
 
 public class Menu {
     private OrthographicCamera camera;
@@ -32,7 +33,10 @@ public class Menu {
     float exitXpos = Gdx.graphics.getWidth() - 80;
     float exitYpos = Gdx.graphics.getHeight() - 80;
 
-    public Menu(){
+    private final PlayerProgress progress;
+
+    public Menu(PlayerProgress progress){
+        this.progress = progress;
 
         name = new Texture("menu/logo.png");
         //button = new Texture("menu/play.png");
@@ -61,14 +65,18 @@ public class Menu {
             //level1 button
             if(mouseX > buttonXpos1 && mouseX < buttonXpos1 + levelButtonWidth
                 && mouseY > buttonYpos1 && mouseY < buttonYpos1 + levelButtonHeight){
-                levelChoice = 1;
-                startGame = true;
+                if (progress.canAccess(0)) {
+                    levelChoice = 1;
+                    startGame = true;
+                }
             }
             //level2 button
             if(mouseX > buttonXpos2 && mouseX < buttonXpos2 + levelButtonWidth
                 && mouseY > buttonYpos2 && mouseY < buttonYpos2 + levelButtonHeight){
-                levelChoice = 2;
-                startGame = true;
+                if (progress.canAccess(1)) {
+                    levelChoice = 2;
+                    startGame = true;
+                }
             }
             //exit button
             if(mouseX > exitXpos && mouseX < exitXpos + levelButtonWidth

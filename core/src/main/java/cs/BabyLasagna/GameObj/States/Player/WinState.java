@@ -7,7 +7,7 @@ public class WinState implements State<Player> {
 
     @Override
     public void enter(Player player) {
-        //gameInt.end(true);
+        //progress.onLevelComplete(currentLevelIndex);
     }
 
     @Override

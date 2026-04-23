@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.Input;
+import cs.BabyLasagna.GameObj.PlayerProgress;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
@@ -14,13 +15,16 @@ public class Main extends ApplicationAdapter {
     private PausedMenu pausedMenu;
     private boolean paused = false;
     private String currentLevel;
+    private int currentLevelIndex = 0; // track index for progress reporting
+
+    private final PlayerProgress progress = new PlayerProgress();
 
     private int winWidth=1, winHeight=1;
 
     @Override
     public void create() {
         batch = new SpriteBatch();
-        menu = new Menu();
+        menu = new Menu(progress);
         pausedMenu = new PausedMenu();
     }
 
@@ -37,11 +41,13 @@ public class Main extends ApplicationAdapter {
                 int level = menu.getLevel();
                 if(level ==1 ){
                     currentLevel = "level1";
+                    currentLevelIndex = 0;
                     game = new Game(currentLevel, winWidth, winHeight);
                     paused = false;
                 }
                 if(level == 2) {
                     currentLevel = "level2";
+                    currentLevelIndex = 1;
                     game = new Game(currentLevel, winWidth, winHeight);
                     paused = false;
                 }
@@ -58,7 +64,7 @@ public class Main extends ApplicationAdapter {
                 paused = true;
             }
         }
-        
+
         // If paused
         if (paused) {
             // Render game then pause menu over top
@@ -89,13 +95,15 @@ public class Main extends ApplicationAdapter {
         // If game is over
         if (!game.isRunning()) {
             Game.Result res = game.getResult();
-            if (res == Game.Result.Win)
+            if (res == Game.Result.Win) {
+                progress.onLevelComplete(currentLevelIndex);
                 System.out.println("GAME WON");
+            }
             else if (res == Game.Result.Loss)
                 System.out.println("GAME LOST");
             else
                 System.err.println("ERROR: Game not running but has no result");
-            
+
             game.dispose();
             game = null;
             return;

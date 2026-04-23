@@ -51,10 +51,10 @@ public class Menu {
         camera.update();
         Main.batch.setProjectionMatrix(camera.combined);
         Main.batch.begin();
-
+        drawLevelButton(level1, buttonXpos1, buttonYpos1, 0);
+        drawLevelButton(level2, buttonXpos2, buttonYpos2, 1);
         Main.batch.draw(name,(Gdx.graphics.getWidth() / 2f) - (176*3 / 2f),250,176*3,32*3);
-        Main.batch.draw(level1,buttonXpos1,buttonYpos1,levelButtonWidth,levelButtonHeight);
-        Main.batch.draw(level2,buttonXpos2,buttonYpos2,levelButtonWidth,levelButtonHeight);
+
         Main.batch.draw(exit,exitXpos,exitYpos,96,96);
 
         if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
@@ -107,5 +107,13 @@ public class Menu {
         level1.dispose();
         //level2.dispose();
         exit.dispose();
+    }
+
+    // Greys out locked levels
+    private void drawLevelButton(Texture texture, float x, float y, int levelIndex) {
+        float tint = progress.canAccess(levelIndex) ? 1f : 0.4f;
+        Main.batch.setColor(tint, tint, tint, 1f);
+        Main.batch.draw(texture, x, y, levelButtonWidth, levelButtonHeight);
+        Main.batch.setColor(1f, 1f, 1f, 1f);
     }
 }

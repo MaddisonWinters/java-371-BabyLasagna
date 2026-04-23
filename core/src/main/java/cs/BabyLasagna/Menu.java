@@ -9,6 +9,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import cs.BabyLasagna.GameObj.Player;
+import cs.BabyLasagna.GameObj.PlayerProgress;
 
 public class Menu {
     private OrthographicCamera camera;
@@ -32,7 +33,10 @@ public class Menu {
     float exitXpos = Gdx.graphics.getWidth() - 80;
     float exitYpos = Gdx.graphics.getHeight() - 80;
 
-    public Menu(){
+    private final PlayerProgress progress;
+
+    public Menu(PlayerProgress progress){
+        this.progress = progress;
 
         name = new Texture("menu/logo.png");
         //button = new Texture("menu/play.png");
@@ -47,10 +51,10 @@ public class Menu {
         camera.update();
         Main.batch.setProjectionMatrix(camera.combined);
         Main.batch.begin();
-
+        drawLevelButton(level1, buttonXpos1, buttonYpos1, 0);
+        drawLevelButton(level2, buttonXpos2, buttonYpos2, 1);
         Main.batch.draw(name,(Gdx.graphics.getWidth() / 2f) - (176*3 / 2f),250,176*3,32*3);
-        Main.batch.draw(level1,buttonXpos1,buttonYpos1,levelButtonWidth,levelButtonHeight);
-        Main.batch.draw(level2,buttonXpos2,buttonYpos2,levelButtonWidth,levelButtonHeight);
+
         Main.batch.draw(exit,exitXpos,exitYpos,96,96);
 
         if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
@@ -61,14 +65,18 @@ public class Menu {
             //level1 button
             if(mouseX > buttonXpos1 && mouseX < buttonXpos1 + levelButtonWidth
                 && mouseY > buttonYpos1 && mouseY < buttonYpos1 + levelButtonHeight){
-                levelChoice = 1;
-                startGame = true;
+                if (progress.canAccess(0)) {
+                    levelChoice = 1;
+                    startGame = true;
+                }
             }
             //level2 button
             if(mouseX > buttonXpos2 && mouseX < buttonXpos2 + levelButtonWidth
                 && mouseY > buttonYpos2 && mouseY < buttonYpos2 + levelButtonHeight){
-                levelChoice = 2;
-                startGame = true;
+                if (progress.canAccess(1)) {
+                    levelChoice = 2;
+                    startGame = true;
+                }
             }
             //exit button
             if(mouseX > exitXpos && mouseX < exitXpos + levelButtonWidth
@@ -99,5 +107,13 @@ public class Menu {
         level1.dispose();
         //level2.dispose();
         exit.dispose();
+    }
+
+    // Greys out locked levels
+    private void drawLevelButton(Texture texture, float x, float y, int levelIndex) {
+        float tint = progress.canAccess(levelIndex) ? 1f : 0.4f;
+        Main.batch.setColor(tint, tint, tint, 1f);
+        Main.batch.draw(texture, x, y, levelButtonWidth, levelButtonHeight);
+        Main.batch.setColor(1f, 1f, 1f, 1f);
     }
 }

@@ -137,6 +137,31 @@ public abstract class GameObj {
         moveWithCollisions(near_tiles, velocity_scaled);
     }
 
+    public void resolveObjectCollisions(float deltaTime) {
+        for (GameObj obj : gameInt.getObjects()) {
+            if (obj == this || !obj.isSolid()) continue;
+
+            if (!hitbox.overlaps(obj.hitbox)) continue;
+
+            float dx = (hitbox.x + hitbox.width/2f) - (obj.hitbox.x + obj.hitbox.width/2f);
+            float dy = (hitbox.y + hitbox.height/2f) - (obj.hitbox.y + obj.hitbox.height/2f);
+
+            if (Math.abs(dx) > Math.abs(dy)) {
+                // X
+                if (dx > 0)
+                    hitbox.x = obj.hitbox.x + obj.hitbox.width;
+                else
+                    hitbox.x = obj.hitbox.x - hitbox.width;
+            } else {
+                // Y
+                if (dy > 0)
+                    hitbox.y = obj.hitbox.y + obj.hitbox.height;
+                else
+                    hitbox.y = obj.hitbox.y - hitbox.height;
+            }
+        }
+    }
+
         /// Constructors
     public GameObj(GameInterface g, float x, float y, float width, float height, float vx, float vy) {
         hitbox.set(x, y, width, height);

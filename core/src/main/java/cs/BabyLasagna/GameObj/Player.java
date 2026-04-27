@@ -5,6 +5,7 @@ import cs.BabyLasagna.GameObj.MyComponents.CoyoteTimeComponent;
 import cs.BabyLasagna.GameObj.MyComponents.FastFallingComponent;
 import cs.BabyLasagna.GameObj.MyComponents.JumpBufferComponent;
 import cs.BabyLasagna.GameObj.MyComponents.StateControllerComponent;
+
 import cs.BabyLasagna.GameObj.States.Player.*;
 import cs.BabyLasagna.TextureManager.Lasagna.*;
 
@@ -17,6 +18,8 @@ import com.badlogic.gdx.Input.Keys;
 import cs.BabyLasagna.SoundManager.GameSnd.PlayerSnd;
 import cs.BabyLasagna.GameObj.UIHandler;
 import cs.BabyLasagna.GameObj.Collectables.Collectable;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
 
 
 public class Player extends LasagnaStack {
@@ -130,16 +133,21 @@ public class Player extends LasagnaStack {
 
     // Uses an ability using the top layer of the lasagna stack
     public void useAbilityTop() {
-        LasagnaFlavor f = this.popTop();
+        LasagnaFlavor f = this.peekTop();
         switch (f) {
             case Pasta:
+                this.popTop();
                 break;
             case Cheese:
+                this.popTop();
                 break;
             case Meat:
-                throwMeat();
+                if (throwMeat()) {
+                    this.popTop();
+                }
                 break;
             case Pepper:
+                this.popTop();
                 break;
             default:
                 System.err.print("Error: Unknown LasagnaFlavor: ");
@@ -172,22 +180,39 @@ public class Player extends LasagnaStack {
         // Reset facing direction if desired
         facingRight = true;
     }
-    private void throwMeat() {
-        float spawnX;
-        float spawnY = (float)Math.floor(hitbox.y + 0.5f);
+    private boolean throwMeat() {
 
+        int tileX;
         if (facingRight) {
-            spawnX = (float)Math.floor(hitbox.x + hitbox.width) + 1f;
+            tileX = (int)Math.floor(hitbox.x + hitbox.width);
         } else {
-            spawnX = (float)Math.floor(hitbox.x - 1);
+            tileX = (int)Math.floor(hitbox.x - 1);
         }
-        // try to make it where meat cant be placed indie another tile
+        int tileY = (int)Math.floor(hitbox.y);
+
+        // get tile layer
+        var layer = gameInt.getMap().getLayers().get("Wall");
+        if (layer == null) return false;
+
+        com.badlogic.gdx.maps.tiled.TiledMapTileLayer tileLayer = (com.badlogic.gdx.maps.tiled.TiledMapTileLayer) layer;
+
+        // if the tile map is there meat block does not get thrown or popped
+        if (tileLayer.getCell(tileX, tileY) != null) {
+            return false;
+        }
+
+        float spawnX = tileX;
+        float spawnY = tileY;
+
+        Rectangle box = new Rectangle(spawnX, spawnY, 1, 1);
+
         for (GameObj obj : gameInt.getObjects()) {
-            if (obj.isSolid() && obj.getHitbox().overlaps(
-                new com.badlogic.gdx.math.Rectangle(spawnX, spawnY, 1, 1))) {
-                return;
+            if (obj.isSolid() && obj.getHitbox().overlaps(box)) {
+                return false;
             }
         }
+
         gameInt.addObject(new Meat(gameInt, spawnX, spawnY));
+        return true;
     }
 }

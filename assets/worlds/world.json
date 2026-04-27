@@ -1,0 +1,21 @@
+{
+  "name": "Baby Lasagna World",
+  "levels": [
+    {
+      "id": "level1",
+      "displayName": "Level 1",
+      "mapFile": "levels/level1",
+      "buttonTexture": "menu/level1.png"
+    },
+    {
+      "id": "level2",
+      "displayName": "Level 2",
+      "mapFile": "levels/level2",
+      "buttonTexture": "menu/level2.png",
+      "unlockCondition": {
+        "type": "complete",
+        "level": "level1"
+      }
+    }
+  ]
+}

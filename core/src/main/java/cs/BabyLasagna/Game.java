@@ -176,7 +176,7 @@ public class Game {
 
         // Load map
         levelFile = level;
-        map = new TmxMapLoader().load("levels/" + levelFile + ".tmx");
+        map = new TmxMapLoader().load(levelFile + ".tmx");
         renderer = new OrthogonalTiledMapRenderer(map, 1/16f);
 
         // Load objects

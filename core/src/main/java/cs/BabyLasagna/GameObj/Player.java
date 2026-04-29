@@ -264,8 +264,8 @@ public class Player extends LasagnaStack {
             return false;
         }
 
-        float spawnX = tileX + 1.1f;
-        float spawnY = tileY + .7f;
+        float spawnX = tileX + 1f;
+        float spawnY = tileY + 11/16f;
 
         // NOTE: thinner hitbox
         Rectangle box = new Rectangle(spawnX, spawnY, 1f, 0.3f);

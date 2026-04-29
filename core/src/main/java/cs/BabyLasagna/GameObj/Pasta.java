@@ -7,7 +7,7 @@ import cs.BabyLasagna.TextureManager;
 public class Pasta extends GameObj {
 
     private static final float WIDTH = 1f;
-    private static final float HEIGHT = 0.3f; // thinner than meat
+    private static final float HEIGHT = 5/16f; // thinner than meat
     private static final float BOUNCE_FORCE = 14f;
 
     public Pasta(GameInterface g, float x, float y) {
@@ -25,7 +25,7 @@ public class Pasta extends GameObj {
     public void render(float deltaTime, SpriteBatch batch) {
         TextureManager.draw(
             batch,
-            TextureManager.Lasagna.LasagnaFlavor.Pasta.getIngredientTex(),
+            TextureManager.Lasagna.LasagnaFlavor.Pasta.getAbilityTex(),
             hitbox.x,
             hitbox.y,
             hitbox.width,

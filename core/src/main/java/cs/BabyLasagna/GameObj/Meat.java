@@ -21,7 +21,7 @@ public class Meat extends GameObj {
     public void render(float deltaTime, SpriteBatch batch) {
         TextureManager.draw(
             batch,
-            TextureManager.Lasagna.LasagnaFlavor.Meat.getIngredientTex(),
+            TextureManager.Lasagna.LasagnaFlavor.Meat.getAbilityTex(),
             hitbox.x,
             hitbox.y,
             hitbox.width,

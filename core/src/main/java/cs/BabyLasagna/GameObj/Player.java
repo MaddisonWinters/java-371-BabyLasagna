@@ -184,7 +184,7 @@ public class Player extends LasagnaStack {
 
         int tileX;
         if (facingRight) {
-            tileX = (int)Math.floor(hitbox.x + hitbox.width);
+            tileX = (int)Math.floor(hitbox.x + hitbox.width + 1);
         } else {
             tileX = (int)Math.floor(hitbox.x - 1);
         }

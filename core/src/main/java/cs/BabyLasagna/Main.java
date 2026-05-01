@@ -146,6 +146,7 @@ public class Main extends ApplicationAdapter {
 
         winWidth = width;
         winHeight = height;
+        if (menu != null) menu.updateViewport(winWidth, winHeight);
         if (game != null) game.updateViewport(winWidth, winHeight);
     }
 }

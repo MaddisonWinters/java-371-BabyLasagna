@@ -66,9 +66,24 @@ public class Menu {
         return (VWIDTH - totalWidth) / 2f + i * (PEG_SIZE + PEG_SPACING);
     }
 
+    private static final float HOVER_MULT = 1.1f;
+    private static final float PRESS_MULT = 0.9f;
+
     // Draws a texture at virtual coordinates, scaled and offset to screen space
     private void drawScaled(Texture tex, float vx, float vy, float vw, float vh) {
         Main.batch.draw(tex, offsetX + vx * scale, offsetY + vy * scale, vw * scale, vh * scale);
+    }
+
+    // Draws a sprite centered on its virtual rect, scaling on hover/press
+    private void drawInteractive(Texture tex, float vx, float vy, float vw, float vh,
+                                 float mx, float my, boolean mouseHeld, boolean interactive) {
+        boolean hovering = interactive
+            && mx > vx && mx < vx + vw
+            && my > vy && my < vy + vh;
+        float mult = hovering ? (mouseHeld ? PRESS_MULT : HOVER_MULT) : 1f;
+        float vcx = vx + vw / 2f;
+        float vcy = vy + vh / 2f;
+        drawScaled(tex, vcx - vw * mult / 2f, vcy - vh * mult / 2f, vw * mult, vh * mult);
     }
 
     public void render() {
@@ -76,7 +91,12 @@ public class Menu {
         Main.batch.setProjectionMatrix(camera.combined);
         Main.batch.begin();
 
-        drawScaled(logo, LOGO_X, LOGO_Y, LOGO_W, LOGO_H);
+        // Virtual mouse position (computed once, used for hover, press, and click)
+        float mx = (Gdx.input.getX() - offsetX) / scale;
+        float my = ((Gdx.graphics.getHeight() - Gdx.input.getY()) - offsetY) / scale;
+        boolean mouseHeld = Gdx.input.isButtonPressed(Input.Buttons.LEFT);
+
+        drawInteractive(logo, LOGO_X, LOGO_Y, LOGO_W, LOGO_H, mx, my, mouseHeld, true);
 
         for (int i = 0; i < NUM_LEVELS; i++) {
             Texture tex;
@@ -89,15 +109,13 @@ public class Menu {
             } else {
                 tex = levelPegLocked;
             }
-            drawScaled(tex, pegVX(i), PEG_Y, PEG_SIZE, PEG_SIZE);
+            boolean interactive = levelExists[i] && progress.canAccess(i);
+            drawInteractive(tex, pegVX(i), PEG_Y, PEG_SIZE, PEG_SIZE, mx, my, mouseHeld, interactive);
         }
 
-        drawScaled(exit, EXIT_X, EXIT_Y, EXIT_SIZE, EXIT_SIZE);
+        drawInteractive(exit, EXIT_X, EXIT_Y, EXIT_SIZE, EXIT_SIZE, mx, my, mouseHeld, true);
 
         if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-            // Map screen mouse position into virtual coordinate space
-            float mx = (Gdx.input.getX() - offsetX) / scale;
-            float my = ((Gdx.graphics.getHeight() - Gdx.input.getY()) - offsetY) / scale;
 
             for (int i = 0; i < NUM_LEVELS; i++) {
                 if (!levelExists[i]) continue;

@@ -5,82 +5,87 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import cs.BabyLasagna.GameObj.Player;
 import cs.BabyLasagna.GameObj.PlayerProgress;
 
 public class Menu {
+    private static final int NUM_LEVELS = 5;
+    private static final float PEG_SIZE = 80f;
+    private static final float PEG_SPACING = 16f;
+
     private OrthographicCamera camera;
-    private Texture name;
-    private Texture level1;
-    private Texture level2;
+    private Texture logo;
     private Texture exit;
+    private Texture[] levelPegs = new Texture[NUM_LEVELS];
+    private Texture[] levelPegsCompleted = new Texture[NUM_LEVELS];
+    private Texture levelPegLocked;
 
     private boolean startGame = false;
     private int levelChoice = 0;
 
-    float levelButtonWidth = 112*2;
-    float levelButtonHeight = 32*2;
-
-    //button pos (Sorry Michael ik how u feel ab floats)
-    float buttonXpos1 = (Gdx.graphics.getWidth() / 2f) - (176*3 / 2f);
-    float buttonXpos2 = (Gdx.graphics.getWidth() / 2f) - (176*3 / 2f);
-    float buttonYpos1 = 175;
-    float buttonYpos2 = 115;
-
-    float exitXpos = Gdx.graphics.getWidth() - 80;
-    float exitYpos = Gdx.graphics.getHeight() - 80;
-
     private final PlayerProgress progress;
 
-    public Menu(PlayerProgress progress){
+    public Menu(PlayerProgress progress) {
         this.progress = progress;
 
-        name = new Texture("menu/logo.png");
-        //button = new Texture("menu/play.png");
-        level1 = new Texture ("menu/level1.png");
-        level2 = new Texture ("menu/level2.png");
-        exit = new Texture ("menu/exit.png");
+        logo = new Texture("menu/logo.png");
+        exit = new Texture("menu/exit.png");
+        levelPegLocked = new Texture("menu/levelpeg-locked.png");
+
+        for (int i = 0; i < NUM_LEVELS; i++) {
+            levelPegs[i] = new Texture("menu/levelpeg-" + (i + 1) + ".png");
+            levelPegsCompleted[i] = new Texture("menu/levelpeg-completed-" + (i + 1) + ".png");
+        }
+
         camera = new OrthographicCamera();
         updateViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
-    public void render(){
+    private float getPegX(int index) {
+        float totalWidth = NUM_LEVELS * PEG_SIZE + (NUM_LEVELS - 1) * PEG_SPACING;
+        float startX = (Gdx.graphics.getWidth() - totalWidth) / 2f;
+        return startX + index * (PEG_SIZE + PEG_SPACING);
+    }
+
+    private static final float PEG_Y = 140f;
+
+    public void render() {
         camera.update();
         Main.batch.setProjectionMatrix(camera.combined);
         Main.batch.begin();
-        drawLevelButton(level1, buttonXpos1, buttonYpos1, 0);
-        drawLevelButton(level2, buttonXpos2, buttonYpos2, 1);
-        Main.batch.draw(name,(Gdx.graphics.getWidth() / 2f) - (176*3 / 2f),250,176*3,32*3);
 
-        Main.batch.draw(exit,exitXpos,exitYpos,96,96);
+        Main.batch.draw(logo, (Gdx.graphics.getWidth() / 2f) - (176 * 3 / 2f), 250, 176 * 3, 32 * 3);
 
-        if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
+        for (int i = 0; i < NUM_LEVELS; i++) {
+            Texture tex;
+            if (progress.isCompleted(i)) {
+                tex = levelPegsCompleted[i];
+            } else if (progress.canAccess(i)) {
+                tex = levelPegs[i];
+            } else {
+                tex = levelPegLocked;
+            }
+            Main.batch.draw(tex, getPegX(i), PEG_Y, PEG_SIZE, PEG_SIZE);
+        }
 
-            float mouseX = Gdx.input.getX() * (camera.viewportWidth / Gdx.graphics.getWidth());;
+        float exitXpos = Gdx.graphics.getWidth() - 80f;
+        float exitYpos = Gdx.graphics.getHeight() - 80f;
+        Main.batch.draw(exit, exitXpos, exitYpos, 64, 64);
+
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+            float mouseX = Gdx.input.getX() * (camera.viewportWidth / Gdx.graphics.getWidth());
             float mouseY = (Gdx.graphics.getHeight() - Gdx.input.getY()) * (camera.viewportHeight / Gdx.graphics.getHeight());
 
-            //level1 button
-            if(mouseX > buttonXpos1 && mouseX < buttonXpos1 + levelButtonWidth
-                && mouseY > buttonYpos1 && mouseY < buttonYpos1 + levelButtonHeight){
-                if (progress.canAccess(0)) {
-                    levelChoice = 1;
-                    startGame = true;
+            for (int i = 0; i < NUM_LEVELS; i++) {
+                float px = getPegX(i);
+                if (mouseX > px && mouseX < px + PEG_SIZE && mouseY > PEG_Y && mouseY < PEG_Y + PEG_SIZE) {
+                    if (progress.canAccess(i)) {
+                        levelChoice = i + 1;
+                        startGame = true;
+                    }
                 }
             }
-            //level2 button
-            if(mouseX > buttonXpos2 && mouseX < buttonXpos2 + levelButtonWidth
-                && mouseY > buttonYpos2 && mouseY < buttonYpos2 + levelButtonHeight){
-                if (progress.canAccess(1)) {
-                    levelChoice = 2;
-                    startGame = true;
-                }
-            }
-            //exit button
-            if(mouseX > exitXpos && mouseX < exitXpos + levelButtonWidth
-                && mouseY > exitYpos && mouseY < exitYpos + levelButtonHeight){
+
+            if (mouseX > exitXpos && mouseX < exitXpos + 64 && mouseY > exitYpos && mouseY < exitYpos + 64) {
                 Gdx.app.exit();
             }
         }
@@ -88,32 +93,26 @@ public class Menu {
         Main.batch.end();
     }
 
-    public void updateViewport(int width, int height) {camera.setToOrtho(false, width, height);}
-    public boolean startGame(){
-        if(startGame){
-            startGame = false; //needs to be here this is what caused main menu not to pop up when the button is pressed from pause menu
+    public void updateViewport(int width, int height) { camera.setToOrtho(false, width, height); }
+
+    public boolean startGame() {
+        if (startGame) {
+            startGame = false;
             return true;
         }
         return false;
     }
 
-    public int getLevel(){
-        return levelChoice;
-    }
-    public void reset(){startGame = false;}
+    public int getLevel() { return levelChoice; }
+    public void reset() { startGame = false; }
 
-    public void dispose(){
-        name.dispose();
-        level1.dispose();
-        //level2.dispose();
+    public void dispose() {
+        logo.dispose();
         exit.dispose();
-    }
-
-    // Greys out locked levels
-    private void drawLevelButton(Texture texture, float x, float y, int levelIndex) {
-        float tint = progress.canAccess(levelIndex) ? 1f : 0.4f;
-        Main.batch.setColor(tint, tint, tint, 1f);
-        Main.batch.draw(texture, x, y, levelButtonWidth, levelButtonHeight);
-        Main.batch.setColor(1f, 1f, 1f, 1f);
+        levelPegLocked.dispose();
+        for (int i = 0; i < NUM_LEVELS; i++) {
+            levelPegs[i].dispose();
+            levelPegsCompleted[i].dispose();
+        }
     }
 }

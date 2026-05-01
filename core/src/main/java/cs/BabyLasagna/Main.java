@@ -17,13 +17,14 @@ public class Main extends ApplicationAdapter {
     private String currentLevel;
     private int currentLevelIndex = 0; // track index for progress reporting
 
-    private final PlayerProgress progress = new PlayerProgress();
+    private PlayerProgress progress;
 
     private int winWidth=1, winHeight=1;
 
     @Override
     public void create() {
         batch = new SpriteBatch();
+        progress = new PlayerProgress();
         menu = new Menu(progress);
         pausedMenu = new PausedMenu();
     }
@@ -39,19 +40,12 @@ public class Main extends ApplicationAdapter {
             menu.render();
             if(menu.startGame()){
                 int level = menu.getLevel();
-                if(level ==1 ){
-                    currentLevel = "level1";
-                    currentLevelIndex = 0;
+                if (level >= 1 && level <= 5) {
+                    currentLevel = "level" + level;
+                    currentLevelIndex = level - 1;
                     game = new Game(currentLevel, winWidth, winHeight);
                     paused = false;
                 }
-                if(level == 2) {
-                    currentLevel = "level2";
-                    currentLevelIndex = 1;
-                    game = new Game(currentLevel, winWidth, winHeight);
-                    paused = false;
-                }
-
             }
             return;
         }

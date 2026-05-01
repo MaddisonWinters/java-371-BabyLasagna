@@ -2,6 +2,8 @@ package cs.BabyLasagna;
 
 import java.util.ArrayList;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.loaders.resolvers.AbsoluteFileHandleResolver;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
@@ -176,7 +178,8 @@ public class Game {
 
         // Load map
         levelFile = level;
-        map = new TmxMapLoader().load("levels/" + levelFile + ".tmx");
+        String tmxPath = Gdx.files.local("Levels/" + levelFile + ".tmx").file().getAbsolutePath();
+        map = new TmxMapLoader(new AbsoluteFileHandleResolver()).load(tmxPath);
         renderer = new OrthogonalTiledMapRenderer(map, 1/16f);
 
         // Load objects

@@ -18,11 +18,13 @@ public class Menu {
     private Texture[] levelPegs = new Texture[NUM_LEVELS];
     private Texture[] levelPegsCompleted = new Texture[NUM_LEVELS];
     private Texture levelPegLocked;
+    private Texture levelPegPlaceholder;
 
     private boolean startGame = false;
     private int levelChoice = 0;
 
     private final PlayerProgress progress;
+    private final boolean[] levelExists = new boolean[NUM_LEVELS];
 
     public Menu(PlayerProgress progress) {
         this.progress = progress;
@@ -30,10 +32,12 @@ public class Menu {
         logo = new Texture("menu/logo.png");
         exit = new Texture("menu/exit.png");
         levelPegLocked = new Texture("menu/levelpeg-locked.png");
+        levelPegPlaceholder = new Texture("menu/levelpeg-placeholder.png");
 
         for (int i = 0; i < NUM_LEVELS; i++) {
             levelPegs[i] = new Texture("menu/levelpeg-" + (i + 1) + ".png");
             levelPegsCompleted[i] = new Texture("menu/levelpeg-completed-" + (i + 1) + ".png");
+            levelExists[i] = Gdx.files.local("Levels/level" + (i + 1) + ".tmx").exists();
         }
 
         camera = new OrthographicCamera();
@@ -57,6 +61,11 @@ public class Menu {
 
         for (int i = 0; i < NUM_LEVELS; i++) {
             Texture tex;
+            if (!levelExists[i]) {
+                tex = progress.canAccess(i) ? levelPegPlaceholder : levelPegLocked;
+                Main.batch.draw(tex, getPegX(i), PEG_Y, PEG_SIZE, PEG_SIZE);
+                continue;
+            }
             if (progress.isCompleted(i)) {
                 tex = levelPegsCompleted[i];
             } else if (progress.canAccess(i)) {
@@ -76,6 +85,7 @@ public class Menu {
             float mouseY = (Gdx.graphics.getHeight() - Gdx.input.getY()) * (camera.viewportHeight / Gdx.graphics.getHeight());
 
             for (int i = 0; i < NUM_LEVELS; i++) {
+                if (!levelExists[i]) continue;
                 float px = getPegX(i);
                 if (mouseX > px && mouseX < px + PEG_SIZE && mouseY > PEG_Y && mouseY < PEG_Y + PEG_SIZE) {
                     if (progress.canAccess(i)) {
@@ -110,6 +120,7 @@ public class Menu {
         logo.dispose();
         exit.dispose();
         levelPegLocked.dispose();
+        levelPegPlaceholder.dispose();
         for (int i = 0; i < NUM_LEVELS; i++) {
             levelPegs[i].dispose();
             levelPegsCompleted[i].dispose();

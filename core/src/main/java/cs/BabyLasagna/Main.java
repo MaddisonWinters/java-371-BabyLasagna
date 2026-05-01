@@ -2,6 +2,7 @@ package cs.BabyLasagna;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.Input;
@@ -24,9 +25,21 @@ public class Main extends ApplicationAdapter {
     @Override
     public void create() {
         batch = new SpriteBatch();
+        initLevelsFolder();
         progress = new PlayerProgress();
         menu = new Menu(progress);
         pausedMenu = new PausedMenu();
+    }
+
+    private void initLevelsFolder() {
+        Gdx.files.local("Levels").mkdirs();
+        String[] bundled = {"level1.tmx", "level2.tmx", "tileSet.png"};
+        for (String name : bundled) {
+            FileHandle dest = Gdx.files.local("Levels/" + name);
+            if (!dest.exists()) {
+                Gdx.files.internal("levels/" + name).copyTo(dest);
+            }
+        }
     }
 
     @Override

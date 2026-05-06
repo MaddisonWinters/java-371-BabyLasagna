@@ -206,8 +206,12 @@ tasks.register("jpackageWin", Exec) {
         '--win-shortcut',   // desktop shortcut
         '--win-menu',       // start menu entry
         '--win-dir-chooser',// lets user pick install directory
-        '--icon',           'icons/logo.ico', // needs .ico format, not .png
-        '--dest',           "$buildDir/jpackage"
+        '--icon',           'icons/logo.ico',
+        '--dest',           "$buildDir/jpackage",
+        '--java-options',   '--add-opens=java.base/java.lang=ALL-UNNAMED',
+        '--java-options',   '--add-opens=java.base/java.nio=ALL-UNNAMED',
+        '--add-modules',    'java.base,java.desktop,java.logging,java.net.http,jdk.unsupported',
+        '--java-options',   '--enable-native-access=ALL-UNNAMED'
 }
 
 distributions {

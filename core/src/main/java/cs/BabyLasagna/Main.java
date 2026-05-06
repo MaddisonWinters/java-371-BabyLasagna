@@ -35,7 +35,7 @@ public class Main extends ApplicationAdapter {
         Gdx.files.local("levels").mkdirs();
         String[] bundled = {"level1.tmx", "level2.tmx", "tileSet.png"};
         for (String name : bundled) {
-            FileHandle dest = Gdx.files.local("Levels/" + name);
+            FileHandle dest = Gdx.files.local("levels/" + name);
             if (!dest.exists()) {
                 Gdx.files.internal("levels/" + name).copyTo(dest);
             }

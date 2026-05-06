@@ -187,7 +187,7 @@ public class Game {
 
         // Load map
         levelFile = level;
-        String tmxPath = Gdx.files.local("Levels/" + levelFile + ".tmx").file().getAbsolutePath();
+        String tmxPath = Gdx.files.local("levels/" + levelFile + ".tmx").file().getAbsolutePath();
         map = new TmxMapLoader(new AbsoluteFileHandleResolver()).load(tmxPath);
         renderer = new OrthogonalTiledMapRenderer(map, 1/16f);
 

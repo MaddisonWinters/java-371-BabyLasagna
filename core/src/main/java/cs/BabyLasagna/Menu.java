@@ -53,7 +53,7 @@ public class Menu {
         for (int i = 0; i < NUM_LEVELS; i++) {
             levelPegs[i]          = new Texture("menu/levelpeg-"           + (i + 1) + ".png");
             levelPegsCompleted[i] = new Texture("menu/levelpeg-completed-" + (i + 1) + ".png");
-            levelExists[i] = Gdx.files.local("Levels/level" + (i + 1) + ".tmx").exists();
+            levelExists[i] = Gdx.files.local("levels/level" + (i + 1) + ".tmx").exists();
         }
 
         camera = new OrthographicCamera();

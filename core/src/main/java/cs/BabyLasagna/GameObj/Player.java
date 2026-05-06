@@ -132,6 +132,29 @@ public class Player extends LasagnaStack {
         // Movement with collisions
         super.update(deltaTime);
 
+        // Pasta
+        // Check for pasta bounce AFTER collisions
+        if (grounded && velocity.y <= 0) {
+            Rectangle feet = new Rectangle(
+                hitbox.x,
+                hitbox.y - 0.05f,   // tiny area below player
+                hitbox.width,
+                0.1f
+            );
+
+            for (GameObj obj : gameInt.getObjects()) {
+                if (obj instanceof Pasta) {
+                    if (feet.overlaps(obj.getHitbox())) {
+
+                        velocity.y = 14f;  // bounce
+                        grounded = false;
+
+                        break;
+                    }
+                }
+            }
+        }
+
         // Update damage timer
         if (damageTimer > 0) {
             damageTimer -= deltaTime;
@@ -181,7 +204,9 @@ public class Player extends LasagnaStack {
         LasagnaFlavor f = this.peekTop();
         switch (f) {
             case Pasta:
-                this.popTop();
+                if (throwPasta()) {
+                    this.popTop();
+                }
                 break;
             case Cheese:
                 throwCheese();
@@ -260,6 +285,44 @@ public class Player extends LasagnaStack {
         }
 
         gameInt.addObject(new Meat(gameInt, spawnX, spawnY));
+        return true;
+    }
+
+    private boolean throwPasta() {
+
+        int tileX;
+        if (facingRight) {
+            tileX = (int)Math.floor(hitbox.x + hitbox.width);
+        } else {
+            tileX = (int)Math.floor(hitbox.x - 1);
+        }
+
+        int tileY = (int)Math.floor(hitbox.y);
+
+        var layer = gameInt.getMap().getLayers().get("Wall");
+        if (layer == null) return false;
+
+        com.badlogic.gdx.maps.tiled.TiledMapTileLayer tileLayer =
+            (com.badlogic.gdx.maps.tiled.TiledMapTileLayer) layer;
+
+        // Blocked by tile
+        if (tileLayer.getCell(tileX, tileY) != null) {
+            return false;
+        }
+
+        float spawnX = tileX + 1f;
+        float spawnY = tileY + 11/16f;
+
+        // NOTE: thinner hitbox
+        Rectangle box = new Rectangle(spawnX, spawnY, 1f, 0.3f);
+
+        for (GameObj obj : gameInt.getObjects()) {
+            if (obj.isSolid() && obj.getHitbox().overlaps(box)) {
+                return false;
+            }
+        }
+
+        gameInt.addObject(new Pasta(gameInt, spawnX, spawnY));
         return true;
     }
 

@@ -17,6 +17,7 @@ public abstract class GameObj {
     protected static final float GRAVITY = -30f;
     public static final float MAX_TILES_PER_FRAME = 0.48f;
     public static final float MAX_VELOCITY = MAX_TILES_PER_FRAME / Game.MAX_DELTA_TIME;
+    protected boolean isSolid = false;
 
         /// Positional members
     protected final Rectangle hitbox = new Rectangle();
@@ -37,6 +38,7 @@ public abstract class GameObj {
     public final Vector2 getVelocity() { return new Vector2(velocity); }
     public boolean isGrounded() { return grounded; }
     public float getGravity() { return GRAVITY; }
+    public boolean isSolid() { return isSolid; }
 
         ///  Setters
     protected final void setPosition(Vector2 v) { hitbox.x=v.x; hitbox.y=v.y; }
@@ -69,6 +71,13 @@ public abstract class GameObj {
             endX,
             endY
         );
+        for (GameObj obj : gameInt.getObjects()) {
+            if (obj == this) continue;
+
+            if (obj.isSolid()) {
+                tiles.add(obj.hitbox);
+            }
+        }
     }
 
     public void getNearbyTags(Array<MapProperties> currentTags, Array<Rectangle> tileRects, Vector2 movement_vec) {
@@ -148,6 +157,7 @@ public abstract class GameObj {
 
         moveWithCollisions(near_tiles, velocity_scaled);
     }
+
 
         /// Constructors
     public GameObj(GameInterface g, float x, float y, float width, float height, float vx, float vy) {

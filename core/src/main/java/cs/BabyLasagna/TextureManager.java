@@ -22,25 +22,12 @@ public class TextureManager {
     public static void draw(SpriteBatch batch, TextureRegion tex, float x, float y, float w, float h, boolean flipX, boolean flipY) {
         batch.draw(
             tex,
-            (flipX
-                ? x + w
-                : x
-            ),
-            (flipY
-                ? y + h
-                : y
-            ),
-            (flipX
-                ? -w
-                : w
-            ),
-            (flipY
-                ? -h
-                : h
-            )
+            (flipX ? x + w : x),
+            (flipY ? y + h : y),
+            (flipX ? -w : w),
+            (flipY ? -h : h)
         );
     }
-
 
     public static class Lasagna {
         public enum LasagnaRegion {
@@ -70,6 +57,8 @@ public class TextureManager {
 
             public final String stackFile;
             public final String ingredientFile;
+            public final String abilityFile;
+
             private final TextureRegion[] stackTextures;
             private final TextureRegion[] ingredientTextures;
 
@@ -77,6 +66,7 @@ public class TextureManager {
             private LasagnaFlavor(String filename) {
                 stackFile = "BabyLasagna/" + filename;
                 ingredientFile = "Collectable/" + filename;
+                abilityFile  = "Ability/" + filename;
 
                 Texture stackSheet = new Texture(this.stackFile);
                 stackTextures = new TextureRegion[LasagnaRegion.values().length];
@@ -95,9 +85,19 @@ public class TextureManager {
                 ingredientTextures[0] = new TextureRegion(ingredientSheet); // Later: animated spritesheet
             }
 
+            // Seperate loader for abilities, allows for missing sprites
+            private TextureRegion[] abilityTextures = null;
+            public final TextureRegion getAbilityTex() {
+                if (abilityTextures == null) {
+                    Texture abilitySheet = new Texture(abilityFile);
+                    abilityTextures = new TextureRegion[1];
+                    abilityTextures[0] = new TextureRegion(abilitySheet);
+                }
+                return abilityTextures[0];
+            }
+
             // Returns the texture for the specified region of a lasagna stack
             public final TextureRegion getStackTex(LasagnaRegion reg) { return this.stackTextures[reg.ordinal()]; }
-
             public final TextureRegion getIngredientTex() { return ingredientTextures[0]; }
         }
     }

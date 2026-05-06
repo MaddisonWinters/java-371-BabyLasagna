@@ -50,6 +50,7 @@ public class Game {
         public final TiledMap getMap() { return game.map; }
         public final Player getPlayer() { return game.player; }
         public final ArrayList<GameObj> getObjects() { return game.objects; }
+        public final void addObject(GameObj obj) { game.objects.add(obj); }
         
         public final void restart() { game.shouldRestart = true; }
         public final void end(boolean success) { 

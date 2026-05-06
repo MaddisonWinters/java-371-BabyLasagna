@@ -5,6 +5,7 @@ import cs.BabyLasagna.GameObj.MyComponents.CoyoteTimeComponent;
 import cs.BabyLasagna.GameObj.MyComponents.FastFallingComponent;
 import cs.BabyLasagna.GameObj.MyComponents.JumpBufferComponent;
 import cs.BabyLasagna.GameObj.MyComponents.StateControllerComponent;
+
 import cs.BabyLasagna.GameObj.States.Player.*;
 import cs.BabyLasagna.TextureManager.Lasagna.*;
 
@@ -22,6 +23,8 @@ import cs.BabyLasagna.SoundManager.GameSnd.PlayerSnd;
 import cs.BabyLasagna.GameObj.UIHandler;
 import cs.BabyLasagna.GameObj.Collectables.Collectable;
 import cs.BabyLasagna.GameObj.CheeseBall;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
 
 
 public class Player extends LasagnaStack {
@@ -76,10 +79,6 @@ public class Player extends LasagnaStack {
 
         uidata.update();
 
-        if (damageTimer > 0) {
-            damageTimer -= deltaTime;
-            damageTimer = Math.max(damageTimer, 0.0f);
-        }
         // Use ability
         if (uidata.useAbility.press) {
             this.useAbilityTop();
@@ -110,7 +109,7 @@ public class Player extends LasagnaStack {
         }
         jumpBuffer.update(deltaTime);
 
-        // Jump (only if grounded/on ground)        
+        // Jump (only if grounded/on ground)
         if (jumpBuffer.hasBufferedJump() && (grounded || coyoteTime.canJump())) {
             velocity.y = JUMP_FORCE;
             coyoteTime.consume(); // prevent double jump
@@ -133,7 +132,13 @@ public class Player extends LasagnaStack {
         // Movement with collisions
         super.update(deltaTime);
 
-        // Win condition
+        // Update damage timer
+        if (damageTimer > 0) {
+            damageTimer -= deltaTime;
+            damageTimer = Math.max(damageTimer, 0.0f);
+        }
+
+        // Damage and win condition
         Array<MapProperties> tags = new Array<>();
         Array<Rectangle> tiles = new Array<>();
         getNearbyTags(tags, tiles, new Vector2(0,0));
@@ -154,7 +159,7 @@ public class Player extends LasagnaStack {
             }
         }
     }
-    
+
     public Player(GameInterface g, float x, float y) {
         super(g, x, y, true, true);
 
@@ -173,16 +178,22 @@ public class Player extends LasagnaStack {
 
     // Uses an ability using the top layer of the lasagna stack
     public void useAbilityTop() {
-        LasagnaFlavor f = this.popTop();
+        LasagnaFlavor f = this.peekTop();
         switch (f) {
             case Pasta:
+                this.popTop();
                 break;
             case Cheese:
                 throwCheese();
+                this.popTop();
                 break;
             case Meat:
+                if (throwMeat()) {
+                    this.popTop();
+                }
                 break;
             case Pepper:
+                this.popTop();
                 break;
             default:
                 System.err.print("Error: Unknown LasagnaFlavor: ");
@@ -214,6 +225,42 @@ public class Player extends LasagnaStack {
                 this.facingRight
             )
         );
+    }
+
+    private boolean throwMeat() {
+
+        int tileX;
+        if (facingRight) {
+            tileX = (int)Math.floor(hitbox.x + hitbox.width + 1);
+        } else {
+            tileX = (int)Math.floor(hitbox.x - 1);
+        }
+        int tileY = (int)Math.floor(hitbox.y);
+
+        // get tile layer
+        var layer = gameInt.getMap().getLayers().get("Wall");
+        if (layer == null) return false;
+
+        com.badlogic.gdx.maps.tiled.TiledMapTileLayer tileLayer = (com.badlogic.gdx.maps.tiled.TiledMapTileLayer) layer;
+
+        // if the tile map is there meat block does not get thrown or popped
+        if (tileLayer.getCell(tileX, tileY) != null) {
+            return false;
+        }
+
+        float spawnX = tileX;
+        float spawnY = tileY;
+
+        Rectangle box = new Rectangle(spawnX, spawnY, 1, 1);
+
+        for (GameObj obj : gameInt.getObjects()) {
+            if (obj.isSolid() && obj.getHitbox().overlaps(box)) {
+                return false;
+            }
+        }
+
+        gameInt.addObject(new Meat(gameInt, spawnX, spawnY));
+        return true;
     }
 
     // Ending the player ends the game. Distinct from kill() because there can be a post-death animation. 

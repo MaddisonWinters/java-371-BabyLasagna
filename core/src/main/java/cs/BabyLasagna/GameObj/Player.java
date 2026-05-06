@@ -36,6 +36,7 @@ public class Player extends LasagnaStack {
     public final RunState runState = new RunState();
     public final FallState fallState = new FallState();
     public final DeathState deathState = new DeathState();
+    public final WinState winState = new WinState();
 
     private static final float JUMP_FORCE = 12f;
     private static final float MOVE_SPEED = 6f;
@@ -229,12 +230,15 @@ public class Player extends LasagnaStack {
     public void kill() {
         if (this.getStateController().isInState(DeathState.class))
             return; // already dead
-        
+
         stateController.changeState(deathState);
     }
 
     public void win() {
-        // Should add a state transition thingy like in kill()
+        if (this.getStateController().isInState(WinState.class))
+            return; // already won
+
+        stateController.changeState(winState);
         gameInt.end(true);
     }
 

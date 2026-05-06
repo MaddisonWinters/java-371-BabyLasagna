@@ -1,78 +1,134 @@
 package cs.BabyLasagna;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import cs.BabyLasagna.GameObj.Player;
+import cs.BabyLasagna.GameObj.PlayerProgress;
 
 public class Menu {
+    private static final int NUM_LEVELS = 5;
+
+    // Virtual (reference) resolution all layout constants are defined against
+    private static final float VWIDTH  = 640f;
+    private static final float VHEIGHT = 480f;
+
+    private static final float PEG_SIZE    = 80f;
+    private static final float PEG_SPACING = 16f;
+    private static final float PEG_Y       = 140f;
+
+    private static final float LOGO_W = 528f;
+    private static final float LOGO_H = 96f;
+    private static final float LOGO_X = (VWIDTH - LOGO_W) / 2f;
+    private static final float LOGO_Y = 250f;
+
+    private static final float EXIT_SIZE = 64f;
+    private static final float EXIT_X = VWIDTH  - 80f;
+    private static final float EXIT_Y = VHEIGHT - 80f;
+
     private OrthographicCamera camera;
-    private Texture name;
-    private Texture level1;
-    private Texture level2;
+    private float scale = 1f, offsetX = 0f, offsetY = 0f;
+
+    private Texture logo;
     private Texture exit;
+    private final Texture[] levelPegs          = new Texture[NUM_LEVELS];
+    private final Texture[] levelPegsCompleted = new Texture[NUM_LEVELS];
+    private Texture levelPegLocked;
+    private Texture levelPegPlaceholder;
 
     private boolean startGame = false;
     private int levelChoice = 0;
 
-    float levelButtonWidth = 112*2;
-    float levelButtonHeight = 32*2;
+    private final PlayerProgress progress;
+    private final boolean[] levelExists = new boolean[NUM_LEVELS];
 
-    //button pos (Sorry Michael ik how u feel ab floats)
-    float buttonXpos1 = (Gdx.graphics.getWidth() / 2f) - (176*3 / 2f);
-    float buttonXpos2 = (Gdx.graphics.getWidth() / 2f) - (176*3 / 2f);
-    float buttonYpos1 = 175;
-    float buttonYpos2 = 115;
+    public Menu(PlayerProgress progress) {
+        this.progress = progress;
 
-    float exitXpos = Gdx.graphics.getWidth() - 80;
-    float exitYpos = Gdx.graphics.getHeight() - 80;
+        logo             = new Texture("menu/logo.png");
+        exit             = new Texture("menu/exit.png");
+        levelPegLocked      = new Texture("menu/levelpeg-locked.png");
+        levelPegPlaceholder = new Texture("menu/levelpeg-placeholder.png");
 
-    public Menu(){
+        for (int i = 0; i < NUM_LEVELS; i++) {
+            levelPegs[i]          = new Texture("menu/levelpeg-"           + (i + 1) + ".png");
+            levelPegsCompleted[i] = new Texture("menu/levelpeg-completed-" + (i + 1) + ".png");
+            levelExists[i] = Gdx.files.local("Levels/level" + (i + 1) + ".tmx").exists();
+        }
 
-        name = new Texture("menu/logo.png");
-        //button = new Texture("menu/play.png");
-        level1 = new Texture ("menu/level1.png");
-        level2 = new Texture ("menu/level2.png");
-        exit = new Texture ("menu/exit.png");
         camera = new OrthographicCamera();
         updateViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
-    public void render(){
+    // Returns the virtual X of peg slot i
+    private float pegVX(int i) {
+        float totalWidth = NUM_LEVELS * PEG_SIZE + (NUM_LEVELS - 1) * PEG_SPACING;
+        return (VWIDTH - totalWidth) / 2f + i * (PEG_SIZE + PEG_SPACING);
+    }
+
+    private static final float HOVER_MULT = 1.1f;
+    private static final float PRESS_MULT = 0.9f;
+
+    // Draws a texture at virtual coordinates, scaled and offset to screen space
+    private void drawScaled(Texture tex, float vx, float vy, float vw, float vh) {
+        Main.batch.draw(tex, offsetX + vx * scale, offsetY + vy * scale, vw * scale, vh * scale);
+    }
+
+    // Draws a sprite centered on its virtual rect, scaling on hover/press
+    private void drawInteractive(Texture tex, float vx, float vy, float vw, float vh,
+                                 float mx, float my, boolean mouseHeld, boolean interactive) {
+        boolean hovering = interactive
+            && mx > vx && mx < vx + vw
+            && my > vy && my < vy + vh;
+        float mult = hovering ? (mouseHeld ? PRESS_MULT : HOVER_MULT) : 1f;
+        float vcx = vx + vw / 2f;
+        float vcy = vy + vh / 2f;
+        drawScaled(tex, vcx - vw * mult / 2f, vcy - vh * mult / 2f, vw * mult, vh * mult);
+    }
+
+    public void render() {
         camera.update();
         Main.batch.setProjectionMatrix(camera.combined);
         Main.batch.begin();
 
-        Main.batch.draw(name,(Gdx.graphics.getWidth() / 2f) - (176*3 / 2f),250,176*3,32*3);
-        Main.batch.draw(level1,buttonXpos1,buttonYpos1,levelButtonWidth,levelButtonHeight);
-        Main.batch.draw(level2,buttonXpos2,buttonYpos2,levelButtonWidth,levelButtonHeight);
-        Main.batch.draw(exit,exitXpos,exitYpos,96,96);
+        // Virtual mouse position (computed once, used for hover, press, and click)
+        float mx = (Gdx.input.getX() - offsetX) / scale;
+        float my = ((Gdx.graphics.getHeight() - Gdx.input.getY()) - offsetY) / scale;
+        boolean mouseHeld = Gdx.input.isButtonPressed(Input.Buttons.LEFT);
 
-        if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
+        drawInteractive(logo, LOGO_X, LOGO_Y, LOGO_W, LOGO_H, mx, my, mouseHeld, true);
 
-            float mouseX = Gdx.input.getX() * (camera.viewportWidth / Gdx.graphics.getWidth());;
-            float mouseY = (Gdx.graphics.getHeight() - Gdx.input.getY()) * (camera.viewportHeight / Gdx.graphics.getHeight());
-
-            //level1 button
-            if(mouseX > buttonXpos1 && mouseX < buttonXpos1 + levelButtonWidth
-                && mouseY > buttonYpos1 && mouseY < buttonYpos1 + levelButtonHeight){
-                levelChoice = 1;
-                startGame = true;
+        for (int i = 0; i < NUM_LEVELS; i++) {
+            Texture tex;
+            if (!levelExists[i]) {
+                tex = progress.canAccess(i) ? levelPegPlaceholder : levelPegLocked;
+            } else if (progress.isCompleted(i)) {
+                tex = levelPegsCompleted[i];
+            } else if (progress.canAccess(i)) {
+                tex = levelPegs[i];
+            } else {
+                tex = levelPegLocked;
             }
-            //level2 button
-            if(mouseX > buttonXpos2 && mouseX < buttonXpos2 + levelButtonWidth
-                && mouseY > buttonYpos2 && mouseY < buttonYpos2 + levelButtonHeight){
-                levelChoice = 2;
-                startGame = true;
+            boolean interactive = levelExists[i] && progress.canAccess(i);
+            drawInteractive(tex, pegVX(i), PEG_Y, PEG_SIZE, PEG_SIZE, mx, my, mouseHeld, interactive);
+        }
+
+        drawInteractive(exit, EXIT_X, EXIT_Y, EXIT_SIZE, EXIT_SIZE, mx, my, mouseHeld, true);
+
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+
+            for (int i = 0; i < NUM_LEVELS; i++) {
+                if (!levelExists[i]) continue;
+                float px = pegVX(i);
+                if (mx > px && mx < px + PEG_SIZE && my > PEG_Y && my < PEG_Y + PEG_SIZE) {
+                    if (progress.canAccess(i)) {
+                        levelChoice = i + 1;
+                        startGame = true;
+                    }
+                }
             }
-            //exit button
-            if(mouseX > exitXpos && mouseX < exitXpos + levelButtonWidth
-                && mouseY > exitYpos && mouseY < exitYpos + levelButtonHeight){
+
+            if (mx > EXIT_X && mx < EXIT_X + EXIT_SIZE && my > EXIT_Y && my < EXIT_Y + EXIT_SIZE) {
                 Gdx.app.exit();
             }
         }
@@ -80,24 +136,32 @@ public class Menu {
         Main.batch.end();
     }
 
-    public void updateViewport(int width, int height) {camera.setToOrtho(false, width, height);}
-    public boolean startGame(){
-        if(startGame){
-            startGame = false; //needs to be here this is what caused main menu not to pop up when the button is pressed from pause menu
+    public void updateViewport(int width, int height) {
+        camera.setToOrtho(false, width, height);
+        scale   = Math.min(width / VWIDTH, height / VHEIGHT);
+        offsetX = (width  - VWIDTH  * scale) / 2f;
+        offsetY = (height - VHEIGHT * scale) / 2f;
+    }
+
+    public boolean startGame() {
+        if (startGame) {
+            startGame = false;
             return true;
         }
         return false;
     }
 
-    public int getLevel(){
-        return levelChoice;
-    }
-    public void reset(){startGame = false;}
+    public int getLevel() { return levelChoice; }
+    public void reset()   { startGame = false; }
 
-    public void dispose(){
-        name.dispose();
-        level1.dispose();
-        //level2.dispose();
+    public void dispose() {
+        logo.dispose();
         exit.dispose();
+        levelPegLocked.dispose();
+        levelPegPlaceholder.dispose();
+        for (int i = 0; i < NUM_LEVELS; i++) {
+            levelPegs[i].dispose();
+            levelPegsCompleted[i].dispose();
+        }
     }
 }

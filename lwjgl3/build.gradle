@@ -22,10 +22,10 @@ sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
 application.mainClass = 'cs.BabyLasagna.lwjgl3.Lwjgl3Launcher'
 application.applicationName = appName
 eclipse.project.name = appName + '-lwjgl3'
-java.sourceCompatibility = 21
-java.targetCompatibility = 21
+java.sourceCompatibility = 17
+java.targetCompatibility = 17
 if (JavaVersion.current().isJava9Compatible()) {
-        compileJava.options.release.set(21)
+        compileJava.options.release.set(17)
 }
 
 dependencies {
@@ -156,6 +156,63 @@ construo {
 // Equivalent to the jar task; here for compatibility with gdx-setup.
 tasks.register('dist') {
   dependsOn 'jar'
+}
+
+
+tasks.register("jpackageLinux", Exec) {
+    dependsOn jar
+    group "build"
+    description "Creates a Linux .deb installer using jpackage"
+
+    doFirst {
+        mkdir "$buildDir/jpackage-input"
+        copy {
+            from jar.archiveFile
+            into "$buildDir/jpackage-input"
+        }
+    }
+
+    commandLine 'jpackage',
+        '--input',          "$buildDir/jpackage-input",
+        '--name',           appName,
+        '--main-jar',       jar.archiveFileName.get(),
+        '--main-class',     application.mainClass.get(),
+        '--type',           'deb',          // or 'rpm' if you prefer
+        '--app-version',    projectVersion,
+        '--icon',           'icons/logo.png',
+        '--linux-shortcut',                 // creates a desktop shortcut
+        '--dest',           "$buildDir/jpackage"
+}
+
+tasks.register("jpackageWin", Exec) {
+    dependsOn jar
+    group "build"
+    description "Creates a Windows .exe installer using jpackage"
+
+    doFirst {
+        mkdir "$buildDir/jpackage-input"
+        copy {
+            from jar.archiveFile
+            into "$buildDir/jpackage-input"
+        }
+    }
+
+    commandLine 'jpackage',
+        '--input',          "$buildDir/jpackage-input",
+        '--name',           appName,
+        '--main-jar',       jar.archiveFileName.get(),
+        '--main-class',     application.mainClass.get(),
+        '--type',           'exe',
+        '--app-version',    projectVersion,
+        '--win-shortcut',   // desktop shortcut
+        '--win-menu',       // start menu entry
+        '--win-dir-chooser',// lets user pick install directory
+        '--icon',           'icons/logo.ico',
+        '--dest',           "$buildDir/jpackage",
+        '--java-options',   '--add-opens=java.base/java.lang=ALL-UNNAMED',
+        '--java-options',   '--add-opens=java.base/java.nio=ALL-UNNAMED',
+        '--add-modules',    'java.base,java.desktop,java.logging,java.net.http,jdk.unsupported',
+        '--java-options',   '--enable-native-access=ALL-UNNAMED'
 }
 
 distributions {

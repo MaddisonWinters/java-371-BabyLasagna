@@ -23,8 +23,8 @@ Go to the releases page, download the ".exe" file for the latest release. On som
 Click the X button to exit the game  
 Click one of the numbered buttons to play the corresponding level  
 A green button means the corresponding level has been completed  
-A lock symbol means the level is not yet unlocked
-A (...) symbol means that there is no level file corresponding to that level number (feel free to create your own with Tiled)  
+A lock symbol means the level is not yet unlocked  
+A (...) symbol means that there is no level file  corresponding to that level number (feel free to create your own with Tiled)  
 
 
 ## Pause Menu

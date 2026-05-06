@@ -1,4 +1,4 @@
-package cs.BabyLasagna.GameObj.MyComponents;
+package cs.BabyLasagna.GameObj.Components;
 
 import cs.BabyLasagna.GameObj.State;
 

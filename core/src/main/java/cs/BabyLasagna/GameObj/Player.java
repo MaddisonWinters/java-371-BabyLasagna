@@ -1,11 +1,10 @@
 package cs.BabyLasagna.GameObj;
 
 import cs.BabyLasagna.Game.GameInterface;
-import cs.BabyLasagna.GameObj.MyComponents.CoyoteTimeComponent;
-import cs.BabyLasagna.GameObj.MyComponents.FastFallingComponent;
-import cs.BabyLasagna.GameObj.MyComponents.JumpBufferComponent;
-import cs.BabyLasagna.GameObj.MyComponents.StateControllerComponent;
-
+import cs.BabyLasagna.GameObj.Components.CoyoteTimeComponent;
+import cs.BabyLasagna.GameObj.Components.FastFallingComponent;
+import cs.BabyLasagna.GameObj.Components.JumpBufferComponent;
+import cs.BabyLasagna.GameObj.Components.StateControllerComponent;
 import cs.BabyLasagna.GameObj.States.Player.*;
 import cs.BabyLasagna.TextureManager.Lasagna.*;
 
@@ -20,7 +19,6 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.maps.MapProperties;
 
 import cs.BabyLasagna.SoundManager.GameSnd.PlayerSnd;
-import cs.BabyLasagna.GameObj.UIHandler;
 import cs.BabyLasagna.GameObj.Collectables.Collectable;
 import cs.BabyLasagna.GameObj.CheeseBall;
 import com.badlogic.gdx.math.Rectangle;
@@ -78,11 +76,6 @@ public class Player extends LasagnaStack {
         }
 
         uidata.update();
-
-        // Use ability
-        if (uidata.useAbility.press) {
-            this.useAbilityTop();
-        }
 
         // Use ability
         if (uidata.useAbility.press) {

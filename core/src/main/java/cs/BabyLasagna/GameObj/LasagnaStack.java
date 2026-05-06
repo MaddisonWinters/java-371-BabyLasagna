@@ -3,6 +3,7 @@ package cs.BabyLasagna.GameObj;
 import java.util.ArrayDeque;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
@@ -13,8 +14,10 @@ import cs.BabyLasagna.Game.GameInterface;
 import cs.BabyLasagna.TextureManager.Lasagna.LasagnaFlavor;
 import cs.BabyLasagna.TextureManager.Lasagna.LasagnaRegion;
 import cs.BabyLasagna.Levels.Util;
+import cs.BabyLasagna.TextureManager.LegAnim;
 
 public class LasagnaStack extends GameObj {
+
 
     public final float HEAD_DECORATIVE_SIZE = 3f / Game.PIXELS_PER_TILE;
 
@@ -48,22 +51,41 @@ public class LasagnaStack extends GameObj {
         LasagnaFlavor top_flavor = peekTop();
 
         float yoff = 0f;
+        float bob = 0f;
 
         // Draw legs
         if (hasLegs) {
+            TextureRegion frame = LegAnim.walk.getFrame();
+            if (frame == LegAnim.walk.legFrames[0] || frame == LegAnim.walk.legFrames[2])
+                bob = 1f / Game.PIXELS_PER_TILE;
+
+            // Animated legs when moving
+            if (velocity.x != 0 && isGrounded()) LegAnim.walk.update(deltaTime);
             TextureManager.draw(
                 batch,
-                // Take the flavor of the bottom layer
-                bot_flavor.getStackTex(LasagnaRegion.Legs),
+                LegAnim.walk.getFrame(),
                 hitbox.x,
-                hitbox.y,
+                hitbox.y + bob,
                 LasagnaRegion.Legs.reg.gw,
                 LasagnaRegion.Legs.reg.gh,
                 !facingRight,
                 false
             );
-            // Update y offset
             yoff += LasagnaRegion.Legs.reg.gh;
+            // Bottom-most layer
+            TextureManager.draw(
+                batch,
+                // Take the flavor of the bottom layer
+                bot_flavor.getStackTex(LasagnaRegion.Bottom),
+                hitbox.x,
+                hitbox.y + yoff + bob,
+                LasagnaRegion.Bottom.reg.gw,
+                LasagnaRegion.Bottom.reg.gh,
+                !facingRight,
+                false
+            );
+            // Update y offset
+            yoff += LasagnaRegion.Bottom.reg.gh;
         }
 
         // Draw each layer
@@ -76,7 +98,7 @@ public class LasagnaStack extends GameObj {
                 batch,
                 layer.flavor.getStackTex(layer.region),
                 hitbox.x,
-                hitbox.y + yoff,
+                hitbox.y + yoff + bob,
                 layer.region.reg.gw,
                 layer.region.reg.gh,
                 !facingRight,
@@ -93,7 +115,7 @@ public class LasagnaStack extends GameObj {
                 // Take flavor of top layer
                 top_flavor.getStackTex(LasagnaRegion.Head),
                 hitbox.x,
-                hitbox.y + yoff,
+                hitbox.y + yoff + bob,
                 LasagnaRegion.Head.reg.gw,
                 LasagnaRegion.Head.reg.gh,
                 !facingRight,
@@ -208,8 +230,10 @@ public class LasagnaStack extends GameObj {
     protected void setHitboxHeight() {
         hitbox.height = 0;
 
-        if (hasLegs)
-            hitbox.height += LasagnaRegion.Legs.reg.gh;
+        if (hasLegs) {
+            hitbox.height += LasagnaRegion.Bottom.reg.gh + LasagnaRegion.Legs.reg.gh;
+            hitbox.y += LasagnaRegion.Bottom.reg.gh;
+        }
         else
             hitbox.height += LasagnaRegion.Layer1.reg.gh;
 

@@ -203,7 +203,7 @@ public class Game {
         updateViewport(winWidth, winHeight);
         updateCamera(1.0f);
 
-        GameMsc.playMain();
+        //GameMsc.playMain();
     }
 
     public void dispose() {}

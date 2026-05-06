@@ -22,25 +22,12 @@ public class TextureManager {
     public static void draw(SpriteBatch batch, TextureRegion tex, float x, float y, float w, float h, boolean flipX, boolean flipY) {
         batch.draw(
             tex,
-            (flipX
-                ? x + w
-                : x
-            ),
-            (flipY
-                ? y + h
-                : y
-            ),
-            (flipX
-                ? -w
-                : w
-            ),
-            (flipY
-                ? -h
-                : h
-            )
+            (flipX ? x + w : x),
+            (flipY ? y + h : y),
+            (flipX ? -w : w),
+            (flipY ? -h : h)
         );
     }
-
 
     public static class Lasagna {
         public enum LasagnaRegion {
@@ -70,6 +57,8 @@ public class TextureManager {
 
             public final String stackFile;
             public final String ingredientFile;
+            public final String abilityFile;
+
             private final TextureRegion[] stackTextures;
             private final TextureRegion[] ingredientTextures;
 
@@ -77,6 +66,7 @@ public class TextureManager {
             private LasagnaFlavor(String filename) {
                 stackFile = "BabyLasagna/" + filename;
                 ingredientFile = "Collectable/" + filename;
+                abilityFile  = "Ability/" + filename;
 
                 Texture stackSheet = new Texture(this.stackFile);
                 stackTextures = new TextureRegion[LasagnaRegion.values().length];
@@ -95,10 +85,105 @@ public class TextureManager {
                 ingredientTextures[0] = new TextureRegion(ingredientSheet); // Later: animated spritesheet
             }
 
+            // Seperate loader for abilities, allows for missing sprites
+            private TextureRegion[] abilityTextures = null;
+            public final TextureRegion getAbilityTex() {
+                if (abilityTextures == null) {
+                    Texture abilitySheet = new Texture(abilityFile);
+                    abilityTextures = new TextureRegion[1];
+                    abilityTextures[0] = new TextureRegion(abilitySheet);
+                }
+                return abilityTextures[0];
+            }
+
             // Returns the texture for the specified region of a lasagna stack
             public final TextureRegion getStackTex(LasagnaRegion reg) { return this.stackTextures[reg.ordinal()]; }
-
             public final TextureRegion getIngredientTex() { return ingredientTextures[0]; }
+        }
+    }
+
+    public static class Abilities {
+        public static class Cheese {
+            private static final TextureRegion[] globTextures;
+            private static final TextureRegion[] splatTextures; 
+
+            private static final int GLOB_TEX_CNT = 1;
+            private static final int SPLAT_TEX_CNT = 1;
+
+            static {
+                String globFile = "Collectable/Cheese.png";
+                String splatFile = "Abilities/CheeseSplat.png";
+
+                Texture globSheet = new Texture(globFile);
+                Texture splatSheet = new Texture(splatFile);
+
+                globTextures = new TextureRegion[GLOB_TEX_CNT];
+                splatTextures = new TextureRegion[SPLAT_TEX_CNT];
+
+                for (int i = 0; i < GLOB_TEX_CNT; ++i) {
+                    globTextures[i] = new TextureRegion(
+                        globSheet,
+                        0, // Hardcoded for now
+                        0, // ^
+                        6,
+                        16
+                    );
+                }
+
+                for (int i = 0; i < SPLAT_TEX_CNT; ++i) {
+                    splatTextures[i] = new TextureRegion(
+                        splatSheet,
+                        0, // Hardcoded for now
+                        0, // ^
+                        6,
+                        16
+                    );
+                }
+            }
+
+            public static final TextureRegion getGlobTex() { return globTextures[0]; }
+            public static final TextureRegion getSplatTex() { return splatTextures[0]; }
+        }
+
+        public static class PepperWheel {
+            private static final TextureRegion[] wheelTextures; 
+            private static final TextureRegion[] explosionTextures;
+
+            public static final int SIZE = 12;
+            public static final int EXPLOSION_SIZE = 18;
+
+            public static final float WHEEL_ROTATE_SPEED = 8.0f;
+            public static final float EXPLOSION_DURATION = 0.5f;
+
+            static {
+                String wheelFile = "Abilities/PepperWheel.png";
+                String explosionFile = "Abilities/Explosion.png";
+
+                Texture wheelSheet = new Texture(wheelFile);
+                Texture explosionSheet = new Texture(explosionFile);
+
+                wheelTextures = TextureRegion.split(wheelSheet, SIZE, SIZE)[0];
+                explosionTextures = TextureRegion.split(explosionSheet, EXPLOSION_SIZE, EXPLOSION_SIZE)[0];
+            }
+
+            public static final TextureRegion getWheelTex(float timestamp) {
+                // 3 - ... because I made the texture rotate backwards on accident
+                int index = 3 - (int)Math.floor(
+                    timestamp * WHEEL_ROTATE_SPEED
+                ) % 4;
+
+                return wheelTextures[index];
+            }
+
+            public static final TextureRegion getExplosionTex(float timestamp) {
+                int index = (int)Math.floor(
+                    4.0f * timestamp / EXPLOSION_DURATION
+                );
+
+                if (index > 3) index = 3;
+
+                return explosionTextures[index];
+            }
         }
     }
 }

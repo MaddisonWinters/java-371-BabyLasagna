@@ -5,6 +5,7 @@ import cs.BabyLasagna.GameObj.MyComponents.CoyoteTimeComponent;
 import cs.BabyLasagna.GameObj.MyComponents.FastFallingComponent;
 import cs.BabyLasagna.GameObj.MyComponents.JumpBufferComponent;
 import cs.BabyLasagna.GameObj.MyComponents.StateControllerComponent;
+
 import cs.BabyLasagna.GameObj.States.Player.*;
 import cs.BabyLasagna.TextureManager.Lasagna.*;
 
@@ -21,6 +22,9 @@ import com.badlogic.gdx.maps.MapProperties;
 import cs.BabyLasagna.SoundManager.GameSnd.PlayerSnd;
 import cs.BabyLasagna.GameObj.UIHandler;
 import cs.BabyLasagna.GameObj.Collectables.Collectable;
+import cs.BabyLasagna.GameObj.CheeseBall;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
 
 
 public class Player extends LasagnaStack {
@@ -43,16 +47,46 @@ public class Player extends LasagnaStack {
 
     private UIHandler uidata;
 
-    private static boolean debug = true;
-
     @Override
     public void update(float deltaTime) {
+        boolean cheeseStick = false;
+
+        // Game object interactions
+        Iterator<GameObj> oi = gameInt.getObjects().iterator();
+        while(oi.hasNext()) {
+            GameObj obj = oi.next();
+
+            // Collectables
+            if (obj instanceof Collectable) {
+                Collectable col = (Collectable) obj;
+
+                if (hitbox.overlaps(col.hitbox)) {
+                    col.collect(this);
+                    oi.remove();
+                }
+            }
+            // Cheese
+            else if (obj instanceof CheeseBall) {
+                CheeseBall chb = (CheeseBall) obj;
+                if (!chb.isSplatted()) continue; // Ignore projectile cheese balls
+
+                if (hitbox.overlaps(chb.hitbox)) {
+                    this.grounded = true;
+                    cheeseStick = true;
+                }
+            }
+        }
 
         uidata.update();
 
-        if (damageTimer > 0) {
-            damageTimer -= deltaTime;
-            damageTimer = Math.max(damageTimer, 0.0f);
+        // Use ability
+        if (uidata.useAbility.press) {
+            this.useAbilityTop();
+        }
+
+        // Use ability
+        if (uidata.useAbility.press) {
+            this.useAbilityTop();
         }
 
         if (stack.isEmpty()) {
@@ -62,30 +96,23 @@ public class Player extends LasagnaStack {
         // Makes sure the player doesn't stay in Idle
         stateController.update(deltaTime);
 
+        // Set horizontal velocity
+        velocity.x = uidata.getMoveXDir() * MOVE_SPEED;
+
+        // Handle facing direction
+        if (uidata.move_x == UIHandler.Ternary.Neg)
+            facingRight = false;
+        else if (uidata.move_x == UIHandler.Ternary.Pos)
+            facingRight = true;
+
         // Update coyote timer
         coyoteTime.update(deltaTime, grounded);
 
-        velocity.x = uidata.getMoveXDir() * MOVE_SPEED;
-
+        // Buffer jump button
         if (uidata.jump.press) {
             jumpBuffer.recordJumpPress();
         }
-
         jumpBuffer.update(deltaTime);
-
-        if (debug) {
-            if (uidata.addTop.press) { addTop(LasagnaFlavor.Pasta); PlayerSnd.grow(); }
-            if (uidata.addBot.press) { addBottom(LasagnaFlavor.Pasta); PlayerSnd.grow(); }
-            if (uidata.popTop.press) { popTop(); PlayerSnd.shrink(); }
-            if (uidata.popBot.press) { popBottom(); PlayerSnd.shrink(); }
-        }
-
-        if (uidata.move_x == UIHandler.Ternary.Neg) {
-            facingRight = false;
-        }
-        else if (uidata.move_x == UIHandler.Ternary.Pos) {
-            facingRight = true;
-        }
 
         // Jump (only if grounded/on ground)
         if (jumpBuffer.hasBufferedJump() && (grounded || coyoteTime.canJump())) {
@@ -95,6 +122,7 @@ public class Player extends LasagnaStack {
             PlayerSnd.jump();
         }
 
+        // Apply fast fall
         velocity.y = fastFall.apply(
             velocity.y,
             GRAVITY,
@@ -103,23 +131,42 @@ public class Player extends LasagnaStack {
             uidata.move_y == UIHandler.Ternary.Neg
         );
 
+        if (cheeseStick && velocity.y < 0)
+            velocity.y = Math.max(-CheeseBall.STICKY_VEL, velocity.y);
+
+        // Movement with collisions
         super.update(deltaTime);
 
-        // Collectables
-        Iterator<GameObj> oi = gameInt.getObjects().iterator();
-        while(oi.hasNext()) {
-            GameObj obj = oi.next();
+        // Pasta
+        // Check for pasta bounce AFTER collisions
+        if (grounded && velocity.y <= 0) {
+            Rectangle feet = new Rectangle(
+                hitbox.x,
+                hitbox.y - 0.05f,   // tiny area below player
+                hitbox.width,
+                0.1f
+            );
 
-            if (!(obj instanceof Collectable)) continue;
-            Collectable col = (Collectable) obj;
-            
-            if (hitbox.overlaps(obj.hitbox)) {
-                col.collect(this);
-                oi.remove();
+            for (GameObj obj : gameInt.getObjects()) {
+                if (obj instanceof Pasta) {
+                    if (feet.overlaps(obj.getHitbox())) {
+
+                        velocity.y = 14f;  // bounce
+                        grounded = false;
+
+                        break;
+                    }
+                }
             }
         }
 
-        // Win condition
+        // Update damage timer
+        if (damageTimer > 0) {
+            damageTimer -= deltaTime;
+            damageTimer = Math.max(damageTimer, 0.0f);
+        }
+
+        // Damage and win condition
         Array<MapProperties> tags = new Array<>();
         Array<Rectangle> tiles = new Array<>();
         getNearbyTags(tags, tiles, new Vector2(0,0));
@@ -140,7 +187,7 @@ public class Player extends LasagnaStack {
             }
         }
     }
-    
+
     public Player(GameInterface g, float x, float y) {
         super(g, x, y, true, true);
 
@@ -157,6 +204,35 @@ public class Player extends LasagnaStack {
         return stateController;
     }
 
+    // Uses an ability using the top layer of the lasagna stack
+    public void useAbilityTop() {
+        LasagnaFlavor f = this.peekTop();
+        switch (f) {
+            case Pasta:
+                if (throwPasta()) {
+                    this.popTop();
+                }
+                break;
+            case Cheese:
+                throwCheese();
+                this.popTop();
+                break;
+            case Meat:
+                if (throwMeat()) {
+                    this.popTop();
+                }
+                break;
+            case Pepper:
+                this.popTop();
+                throwPepper();
+                break;
+            default:
+                System.err.print("Error: Unknown LasagnaFlavor: ");
+                System.err.println(f);
+                break;
+        }
+    }
+
     public void kill() {
         if (this.getStateController().isInState(DeathState.class))
             return; // already dead
@@ -167,6 +243,106 @@ public class Player extends LasagnaStack {
     public void win() {
         // Should add a state transition thingy like in kill()
         gameInt.end(true);
+    }
+
+    private void throwCheese() {
+        gameInt.getObjects().add(
+            new CheeseBall(
+                gameInt,
+                this.getCenterX(),
+                this.getCenterY(),
+                this.velocity.x,
+                this.velocity.y,
+                this.facingRight
+            )
+        );
+    }
+
+    private boolean throwMeat() {
+
+        int tileX;
+        if (facingRight) {
+            tileX = (int)Math.floor(hitbox.x + hitbox.width + 1);
+        } else {
+            tileX = (int)Math.floor(hitbox.x - 1);
+        }
+        int tileY = (int)Math.floor(hitbox.y);
+
+        // get tile layer
+        var layer = gameInt.getMap().getLayers().get("Wall");
+        if (layer == null) return false;
+
+        com.badlogic.gdx.maps.tiled.TiledMapTileLayer tileLayer = (com.badlogic.gdx.maps.tiled.TiledMapTileLayer) layer;
+
+        // if the tile map is there meat block does not get thrown or popped
+        if (tileLayer.getCell(tileX, tileY) != null) {
+            return false;
+        }
+
+        float spawnX = tileX;
+        float spawnY = tileY;
+
+        Rectangle box = new Rectangle(spawnX, spawnY, 1, 1);
+
+        for (GameObj obj : gameInt.getObjects()) {
+            if (obj.isSolid() && obj.getHitbox().overlaps(box)) {
+                return false;
+            }
+        }
+
+        gameInt.addObject(new Meat(gameInt, spawnX, spawnY));
+        return true;
+    }
+
+    private boolean throwPasta() {
+
+        int tileX;
+        if (facingRight) {
+            tileX = (int)Math.floor(hitbox.x + hitbox.width);
+        } else {
+            tileX = (int)Math.floor(hitbox.x - 1);
+        }
+
+        int tileY = (int)Math.floor(hitbox.y);
+
+        var layer = gameInt.getMap().getLayers().get("Wall");
+        if (layer == null) return false;
+
+        com.badlogic.gdx.maps.tiled.TiledMapTileLayer tileLayer =
+            (com.badlogic.gdx.maps.tiled.TiledMapTileLayer) layer;
+
+        // Blocked by tile
+        if (tileLayer.getCell(tileX, tileY) != null) {
+            return false;
+        }
+
+        float spawnX = tileX + 1f;
+        float spawnY = tileY + 11/16f;
+
+        // NOTE: thinner hitbox
+        Rectangle box = new Rectangle(spawnX, spawnY, 1f, 0.3f);
+
+        for (GameObj obj : gameInt.getObjects()) {
+            if (obj.isSolid() && obj.getHitbox().overlaps(box)) {
+                return false;
+            }
+        }
+
+        gameInt.addObject(new Pasta(gameInt, spawnX, spawnY));
+        return true;
+    }
+
+    private void throwPepper() {
+        gameInt.getObjects().add(
+            new Pepper(
+                gameInt,
+                this.getCenterX(),
+                this.getCenterY(),
+                this.velocity.x,
+                this.velocity.y,
+                this.facingRight
+            )
+        );
     }
 
     // Ending the player ends the game. Distinct from kill() because there can be a post-death animation. 

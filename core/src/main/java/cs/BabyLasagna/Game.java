@@ -1,6 +1,7 @@
 package cs.BabyLasagna;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -53,6 +54,7 @@ public class Game {
         public final TiledMap getMap() { return game.map; }
         public final Player getPlayer() { return game.player; }
         public final ArrayList<GameObj> getObjects() { return game.objects; }
+        public final void addObject(GameObj obj) { game.objects.add(obj); }
         
         public final void restart() { game.shouldRestart = true; }
         public final void end(boolean success) { 
@@ -78,7 +80,13 @@ public class Game {
         if (!running || shouldRestart) return;
         deltaTime = Math.min(deltaTime, MAX_DELTA_TIME);
 
-        for (GameObj obj : objects) {
+        Iterator<GameObj> oi = objects.iterator();
+        while (oi.hasNext()) {
+            GameObj obj = oi.next();
+            if (obj.shouldRemove()) {
+                oi.remove();
+                continue;
+            }
             obj.update(deltaTime);
         }
 
@@ -166,6 +174,7 @@ public class Game {
 
                 if (i == null) continue;
 
+                colLayer.setCell(x,y,null);
                 objects.add(i);
             }
         }

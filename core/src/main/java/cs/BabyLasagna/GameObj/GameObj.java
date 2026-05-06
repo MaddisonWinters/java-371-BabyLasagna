@@ -17,6 +17,7 @@ public abstract class GameObj {
     protected static final float GRAVITY = -30f;
     public static final float MAX_TILES_PER_FRAME = 0.48f;
     public static final float MAX_VELOCITY = MAX_TILES_PER_FRAME / Game.MAX_DELTA_TIME;
+    protected boolean isSolid = false;
 
         /// Positional members
     protected final Rectangle hitbox = new Rectangle();
@@ -25,15 +26,21 @@ public abstract class GameObj {
 
         /// Environment
     protected final GameInterface gameInt;
+    private boolean shouldBeRemoved = false;
 
         /// Getters
-    public final Vector2 getPosition() { return new Vector2(hitbox.x, hitbox.y); }
     public final float getX() { return hitbox.x; }
     public final float getY() { return hitbox.y; }
+    public final Vector2 getPosition() { return new Vector2(hitbox.x, hitbox.y); }
+    public final float getCenterX() { return hitbox.x + hitbox.width*0.5f; }
+    public final float getCenterY() { return hitbox.y + hitbox.height*0.5f; }
+    public final Vector2 getCenterPosition() { return new Vector2(getCenterX(), getCenterY()); }
     public final Rectangle getHitbox() { return new Rectangle(hitbox); }
     public final Vector2 getVelocity() { return new Vector2(velocity); }
     public boolean isGrounded() { return grounded; }
     public float getGravity() { return GRAVITY; }
+    public boolean isSolid() { return isSolid; }
+    public final boolean shouldRemove() { return shouldBeRemoved; }
 
         ///  Setters
     protected final void setPosition(Vector2 v) { hitbox.x=v.x; hitbox.y=v.y; }
@@ -41,6 +48,7 @@ public abstract class GameObj {
     protected final void setY(float y) { hitbox.y=y; }
     protected final void setHitbox(Rectangle r) { hitbox.set(r); }
     protected final void setVelocity(Vector2 v) { velocity.set(v); }
+    protected final void setShouldRemoveSelf() { shouldBeRemoved = true; }
 
         /// Abstract member functions
     // batch.begin() and batch.end() are not to be called within this function
@@ -66,6 +74,13 @@ public abstract class GameObj {
             endX,
             endY
         );
+        for (GameObj obj : gameInt.getObjects()) {
+            if (obj == this) continue;
+
+            if (obj.isSolid()) {
+                tiles.add(obj.hitbox);
+            }
+        }
     }
 
     public void getNearbyTags(Array<MapProperties> currentTags, Array<Rectangle> tileRects, Vector2 movement_vec) {
@@ -111,6 +126,8 @@ public abstract class GameObj {
 
             float dy = (hitbox.y + hitbox.height/2f) - (tile.y + tile.height/2f);
 
+            // Note: Why are there nested if statements here checking velocity?
+            //       This doesn't happen for x, and I'm not sure what the significance is. 
             if (dy > 0) {
                 if (velocity.y <= 0) {
                     hitbox.y = tile.y + tile.height;
@@ -143,6 +160,7 @@ public abstract class GameObj {
 
         moveWithCollisions(near_tiles, velocity_scaled);
     }
+
 
         /// Constructors
     public GameObj(GameInterface g, float x, float y, float width, float height, float vx, float vy) {

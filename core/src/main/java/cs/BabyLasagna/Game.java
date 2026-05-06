@@ -1,6 +1,7 @@
 package cs.BabyLasagna;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -64,7 +65,13 @@ public class Game {
         if (!running || shouldRestart) return;
         deltaTime = Math.min(deltaTime, MAX_DELTA_TIME);
 
-        for (GameObj obj : objects) {
+        Iterator<GameObj> oi = objects.iterator();
+        while (oi.hasNext()) {
+            GameObj obj = oi.next();
+            if (obj.shouldRemove()) {
+                oi.remove();
+                continue;
+            }
             obj.update(deltaTime);
         }
 

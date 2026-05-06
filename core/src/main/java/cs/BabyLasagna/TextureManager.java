@@ -144,5 +144,46 @@ public class TextureManager {
             public static final TextureRegion getGlobTex() { return globTextures[0]; }
             public static final TextureRegion getSplatTex() { return splatTextures[0]; }
         }
+
+        public static class PepperWheel {
+            private static final TextureRegion[] wheelTextures; 
+            private static final TextureRegion[] explosionTextures;
+
+            public static final int SIZE = 12;
+            public static final int EXPLOSION_SIZE = 18;
+
+            public static final float WHEEL_ROTATE_SPEED = 8.0f;
+            public static final float EXPLOSION_DURATION = 0.5f;
+
+            static {
+                String wheelFile = "Abilities/PepperWheel.png";
+                String explosionFile = "Abilities/Explosion.png";
+
+                Texture wheelSheet = new Texture(wheelFile);
+                Texture explosionSheet = new Texture(explosionFile);
+
+                wheelTextures = TextureRegion.split(wheelSheet, SIZE, SIZE)[0];
+                explosionTextures = TextureRegion.split(explosionSheet, EXPLOSION_SIZE, EXPLOSION_SIZE)[0];
+            }
+
+            public static final TextureRegion getWheelTex(float timestamp) {
+                // 3 - ... because I made the texture rotate backwards on accident
+                int index = 3 - (int)Math.floor(
+                    timestamp * WHEEL_ROTATE_SPEED
+                ) % 4;
+
+                return wheelTextures[index];
+            }
+
+            public static final TextureRegion getExplosionTex(float timestamp) {
+                int index = (int)Math.floor(
+                    4.0f * timestamp / EXPLOSION_DURATION
+                );
+
+                if (index > 3) index = 3;
+
+                return explosionTextures[index];
+            }
+        }
     }
 }

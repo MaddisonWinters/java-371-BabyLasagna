@@ -183,6 +183,7 @@ public class Player extends LasagnaStack {
             case Meat:
                 break;
             case Pepper:
+                throwPepper();
                 break;
             default:
                 System.err.print("Error: Unknown LasagnaFlavor: ");
@@ -206,6 +207,19 @@ public class Player extends LasagnaStack {
     private void throwCheese() {
         gameInt.getObjects().add(
             new CheeseBall(
+                gameInt,
+                this.getCenterX(),
+                this.getCenterY(),
+                this.velocity.x,
+                this.velocity.y,
+                this.facingRight
+            )
+        );
+    }
+
+    private void throwPepper() {
+        gameInt.getObjects().add(
+            new Pepper(
                 gameInt,
                 this.getCenterX(),
                 this.getCenterY(),

@@ -10,9 +10,12 @@ public abstract class Projectile extends GameObj {
     protected boolean facing_right = false;
     protected boolean stuck = false; // Whether the projectile is stuck onto something
 
-    public Projectile(GameInterface g, float x, float y, float vx, float vy, float source_vel, boolean facing_right) {
+    public Projectile(GameInterface g, float x, float y, float vx, float vy, float size, float source_vel, boolean facing_right) {
         super(
-            g, x, y, 0.5f, 0.5f,
+            g, 
+            x-(0.5f*size), 
+            y-(0.5f*size), 
+            size, size,
             source_vel*vx,
             source_vel*vy
         );
@@ -30,6 +33,8 @@ public abstract class Projectile extends GameObj {
     }
 
     protected abstract void hit(Rectangle target);
+
+    protected float bounciness() { return 0.5f; }
 
     // Move and collide with general list of hitboxes | Primary collision function
     @Override
@@ -89,7 +94,7 @@ public abstract class Projectile extends GameObj {
                 }
             }
 
-            velocity.y *= -0.8f; // Bounce off of top/bottom surface
+            velocity.y *= -bounciness(); // Bounce off of top/bottom surface
         }
     }
 }

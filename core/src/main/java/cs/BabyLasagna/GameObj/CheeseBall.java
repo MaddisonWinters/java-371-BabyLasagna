@@ -23,7 +23,7 @@ public class CheeseBall extends Projectile {
     public static final float STICKY_VEL = 1.6f;
 
     public CheeseBall(GameInterface g, float x, float y, float vx, float vy, boolean facing_right) {
-        super(g,x,y,vx,vy,SOURCE_VEL,facing_right);
+        super(g,x,y,vx,vy,BALL_SIZE,SOURCE_VEL,facing_right);
 
         velocity.x += (this.facing_right ? INITIAL_VX : -INITIAL_VX);
         velocity.y += INITIAL_VY;
@@ -40,6 +40,9 @@ public class CheeseBall extends Projectile {
         hitbox.x = alignTile.x - 0.5f*hitbox.width;
         if (facing_right) hitbox.x += 1.0f;
     }
+
+    @Override
+    protected float bounciness() { return 0.8f; }
 
     public boolean isSplatted() { return stuck; }
 

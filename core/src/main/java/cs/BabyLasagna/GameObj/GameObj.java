@@ -26,6 +26,7 @@ public abstract class GameObj {
 
         /// Environment
     protected final GameInterface gameInt;
+    private boolean shouldBeRemoved = false;
 
         /// Getters
     public final float getX() { return hitbox.x; }
@@ -39,6 +40,7 @@ public abstract class GameObj {
     public boolean isGrounded() { return grounded; }
     public float getGravity() { return GRAVITY; }
     public boolean isSolid() { return isSolid; }
+    public final boolean shouldRemove() { return shouldBeRemoved; }
 
         ///  Setters
     protected final void setPosition(Vector2 v) { hitbox.x=v.x; hitbox.y=v.y; }
@@ -46,6 +48,7 @@ public abstract class GameObj {
     protected final void setY(float y) { hitbox.y=y; }
     protected final void setHitbox(Rectangle r) { hitbox.set(r); }
     protected final void setVelocity(Vector2 v) { velocity.set(v); }
+    protected final void setShouldRemoveSelf() { shouldBeRemoved = true; }
 
         /// Abstract member functions
     // batch.begin() and batch.end() are not to be called within this function

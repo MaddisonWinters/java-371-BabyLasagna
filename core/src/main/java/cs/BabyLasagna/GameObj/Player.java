@@ -219,6 +219,7 @@ public class Player extends LasagnaStack {
                 break;
             case Pepper:
                 this.popTop();
+                throwPepper();
                 break;
             default:
                 System.err.print("Error: Unknown LasagnaFlavor: ");
@@ -324,6 +325,19 @@ public class Player extends LasagnaStack {
 
         gameInt.addObject(new Pasta(gameInt, spawnX, spawnY));
         return true;
+    }
+
+    private void throwPepper() {
+        gameInt.getObjects().add(
+            new Pepper(
+                gameInt,
+                this.getCenterX(),
+                this.getCenterY(),
+                this.velocity.x,
+                this.velocity.y,
+                this.facingRight
+            )
+        );
     }
 
     // Ending the player ends the game. Distinct from kill() because there can be a post-death animation. 

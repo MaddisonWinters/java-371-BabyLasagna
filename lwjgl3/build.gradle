@@ -179,6 +179,7 @@ tasks.register("jpackageLinux", Exec) {
         '--main-class',     application.mainClass.get(),
         '--type',           'deb',          // or 'rpm' if you prefer
         '--app-version',    projectVersion,
+        '--icon',           'icons/logo.png',
         '--linux-shortcut',                 // creates a desktop shortcut
         '--dest',           "$buildDir/jpackage"
 }
